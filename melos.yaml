@@ -1,0 +1,25 @@
+name: neurobleed_alert
+packages:
+  - apps/**
+  - packages/**
+
+scripts:
+  analyze:
+    run: melos exec -c 1 -- "flutter analyze"
+    description: Run flutter analyze on all packages
+
+  format:
+    run: melos exec -- "dart format --fix ."
+    description: Format all Dart code
+
+  test:
+    run: melos exec -- "flutter test"
+    description: Run tests on all packages
+
+  pub_get:
+    run: melos exec -- "flutter pub get"
+    description: Get dependencies for all packages
+
+  clean:
+    run: melos exec -- "flutter clean"
+    description: Clean all packages

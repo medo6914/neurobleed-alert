@@ -1,0 +1,54 @@
+# Flutter
+**/build/
+**/.dart_tool/
+**/.packages
+**/.pub/
+**/pubspec.lock
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+**/docker-compose.override.yml
+
+# Python
+.pytest_cache/
+*.egg-info/
+.venv/
+venv/
+
+# Hardware
+**/build/
+**/CMakeFiles/
+**/cmake-build-*/

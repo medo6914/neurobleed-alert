@@ -1,0 +1,72 @@
+# Staging environment — production-like but with relaxed security
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.staging.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - fastapi
+      - web_flutter
+
+  web_flutter:
+    image: neurobleed/web:staging
+    build:
+      context: ../../apps/web_flutter
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      API_BASE_URL: https://staging.neurobleed.com
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: neurobleed_staging
+      POSTGRES_USER: neurobleed
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+      - ../../database/postgres/init:/docker-entrypoint-initdb.d
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_staging_data:/data
+    restart: always
+
+  fastapi:
+    image: neurobleed/backend:staging
+    build:
+      context: ../../backend/fastapi
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://neurobleed:${POSTGRES_PASSWORD}@postgres:5432/neurobleed_staging
+      REDIS_URL: redis://redis:6379/0
+      ENVIRONMENT: staging
+      SECRET_KEY: ${SECRET_KEY}
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+  ai-gateway:
+    image: neurobleed/ai-gateway:staging
+    ports:
+      - "8001:8001"
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    depends_on:
+      - redis
+    restart: always
+
+volumes:
+  postgres_staging_data:
+  redis_staging_data:

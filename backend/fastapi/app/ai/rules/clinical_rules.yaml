@@ -1,0 +1,112 @@
+rules:
+  - name: "critical_bradycardia"
+    condition: "heart_rate < 40 AND spo2 < 90"
+    action: "OVERRIDE_ALERT_CRITICAL"
+    priority: 1000
+    severity: "critical"
+    description: "Heart rate below 40 with SpO2 below 90% - life threatening"
+
+  - name: "severe_bradycardia"
+    condition: "heart_rate < 50"
+    action: "ALERT_BRADYCARDIA"
+    priority: 900
+    severity: "high"
+    description: "Heart rate below 50 bpm"
+
+  - name: "tachycardia_critical"
+    condition: "heart_rate > 140"
+    action: "ALERT_TACHYCARDIA"
+    priority: 900
+    severity: "high"
+    description: "Heart rate above 140 bpm"
+
+  - name: "desaturation_cascade"
+    condition: "spo2 < 85 AND systolic_bp < 90"
+    action: "ESCALATE_TO_EMERGENCY"
+    priority: 999
+    severity: "critical"
+    description: "SpO2 below 85% with hypotension - immediate escalation"
+
+  - name: "severe_hypoxia"
+    condition: "spo2 < 80"
+    action: "ALERT_CRITICAL_HYPOXIA"
+    priority: 950
+    severity: "critical"
+    description: "SpO2 below 80% - critical hypoxia"
+
+  - name: "moderate_hypoxia"
+    condition: "spo2 < 90 AND spo2 >= 80"
+    action: "ALERT_HYPOXIA"
+    priority: 700
+    severity: "high"
+    description: "SpO2 between 80-90%"
+
+  - name: "ich_suspicion"
+    condition: "rso2_drop > 15 AND gcs < 13"
+    action: "ALERT_ICH_SUSPECTED"
+    priority: 950
+    severity: "critical"
+    description: "rSO2 drop >15% with GCS <13 - ICH suspected"
+
+  - name: "icp_elevation_risk"
+    condition: "rso2 < 50 AND systolic_bp > 160"
+    action: "ALERT_ICP_ELEVATED"
+    priority: 900
+    severity: "high"
+    description: "rSO2 below 50 with hypertension - ICP elevation risk"
+
+  - name: "cerebral_ischemia_risk"
+    condition: "rso2 < 55"
+    action: "ALERT_CEREBRAL_ISCHEMIA"
+    priority: 800
+    severity: "high"
+    description: "rSO2 below 55% - cerebral ischemia risk"
+
+  - name: "hemodynamic_instability"
+    condition: "systolic_bp < 90 OR systolic_bp > 200"
+    action: "ALERT_HEMODYNAMIC"
+    priority: 850
+    severity: "high"
+    description: "Systolic BP outside safe range"
+
+  - name: "hypertensive_urgency"
+    condition: "systolic_bp > 180 AND diastolic_bp > 110"
+    action: "ALERT_HYPERTENSIVE_URGENCY"
+    priority: 800
+    severity: "high"
+    description: "Severe hypertension requiring immediate attention"
+
+  - name: "poor_signal_quality"
+    condition: "signal_quality < 0.5"
+    action: "FLAG_LOW_CONFIDENCE"
+    priority: 500
+    severity: "warning"
+    description: "Signal quality below 0.5 - assessment confidence reduced"
+
+  - name: "high_motion_artifact"
+    condition: "motion_artifact > 0.3"
+    action: "FLAG_MOTION_ARTIFACT"
+    priority: 500
+    severity: "warning"
+    description: "Motion artifact above 0.3 - readings may be unreliable"
+
+  - name: "tachycardia_with_hypoxia"
+    condition: "heart_rate > 120 AND spo2 < 91"
+    action: "ESCALATE_TACHY_HYPOXIA"
+    priority: 880
+    severity: "high"
+    description: "Tachycardia with borderline hypoxia - clinical concern"
+
+  - name: "bradycardia_with_hypoxia"
+    condition: "heart_rate < 55 AND spo2 < 92"
+    action: "ESCALATE_BRADY_HYPOXIA"
+    priority: 880
+    severity: "high"
+    description: "Bradycardia with borderline hypoxia - clinical concern"
+
+  - name: "normal_readings"
+    condition: "heart_rate BETWEEN 60 AND 100 AND spo2 >= 95 AND systolic_bp BETWEEN 100 AND 130"
+    action: "NO_ACTION"
+    priority: 100
+    severity: "info"
+    description: "All vital signs within normal range"

@@ -1,0 +1,161 @@
+Summary,Issue Type,Epic Link,Priority,Labels,Description,Phase
+EPIC 1: Enterprise Architecture,Epic,,Highest,epic,"Multi-Tenant Architecture, Organization, Hospital, Department, Branch Management",
+Multi-Tenant Database Schema,Task,EPIC 1: Enterprise Architecture,Highest,enterprise,"Separate data per hospital/organization via tenant_id",5
+Tenant Isolation Middleware,Task,EPIC 1: Enterprise Architecture,Highest,enterprise,"Automatically scope all queries to current tenant",4
+Organization CRUD API,Task,EPIC 1: Enterprise Architecture,Highest,enterprise,Create/read/update/delete organizations,4
+Hospital CRUD API,Task,EPIC 1: Enterprise Architecture,Highest,enterprise,"Hospitals belong to organizations, scoped by tenant",4
+Department CRUD API,Task,EPIC 1: Enterprise Architecture,High,enterprise,Departments within hospitals,4
+Branch CRUD API,Task,EPIC 1: Enterprise Architecture,High,enterprise,Branches within hospitals,4
+Super Admin Panel,Task,EPIC 1: Enterprise Architecture,High,admin,"Manage tenants, hospitals, branches from Flutter Web",3
+EPIC 2: Identity & Security,Epic,,Highest,epic,"RBAC, Permissions, Audit, Sessions, Refresh Tokens, MFA",
+RBAC Role Definitions,Task,EPIC 2: Identity & Security,Highest,security,"Roles: Super Admin, Hospital Admin, Doctor, Nurse, Paramedic",6
+Permission Matrix Design,Task,EPIC 2: Identity & Security,Highest,security,"Define all permissions per resource + action",6
+Fine-Grained Permission Enforcement,Task,EPIC 2: Identity & Security,Highest,security,Middleware checks permissions per endpoint,6
+Audit Log System,Task,EPIC 2: Identity & Security,Highest,security,"Log all state-changing operations to audit_log table",6
+Session Management API,Task,EPIC 2: Identity & Security,Highest,security,"List active sessions, revoke by ID",6
+Refresh Token Rotation,Task,EPIC 2: Identity & Security,Highest,security,"Rotate refresh tokens on each use, 30-day expiry",6
+MFA Architecture (Future),Task,EPIC 2: Identity & Security,Lowest,security,"Design for future TOTP/WebAuthn, NOT implemented yet",
+Login Screen (Flutter),Task,EPIC 2: Identity & Security,Highest,mobile,"Email/password login with validation",2
+Register Screen (Flutter),Task,EPIC 2: Identity & Security,Highest,mobile,"Self-registration with role selection",2
+Role-Based UI Navigation,Task,EPIC 2: Identity & Security,Highest,mobile,"Show/hide screens based on user role",2
+EPIC 3: API & Integration,Epic,,High,epic,"API Versioning, OpenAPI, WebSocket, MQTT, FHIR, HL7",
+API Versioning Strategy,Task,EPIC 3: API & Integration,Highest,api,"URL-prefix versioning /v1/, /v2/",4
+OpenAPI / Swagger Documentation,Task,EPIC 3: API & Integration,Highest,api,Auto-generated from FastAPI routes,4
+WebSocket Server,Task,EPIC 3: API & Integration,Highest,realtime,Real-time vital sign broadcasting,4
+MQTT Broker Integration,Task,EPIC 3: API & Integration,High,device,"Device telemetry ingestion via MQTT",4
+FHIR R4 API Adapter,Task,EPIC 3: API & Integration,Medium,medical,Translate internal models to/from FHIR resources,8
+HL7 v2 Message Parser,Task,EPIC 3: API & Integration,Medium,medical,Parsing HL7 messages for hospital integration,8
+Third-Party API Rate Limiter,Task,EPIC 3: API & Integration,High,api,Configurable rate limits per external API,4
+EPIC 4: Localization,Epic,,Highest,epic,"Arabic, English, RTL, LTR, Dynamic Switching",
+Arabic Translation Strings,Task,EPIC 4: Localization,Highest,i18n,All UI strings translated to Arabic,2
+English Translation Strings,Task,EPIC 4: Localization,Highest,i18n,All UI strings in English,2
+RTL Layout Support,Task,EPIC 4: Localization,Highest,i18n,Flutter RTL rendering for Arabic,2
+LTR Layout Support,Task,EPIC 4: Localization,Highest,i18n,Standard left-to-right for English,2
+Dynamic Language Switcher,Task,EPIC 4: Localization,Highest,i18n,"Switch language at runtime, no restart",2
+Backend Localized Messages,Task,EPIC 4: Localization,High,i18n,"API error messages in AR/EN based on Accept-Language",4
+EPIC 5: Observability,Epic,,High,epic,"Logging, Metrics, Tracing, Prometheus, Grafana, Alerting",
+Centralized Logging (Loki),Task,EPIC 5: Observability,High,ops,Collect all service logs in Loki,14
+Application Metrics (Prometheus),Task,EPIC 5: Observability,High,ops,Expose metrics from FastAPI + Flutter,14
+Distributed Tracing (Tempo),Task,EPIC 5: Observability,Medium,ops,Trace requests across services,14
+Prometheus Exporters,Task,EPIC 5: Observability,High,ops,"Export Redis, PostgreSQL metrics",14
+Grafana Dashboards,Task,EPIC 5: Observability,High,obs,"System, Medical, AI, Device dashboards",14
+Health Check Endpoints,Task,EPIC 5: Observability,Highest,ops,/health for all services,4
+Alerting Rules (Grafana),Task,EPIC 5: Observability,Medium,ops,Alert on critical metric thresholds,14
+Sentry Error Tracking,Task,EPIC 5: Observability,High,ops,"Flutter + Python crash reporting",2
+EPIC 6: Performance & Scalability,Epic,,High,epic,"Scaling, Redis, Rate Limiting, Workers, Queue",
+Horizontal Scaling Design,Task,EPIC 6: Performance & Scalability,High,ops,Stateless services behind load balancer,14
+Load Balancer Config (Nginx),Task,EPIC 6: Performance & Scalability,High,ops,"Reverse proxy, round-robin",14
+Redis Cache Layer,Task,EPIC 6: Performance & Scalability,Highest,cache,Cache frequent queries + session store,4
+Database Connection Pooling,Task,EPIC 6: Performance & Scalability,Highest,db,SQLAlchemy async pool management,4
+API Rate Limiting,Task,EPIC 6: Performance & Scalability,Highest,security,Enforce limits per endpoint per tenant,6
+Background Workers (ARQ),Task,EPIC 6: Performance & Scalability,High,backend,"Async task processing for sync, reports",4
+Redis Streams Queue,Task,EPIC 6: Performance & Scalability,Highest,messaging,Message queue for telemetry + alerts,4
+EPIC 7: Backup & Reliability,Epic,,High,epic,"Backup, PITR, DR, Replication, HA",
+Automatic Database Backup,Task,EPIC 7: Backup & Reliability,High,ops,Daily pg_dump to S3-compatible storage,14
+Point-in-Time Recovery,Task,EPIC 7: Backup & Reliability,Medium,ops,WAL archiving for PITR,14
+Disaster Recovery Playbook,Task,EPIC 7: Backup & Reliability,High,ops,Documented recovery procedures,14
+Streaming Replication,Task,EPIC 7: Backup & Reliability,Medium,ops,PostgreSQL hot standby setup,14
+High Availability Docker Config,Task,EPIC 7: Backup & Reliability,Medium,ops,Multi-instance failover setup,14
+EPIC 8: AI Platform,Epic,,High,epic,"AI Gateway, TinyML, RAG, Knowledge Base, PubMed, XAI",
+AI Gateway Microservice,Task,EPIC 8: AI Platform,High,ai,FastAPI gateway for all AI services,7
+Cloud AI Risk Engine (XGBoost),Task,EPIC 8: AI Platform,High,ai,XGBoost ensemble risk assessment,7
+TinyML Model Export,Task,EPIC 8: AI Platform,Medium,ai,Convert model to TFLite for edge,7
+RAG Engine (LangChain + FAISS),Task,EPIC 8: AI Platform,Medium,ai,"Retrieval-augmented generation for queries",7
+Medical Knowledge Base,Task,EPIC 8: AI Platform,Medium,ai,PostgreSQL + pgvector for embeddings,7
+PubMed Integration,Task,EPIC 8: AI Platform,Medium,ai,Fetch and index medical literature,7
+Explainable AI (SHAP/LIME),Task,EPIC 8: AI Platform,Medium,ai,Feature importance per prediction,7
+AI Monitoring Dashboard,Task,EPIC 8: AI Platform,Medium,ai,"Model drift, latency, accuracy metrics",7
+EPIC 9: Medical Platform,Epic,,Highest,epic,"Patients, Devices, Alerts, Reports, Risk, Emergency",
+Patient CRUD Backend API,Task,EPIC 9: Medical Platform,Highest,medical,"Create, read, update, delete patients",8
+Patient List Screen (Mobile),Task,EPIC 9: Medical Platform,Highest,mobile,"Search, filter, sort patients",2
+Patient Detail Screen (Mobile),Task,EPIC 9: Medical Platform,Highest,mobile,"Full patient info + vitals display",2
+Patient Management (Web),Task,EPIC 9: Medical Platform,Highest,dashboard,Dashboard for hospital admin,3
+Device CRUD Backend API,Task,EPIC 9: Medical Platform,Highest,medical,"Register, pair, update devices",8
+Device Management Screen,Task,EPIC 9: Medical Platform,Highest,mobile,"List, pair, diagnostics view",2
+Alert CRUD Backend API,Task,EPIC 9: Medical Platform,Highest,medical,"Create, list, acknowledge alerts",8
+Alert List Screen (Mobile),Task,EPIC 9: Medical Platform,Highest,mobile,Filter by severity and acknowledge,2
+Clinical Reports Generator,Task,EPIC 9: Medical Platform,High,medical,PDF report generation,8
+Risk Assessment Dashboard,Task,EPIC 9: Medical Platform,High,dashboard,Display AI risk scores per patient,8
+Knowledge Center,Task,EPIC 9: Medical Platform,Medium,medical,Searchable medical guidelines,8
+Emergency Workflow,Task,EPIC 9: Medical Platform,High,medical,"SOS button, emergency contact sequence",8
+EPIC 10: Hardware Platform,Epic,,Highest,epic,frozen,"Firmware, Drivers, BLE, Cellular, OTA, PCB",
+ESP32-S3 Firmware Scaffold,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+MAX30102 PPG Driver,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+NIRS rSO2 Driver,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+MPU6050 IMU Driver,Task,EPIC 10: Hardware Platform,High,firmware,frozen,10
+Signal Processing Pipeline,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+Feature Extraction,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+TinyML Runtime,Task,EPIC 10: Hardware Platform,High,firmware,frozen,10
+BLE 5.0 Manager,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+SIM7000G Cellular Module,Task,EPIC 10: Hardware Platform,High,firmware,frozen,10
+OTA Update Mechanism,Task,EPIC 10: Hardware Platform,High,firmware,frozen,10
+Battery Management,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+Power Optimization,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+Watchdog Timer,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+Error Recovery,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+Device Pairing (BLE),Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+Device Provisioning Flow,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+Device Registration API,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,9
+Device Diagnostics API,Task,EPIC 10: Hardware Platform,High,firmware,frozen,9
+Firmware Versioning,Task,EPIC 10: Hardware Platform,Highest,firmware,frozen,10
+EPIC 11: Testing,Epic,,Highest,epic,"Unit, Widget, Integration, API, Performance, Security",
+Flutter Unit Tests,Task,EPIC 11: Testing,Highest,test,"Test entities, utils, tokens",14
+Flutter Widget Tests,Task,EPIC 11: Testing,Highest,test,"Test all components + screens",14
+Flutter Integration Tests,Task,EPIC 11: Testing,Highest,test,"Critical flows: auth, patients, alerts",14
+Backend API Tests (pytest),Task,EPIC 11: Testing,Highest,test,"Test all endpoints",14
+Backend Unit Tests (pytest),Task,EPIC 11: Testing,Highest,test,"Test services, models",14
+Performance / Load Tests,Task,EPIC 11: Testing,High,test,"k6 or locust for API endpoints",14
+Security Tests,Task,EPIC 11: Testing,High,test,"OWASP scan, penetration test",14
+Firmware Tests,Task,EPIC 11: Testing,Lowest,test,"Hardware-in-the-loop testing (frozen)",14
+Hardware Validation,Task,EPIC 11: Testing,Lowest,test,"Sensor accuracy, battery life (frozen)",14
+EPIC 12: DevOps,Epic,,Highest,epic,"Docker, CI/CD, GitHub Actions, Release, Secrets",
+Docker Compose Development,Task,EPIC 12: DevOps,Highest,ops,"PostgreSQL, Redis, FastAPI services",1
+Docker Compose Production,Task,EPIC 12: DevOps,High,ops,"Multi-service with monitoring stack",14
+CI Pipeline (GitHub Actions),Task,EPIC 12: DevOps,Highest,ci,"Lint, test, build for all packages",1
+CD Pipeline (GitHub Actions),Task,EPIC 12: DevOps,High,cd,"Deploy to staging on tag",14
+Release Pipeline,Task,EPIC 12: DevOps,High,release,"Versioning, changelog, artifacts",14
+Environment Management,Task,EPIC 12: DevOps,Highest,ops,".env files, Docker profiles",1
+Secrets Management,Task,EPIC 12: DevOps,Highest,security,"GitHub Secrets, Docker secrets",1
+Docker Health Checks,Task,EPIC 12: DevOps,Highest,ops,"Health checks + depends_on for all services",14
+Flutter Web Build in CI,Task,EPIC 12: DevOps,High,ci,"Add flutter build web to CI pipeline",14
+Per-Package CI Jobs,Task,EPIC 12: DevOps,High,ci,"Run tests for each Flutter package independently",14
+EPIC 13: Regulatory & Compliance,Epic,,High,epic,"SFDA, FDA, CE, HIPAA, PDPL, ISO",
+SFDA Registration Preparation,Task,EPIC 13: Regulatory & Compliance,High,regulatory,"Prepare SFDA medical device registration dossier",8
+SFDA Registration Submission,Task,EPIC 13: Regulatory & Compliance,High,regulatory,"Submit SFDA Class II/III application",14
+FDA 510(k) Consultant,Task,EPIC 13: Regulatory & Compliance,High,regulatory,"Engage FDA regulatory consultant",14
+FDA 510(k) Submission Preparation,Task,EPIC 13: Regulatory & Compliance,High,regulatory,"Prepare 510(k) submission with clinical data",14
+FDA 510(k) Submission,Task,EPIC 13: Regulatory & Compliance,Medium,regulatory,"Submit FDA 510(k) premarket notification",15
+CE Marking Technical File,Task,EPIC 13: Regulatory & Compliance,Medium,regulatory,"Prepare EU MDR technical documentation",14
+CE Marking Submission,Task,EPIC 13: Regulatory & Compliance,Medium,regulatory,"Submit to EU notified body",14
+HIPAA Compliance Audit,Task,EPIC 13: Regulatory & Compliance,High,regulatory,"Third-party HIPAA compliance assessment",14
+PDPL (KSA) Compliance Audit,Task,EPIC 13: Regulatory & Compliance,High,regulatory,"Saudi PDPL personal data protection compliance",14
+ISO 13485 QMS Documentation,Task,EPIC 13: Regulatory & Compliance,Medium,regulatory,"Quality management system for medical devices",14
+ISO 14971 Risk Management File,Task,EPIC 13: Regulatory & Compliance,Medium,regulatory,"Complete ISO 14971 risk management documentation",14
+EPIC 14: Technical Debt (Pre-v1.0),Epic,,Highest,epic,"Must-fix technical debt before v1.0 launch",
+Isar Local DB Initialization,Task,EPIC 14: Technical Debt (Pre-v1.0),Highest,debt,"Complete Isar init in local_database_service.dart",1
+WebSocket Authentication Guard,Task,EPIC 14: Technical Debt (Pre-v1.0),Highest,debt,"Add JWT verification on WS upgrade",4
+Refresh Token Rotation,Task,EPIC 14: Technical Debt (Pre-v1.0),Highest,debt,"Rotate refresh tokens on each use",6
+WebSocket CORS Origin Validation,Task,EPIC 14: Technical Debt (Pre-v1.0),Highest,debt,"Add origin check for WS connections",4
+EPIC 15: Business Operations,Epic,,High,epic,"Pricing, Billing, Onboarding, Analytics, Support",
+Pricing Tier Configuration API,Task,EPIC 15: Business Operations,High,business,"Configurable pricing tiers in backend",8
+Payment Gateway Integration,Task,EPIC 15: Business Operations,High,business,"Stripe/Moyasar for subscription billing",8
+Hospital Onboarding Flow,Task,EPIC 15: Business Operations,High,business,"Step-by-step hospital setup wizard",8
+Business KPI Analytics Dashboard,Task,EPIC 15: Business Operations,High,business,"MRR, active patients, devices deployed",3
+Email Notification System,Task,EPIC 15: Business Operations,High,business,"Transactional emails: invoices, alerts, reports",8
+Multi-Currency Support,Task,EPIC 15: Business Operations,Medium,business,"USD, SAR, AED, EGP",8
+Local Tax Handling (VAT),Task,EPIC 15: Business Operations,Medium,business,"15% KSA VAT, 5% UAE VAT",8
+FHIR R4 Patient Resource,Task,EPIC 3: API & Integration,Medium,integration,"Map patient CRUD to FHIR Patient resource",8
+FHIR R4 Observation Resource,Task,EPIC 3: API & Integration,Medium,integration,"Map vital signs + alerts to FHIR Observation",8
+HL7 v2 ADT Parser,Task,EPIC 3: API & Integration,Medium,integration,"Parse admission/transfer/discharge messages",8
+HL7 v2 ORU Parser,Task,EPIC 3: API & Integration,Medium,integration,"Parse observation result messages",8
+EMR Integration Epic,Task,EPIC 3: API & Integration,Medium,integration,"Epic FHIR R4 integration module",8
+EMR Integration Seha Cerner,Task,EPIC 3: API & Integration,Medium,integration,"Seha/Cerner integration module",8
+Clinical Validation IRB Protocol,Task,EPIC 8: AI Platform,High,clinical,"Design and submit IRB protocol",7
+Clinical Validation Data Collection,Task,EPIC 8: AI Platform,High,clinical,"Collect patient data for model validation",7
+Clinical Validation Publication,Task,EPIC 8: AI Platform,Medium,clinical,"Publish results in peer-reviewed journal",7
+Subscription Billing API,Task,EPIC 9: Medical Platform,High,medical,"Plan management, invoicing, payment integration",8
+Subscription Mgmt Screen,Task,EPIC 9: Medical Platform,High,dashboard,"Hospital admin manages subscription",3
+Clinical Reports PDF Export,Task,EPIC 9: Medical Platform,High,medical,"Generate PDF patient summary + vital trends",8
+In-App Support Ticket System,Task,EPIC 9: Medical Platform,Medium,support,"Submit, track, resolve support requests",8
+Training Portal,Task,EPIC 9: Medical Platform,Medium,dashboard,"Video guides, certification, user manual",3
+DB Connection Pool Tuning,Task,EPIC 6: Performance & Scalability,Highest,db,"Configure pool_size, max_overflow, pool_pre_ping",5

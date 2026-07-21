@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: neurobleed
+      POSTGRES_USER: neurobleed
+      POSTGRES_PASSWORD: neurobleed_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../../database/postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U neurobleed"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  fastapi:
+    build:
+      context: ../../backend/fastapi
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://neurobleed:neurobleed_dev@postgres:5432/neurobleed
+      REDIS_URL: redis://redis:6379/0
+      ENVIRONMENT: development
+      SECRET_KEY: dev-secret-key-change-in-production
+      FIREBASE_CREDENTIALS_PATH: /app/credentials/firebase.json
+    volumes:
+      - ../../backend/fastapi:/app
+      - firebase_credentials:/app/credentials:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  ai-gateway:
+    build:
+      context: ../../ai
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      MODEL_PATH: /app/models/risk_model.pkl
+    volumes:
+      - ../../ai:/app
+    depends_on:
+      - redis
+    command: uvicorn gateway.main:app --host 0.0.0.0 --port 8001 --reload
+
+volumes:
+  postgres_data:
+  redis_data:
+  firebase_credentials:

@@ -1,0 +1,50 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/backend/fastapi"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "neurobleed-dev"
+
+  - package-ecosystem: "pub"
+    directory: "/apps/mobile_flutter"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "neurobleed-dev"
+
+  - package-ecosystem: "pub"
+    directory: "/apps/web_flutter"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "neurobleed-dev"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/design_system"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "neurobleed-dev"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/shared"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "neurobleed-dev"
+
+  - package-ecosystem: "pub"
+    directory: "/packages/core"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "neurobleed-dev"
+
+  - package-ecosystem: "docker"
+    directory: "/backend/fastapi"
+    schedule:
+      interval: "monthly"
+    assignees:
+      - "neurobleed-dev"

@@ -1,0 +1,9 @@
+export 'register_patient.dart';
+export 'update_patient.dart';
+export 'search_patients.dart';
+export 'get_patient_history.dart';
+export 'admit_patient.dart';
+export 'discharge_patient.dart';
+export 'add_patient_note.dart';
+export 'manage_emergency_contact.dart';
+export 'upload_document.dart';

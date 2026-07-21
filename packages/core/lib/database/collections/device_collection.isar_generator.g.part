@@ -1,0 +1,3130 @@
+part of 'device_collection.dart';
+
+// **************************************************************************
+// IsarCollectionGenerator
+// **************************************************************************
+
+// coverage:ignore-file
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
+
+extension GetDeviceCollectionCollection on Isar {
+  IsarCollection<DeviceCollection> get deviceCollections => this.collection();
+}
+
+const DeviceCollectionSchema = CollectionSchema(
+  name: r'DeviceCollection',
+  id: -1164842041873454857,
+  properties: {
+    r'batteryLevel': PropertySchema(
+      id: 0,
+      name: r'batteryLevel',
+      type: IsarType.double,
+    ),
+    r'createdAt': PropertySchema(
+      id: 1,
+      name: r'createdAt',
+      type: IsarType.dateTime,
+    ),
+    r'firmwareVersion': PropertySchema(
+      id: 2,
+      name: r'firmwareVersion',
+      type: IsarType.string,
+    ),
+    r'hardwareVersion': PropertySchema(
+      id: 3,
+      name: r'hardwareVersion',
+      type: IsarType.string,
+    ),
+    r'hospitalId': PropertySchema(
+      id: 4,
+      name: r'hospitalId',
+      type: IsarType.string,
+    ),
+    r'id': PropertySchema(
+      id: 5,
+      name: r'id',
+      type: IsarType.string,
+    ),
+    r'lastHeartbeat': PropertySchema(
+      id: 6,
+      name: r'lastHeartbeat',
+      type: IsarType.dateTime,
+    ),
+    r'lastReadingAt': PropertySchema(
+      id: 7,
+      name: r'lastReadingAt',
+      type: IsarType.dateTime,
+    ),
+    r'name': PropertySchema(
+      id: 8,
+      name: r'name',
+      type: IsarType.string,
+    ),
+    r'pairedAt': PropertySchema(
+      id: 9,
+      name: r'pairedAt',
+      type: IsarType.dateTime,
+    ),
+    r'patientId': PropertySchema(
+      id: 10,
+      name: r'patientId',
+      type: IsarType.string,
+    ),
+    r'serialNumber': PropertySchema(
+      id: 11,
+      name: r'serialNumber',
+      type: IsarType.string,
+    ),
+    r'signalStrength': PropertySchema(
+      id: 12,
+      name: r'signalStrength',
+      type: IsarType.long,
+    ),
+    r'status': PropertySchema(
+      id: 13,
+      name: r'status',
+      type: IsarType.string,
+    ),
+    r'type': PropertySchema(
+      id: 14,
+      name: r'type',
+      type: IsarType.string,
+    )
+  },
+  estimateSize: _deviceCollectionEstimateSize,
+  serialize: _deviceCollectionSerialize,
+  deserialize: _deviceCollectionDeserialize,
+  deserializeProp: _deviceCollectionDeserializeProp,
+  idName: r'isarId',
+  indexes: {
+    r'id': IndexSchema(
+      id: -3268401673993471357,
+      name: r'id',
+      unique: true,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'id',
+          type: IndexType.hash,
+          caseSensitive: true,
+        )
+      ],
+    ),
+    r'serialNumber': IndexSchema(
+      id: 135203776617746534,
+      name: r'serialNumber',
+      unique: true,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'serialNumber',
+          type: IndexType.hash,
+          caseSensitive: true,
+        )
+      ],
+    ),
+    r'patientId': IndexSchema(
+      id: 403389457658259617,
+      name: r'patientId',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'patientId',
+          type: IndexType.hash,
+          caseSensitive: true,
+        )
+      ],
+    ),
+    r'hospitalId': IndexSchema(
+      id: 6952312329871491669,
+      name: r'hospitalId',
+      unique: false,
+      replace: false,
+      properties: [
+        IndexPropertySchema(
+          name: r'hospitalId',
+          type: IndexType.hash,
+          caseSensitive: true,
+        )
+      ],
+    )
+  },
+  links: {},
+  embeddedSchemas: {},
+  getId: _deviceCollectionGetId,
+  getLinks: _deviceCollectionGetLinks,
+  attach: _deviceCollectionAttach,
+  version: '3.3.2',
+);
+
+int _deviceCollectionEstimateSize(
+  DeviceCollection object,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  var bytesCount = offsets.last;
+  bytesCount += 3 + object.firmwareVersion.length * 3;
+  {
+    final value = object.hardwareVersion;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.hospitalId;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  bytesCount += 3 + object.id.length * 3;
+  {
+    final value = object.name;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.patientId;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  bytesCount += 3 + object.serialNumber.length * 3;
+  bytesCount += 3 + object.status.length * 3;
+  bytesCount += 3 + object.type.length * 3;
+  return bytesCount;
+}
+
+void _deviceCollectionSerialize(
+  DeviceCollection object,
+  IsarWriter writer,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  writer.writeDouble(offsets[0], object.batteryLevel);
+  writer.writeDateTime(offsets[1], object.createdAt);
+  writer.writeString(offsets[2], object.firmwareVersion);
+  writer.writeString(offsets[3], object.hardwareVersion);
+  writer.writeString(offsets[4], object.hospitalId);
+  writer.writeString(offsets[5], object.id);
+  writer.writeDateTime(offsets[6], object.lastHeartbeat);
+  writer.writeDateTime(offsets[7], object.lastReadingAt);
+  writer.writeString(offsets[8], object.name);
+  writer.writeDateTime(offsets[9], object.pairedAt);
+  writer.writeString(offsets[10], object.patientId);
+  writer.writeString(offsets[11], object.serialNumber);
+  writer.writeLong(offsets[12], object.signalStrength);
+  writer.writeString(offsets[13], object.status);
+  writer.writeString(offsets[14], object.type);
+}
+
+DeviceCollection _deviceCollectionDeserialize(
+  Id id,
+  IsarReader reader,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  final object = DeviceCollection();
+  object.batteryLevel = reader.readDouble(offsets[0]);
+  object.createdAt = reader.readDateTime(offsets[1]);
+  object.firmwareVersion = reader.readString(offsets[2]);
+  object.hardwareVersion = reader.readStringOrNull(offsets[3]);
+  object.hospitalId = reader.readStringOrNull(offsets[4]);
+  object.id = reader.readString(offsets[5]);
+  object.isarId = id;
+  object.lastHeartbeat = reader.readDateTime(offsets[6]);
+  object.lastReadingAt = reader.readDateTimeOrNull(offsets[7]);
+  object.name = reader.readStringOrNull(offsets[8]);
+  object.pairedAt = reader.readDateTimeOrNull(offsets[9]);
+  object.patientId = reader.readStringOrNull(offsets[10]);
+  object.serialNumber = reader.readString(offsets[11]);
+  object.signalStrength = reader.readLong(offsets[12]);
+  object.status = reader.readString(offsets[13]);
+  object.type = reader.readString(offsets[14]);
+  return object;
+}
+
+P _deviceCollectionDeserializeProp<P>(
+  IsarReader reader,
+  int propertyId,
+  int offset,
+  Map<Type, List<int>> allOffsets,
+) {
+  switch (propertyId) {
+    case 0:
+      return (reader.readDouble(offset)) as P;
+    case 1:
+      return (reader.readDateTime(offset)) as P;
+    case 2:
+      return (reader.readString(offset)) as P;
+    case 3:
+      return (reader.readStringOrNull(offset)) as P;
+    case 4:
+      return (reader.readStringOrNull(offset)) as P;
+    case 5:
+      return (reader.readString(offset)) as P;
+    case 6:
+      return (reader.readDateTime(offset)) as P;
+    case 7:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 8:
+      return (reader.readStringOrNull(offset)) as P;
+    case 9:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 10:
+      return (reader.readStringOrNull(offset)) as P;
+    case 11:
+      return (reader.readString(offset)) as P;
+    case 12:
+      return (reader.readLong(offset)) as P;
+    case 13:
+      return (reader.readString(offset)) as P;
+    case 14:
+      return (reader.readString(offset)) as P;
+    default:
+      throw IsarError('Unknown property with id $propertyId');
+  }
+}
+
+Id _deviceCollectionGetId(DeviceCollection object) {
+  return object.isarId ?? Isar.autoIncrement;
+}
+
+List<IsarLinkBase<dynamic>> _deviceCollectionGetLinks(DeviceCollection object) {
+  return [];
+}
+
+void _deviceCollectionAttach(
+    IsarCollection<dynamic> col, Id id, DeviceCollection object) {
+  object.isarId = id;
+}
+
+extension DeviceCollectionByIndex on IsarCollection<DeviceCollection> {
+  Future<DeviceCollection?> getById(String id) {
+    return getByIndex(r'id', [id]);
+  }
+
+  DeviceCollection? getByIdSync(String id) {
+    return getByIndexSync(r'id', [id]);
+  }
+
+  Future<bool> deleteById(String id) {
+    return deleteByIndex(r'id', [id]);
+  }
+
+  bool deleteByIdSync(String id) {
+    return deleteByIndexSync(r'id', [id]);
+  }
+
+  Future<List<DeviceCollection?>> getAllById(List<String> idValues) {
+    final values = idValues.map((e) => [e]).toList();
+    return getAllByIndex(r'id', values);
+  }
+
+  List<DeviceCollection?> getAllByIdSync(List<String> idValues) {
+    final values = idValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'id', values);
+  }
+
+  Future<int> deleteAllById(List<String> idValues) {
+    final values = idValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'id', values);
+  }
+
+  int deleteAllByIdSync(List<String> idValues) {
+    final values = idValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'id', values);
+  }
+
+  Future<Id> putById(DeviceCollection object) {
+    return putByIndex(r'id', object);
+  }
+
+  Id putByIdSync(DeviceCollection object, {bool saveLinks = true}) {
+    return putByIndexSync(r'id', object, saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllById(List<DeviceCollection> objects) {
+    return putAllByIndex(r'id', objects);
+  }
+
+  List<Id> putAllByIdSync(List<DeviceCollection> objects,
+      {bool saveLinks = true}) {
+    return putAllByIndexSync(r'id', objects, saveLinks: saveLinks);
+  }
+
+  Future<DeviceCollection?> getBySerialNumber(String serialNumber) {
+    return getByIndex(r'serialNumber', [serialNumber]);
+  }
+
+  DeviceCollection? getBySerialNumberSync(String serialNumber) {
+    return getByIndexSync(r'serialNumber', [serialNumber]);
+  }
+
+  Future<bool> deleteBySerialNumber(String serialNumber) {
+    return deleteByIndex(r'serialNumber', [serialNumber]);
+  }
+
+  bool deleteBySerialNumberSync(String serialNumber) {
+    return deleteByIndexSync(r'serialNumber', [serialNumber]);
+  }
+
+  Future<List<DeviceCollection?>> getAllBySerialNumber(
+      List<String> serialNumberValues) {
+    final values = serialNumberValues.map((e) => [e]).toList();
+    return getAllByIndex(r'serialNumber', values);
+  }
+
+  List<DeviceCollection?> getAllBySerialNumberSync(
+      List<String> serialNumberValues) {
+    final values = serialNumberValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'serialNumber', values);
+  }
+
+  Future<int> deleteAllBySerialNumber(List<String> serialNumberValues) {
+    final values = serialNumberValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'serialNumber', values);
+  }
+
+  int deleteAllBySerialNumberSync(List<String> serialNumberValues) {
+    final values = serialNumberValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'serialNumber', values);
+  }
+
+  Future<Id> putBySerialNumber(DeviceCollection object) {
+    return putByIndex(r'serialNumber', object);
+  }
+
+  Id putBySerialNumberSync(DeviceCollection object, {bool saveLinks = true}) {
+    return putByIndexSync(r'serialNumber', object, saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllBySerialNumber(List<DeviceCollection> objects) {
+    return putAllByIndex(r'serialNumber', objects);
+  }
+
+  List<Id> putAllBySerialNumberSync(List<DeviceCollection> objects,
+      {bool saveLinks = true}) {
+    return putAllByIndexSync(r'serialNumber', objects, saveLinks: saveLinks);
+  }
+}
+
+extension DeviceCollectionQueryWhereSort
+    on QueryBuilder<DeviceCollection, DeviceCollection, QWhere> {
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhere> anyIsarId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+}
+
+extension DeviceCollectionQueryWhere
+    on QueryBuilder<DeviceCollection, DeviceCollection, QWhereClause> {
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      isarIdEqualTo(Id isarId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IdWhereClause.between(
+        lower: isarId,
+        upper: isarId,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      isarIdNotEqualTo(Id isarId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(
+              IdWhereClause.lessThan(upper: isarId, includeUpper: false),
+            )
+            .addWhereClause(
+              IdWhereClause.greaterThan(lower: isarId, includeLower: false),
+            );
+      } else {
+        return query
+            .addWhereClause(
+              IdWhereClause.greaterThan(lower: isarId, includeLower: false),
+            )
+            .addWhereClause(
+              IdWhereClause.lessThan(upper: isarId, includeUpper: false),
+            );
+      }
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      isarIdGreaterThan(Id isarId, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IdWhereClause.greaterThan(lower: isarId, includeLower: include),
+      );
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      isarIdLessThan(Id isarId, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IdWhereClause.lessThan(upper: isarId, includeUpper: include),
+      );
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      isarIdBetween(
+    Id lowerIsarId,
+    Id upperIsarId, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IdWhereClause.between(
+        lower: lowerIsarId,
+        includeLower: includeLower,
+        upper: upperIsarId,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause> idEqualTo(
+      String id) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'id',
+        value: [id],
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      idNotEqualTo(String id) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id',
+              lower: [],
+              upper: [id],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id',
+              lower: [id],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id',
+              lower: [id],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id',
+              lower: [],
+              upper: [id],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      serialNumberEqualTo(String serialNumber) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'serialNumber',
+        value: [serialNumber],
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      serialNumberNotEqualTo(String serialNumber) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'serialNumber',
+              lower: [],
+              upper: [serialNumber],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'serialNumber',
+              lower: [serialNumber],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'serialNumber',
+              lower: [serialNumber],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'serialNumber',
+              lower: [],
+              upper: [serialNumber],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      patientIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'patientId',
+        value: [null],
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      patientIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'patientId',
+        lower: [null],
+        includeLower: false,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      patientIdEqualTo(String? patientId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'patientId',
+        value: [patientId],
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      patientIdNotEqualTo(String? patientId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'patientId',
+              lower: [],
+              upper: [patientId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'patientId',
+              lower: [patientId],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'patientId',
+              lower: [patientId],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'patientId',
+              lower: [],
+              upper: [patientId],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      hospitalIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'hospitalId',
+        value: [null],
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      hospitalIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.between(
+        indexName: r'hospitalId',
+        lower: [null],
+        includeLower: false,
+        upper: [],
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      hospitalIdEqualTo(String? hospitalId) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'hospitalId',
+        value: [hospitalId],
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterWhereClause>
+      hospitalIdNotEqualTo(String? hospitalId) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'hospitalId',
+              lower: [],
+              upper: [hospitalId],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'hospitalId',
+              lower: [hospitalId],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'hospitalId',
+              lower: [hospitalId],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'hospitalId',
+              lower: [],
+              upper: [hospitalId],
+              includeUpper: false,
+            ));
+      }
+    });
+  }
+}
+
+extension DeviceCollectionQueryFilter
+    on QueryBuilder<DeviceCollection, DeviceCollection, QFilterCondition> {
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      batteryLevelEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'batteryLevel',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      batteryLevelGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'batteryLevel',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      batteryLevelLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'batteryLevel',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      batteryLevelBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'batteryLevel',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      createdAtEqualTo(DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'createdAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      createdAtGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'createdAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      createdAtLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'createdAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      createdAtBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'createdAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      firmwareVersionEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'firmwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      firmwareVersionGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'firmwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      firmwareVersionLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'firmwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      firmwareVersionBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'firmwareVersion',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      firmwareVersionStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'firmwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      firmwareVersionEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'firmwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      firmwareVersionContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'firmwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      firmwareVersionMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'firmwareVersion',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      firmwareVersionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'firmwareVersion',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      firmwareVersionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'firmwareVersion',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'hardwareVersion',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'hardwareVersion',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'hardwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'hardwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'hardwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'hardwareVersion',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'hardwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'hardwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'hardwareVersion',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'hardwareVersion',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'hardwareVersion',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hardwareVersionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'hardwareVersion',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'hospitalId',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'hospitalId',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'hospitalId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'hospitalId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'hospitalId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'hospitalId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'hospitalId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'hospitalId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'hospitalId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'hospitalId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'hospitalId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      hospitalIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'hospitalId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      idEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'id',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      idGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'id',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      idLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'id',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      idBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'id',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      idStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'id',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      idEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'id',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      idContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'id',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      idMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'id',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      idIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'id',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      idIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'id',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      isarIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'isarId',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      isarIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'isarId',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      isarIdEqualTo(Id? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isarId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      isarIdGreaterThan(
+    Id? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'isarId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      isarIdLessThan(
+    Id? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'isarId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      isarIdBetween(
+    Id? lower,
+    Id? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'isarId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      lastHeartbeatEqualTo(DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'lastHeartbeat',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      lastHeartbeatGreaterThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'lastHeartbeat',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      lastHeartbeatLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'lastHeartbeat',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      lastHeartbeatBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'lastHeartbeat',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      lastReadingAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'lastReadingAt',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      lastReadingAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'lastReadingAt',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      lastReadingAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'lastReadingAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      lastReadingAtGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'lastReadingAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      lastReadingAtLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'lastReadingAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      lastReadingAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'lastReadingAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'name',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'name',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'name',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'name',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'name',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'name',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      nameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'name',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      pairedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'pairedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      pairedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'pairedAt',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      pairedAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'pairedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      pairedAtGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'pairedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      pairedAtLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'pairedAt',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      pairedAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'pairedAt',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'patientId',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'patientId',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'patientId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'patientId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'patientId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'patientId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'patientId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'patientId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'patientId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'patientId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'patientId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      patientIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'patientId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      serialNumberEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serialNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      serialNumberGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'serialNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      serialNumberLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'serialNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      serialNumberBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'serialNumber',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      serialNumberStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'serialNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      serialNumberEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'serialNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      serialNumberContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'serialNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      serialNumberMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'serialNumber',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      serialNumberIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serialNumber',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      serialNumberIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'serialNumber',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      signalStrengthEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'signalStrength',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      signalStrengthGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'signalStrength',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      signalStrengthLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'signalStrength',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      signalStrengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'signalStrength',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      statusEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'status',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      statusGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'status',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      statusLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'status',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      statusBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'status',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      statusStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'status',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      statusEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'status',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      statusContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'status',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      statusMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'status',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      statusIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'status',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      statusIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'status',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      typeEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      typeGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      typeLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      typeBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'type',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      typeStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      typeEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      typeContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      typeMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'type',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      typeIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'type',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterFilterCondition>
+      typeIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'type',
+        value: '',
+      ));
+    });
+  }
+}
+
+extension DeviceCollectionQueryObject
+    on QueryBuilder<DeviceCollection, DeviceCollection, QFilterCondition> {}
+
+extension DeviceCollectionQueryLinks
+    on QueryBuilder<DeviceCollection, DeviceCollection, QFilterCondition> {}
+
+extension DeviceCollectionQuerySortBy
+    on QueryBuilder<DeviceCollection, DeviceCollection, QSortBy> {
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByBatteryLevel() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batteryLevel', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByBatteryLevelDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batteryLevel', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByCreatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByCreatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByFirmwareVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firmwareVersion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByFirmwareVersionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firmwareVersion', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByHardwareVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hardwareVersion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByHardwareVersionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hardwareVersion', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByHospitalId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hospitalId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByHospitalIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hospitalId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy> sortById() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByLastHeartbeat() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastHeartbeat', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByLastHeartbeatDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastHeartbeat', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByLastReadingAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastReadingAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByLastReadingAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastReadingAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy> sortByName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByPairedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pairedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByPairedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pairedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByPatientId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'patientId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByPatientIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'patientId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortBySerialNumber() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serialNumber', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortBySerialNumberDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serialNumber', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortBySignalStrength() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'signalStrength', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortBySignalStrengthDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'signalStrength', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByStatus() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByStatusDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy> sortByType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'type', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      sortByTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'type', Sort.desc);
+    });
+  }
+}
+
+extension DeviceCollectionQuerySortThenBy
+    on QueryBuilder<DeviceCollection, DeviceCollection, QSortThenBy> {
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByBatteryLevel() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batteryLevel', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByBatteryLevelDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batteryLevel', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByCreatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByCreatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByFirmwareVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firmwareVersion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByFirmwareVersionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'firmwareVersion', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByHardwareVersion() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hardwareVersion', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByHardwareVersionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hardwareVersion', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByHospitalId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hospitalId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByHospitalIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hospitalId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy> thenById() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByIsarId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isarId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByIsarIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isarId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByLastHeartbeat() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastHeartbeat', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByLastHeartbeatDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastHeartbeat', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByLastReadingAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastReadingAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByLastReadingAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastReadingAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy> thenByName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByPairedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pairedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByPairedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pairedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByPatientId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'patientId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByPatientIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'patientId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenBySerialNumber() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serialNumber', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenBySerialNumberDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serialNumber', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenBySignalStrength() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'signalStrength', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenBySignalStrengthDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'signalStrength', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByStatus() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByStatusDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'status', Sort.desc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy> thenByType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'type', Sort.asc);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QAfterSortBy>
+      thenByTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'type', Sort.desc);
+    });
+  }
+}
+
+extension DeviceCollectionQueryWhereDistinct
+    on QueryBuilder<DeviceCollection, DeviceCollection, QDistinct> {
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct>
+      distinctByBatteryLevel() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'batteryLevel');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct>
+      distinctByCreatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'createdAt');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct>
+      distinctByFirmwareVersion({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'firmwareVersion',
+          caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct>
+      distinctByHardwareVersion({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'hardwareVersion',
+          caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct>
+      distinctByHospitalId({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'hospitalId', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct> distinctById(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'id', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct>
+      distinctByLastHeartbeat() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'lastHeartbeat');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct>
+      distinctByLastReadingAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'lastReadingAt');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct> distinctByName(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct>
+      distinctByPairedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'pairedAt');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct>
+      distinctByPatientId({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'patientId', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct>
+      distinctBySerialNumber({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'serialNumber', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct>
+      distinctBySignalStrength() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'signalStrength');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct> distinctByStatus(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'status', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DeviceCollection, QDistinct> distinctByType(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'type', caseSensitive: caseSensitive);
+    });
+  }
+}
+
+extension DeviceCollectionQueryProperty
+    on QueryBuilder<DeviceCollection, DeviceCollection, QQueryProperty> {
+  QueryBuilder<DeviceCollection, int, QQueryOperations> isarIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isarId');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, double, QQueryOperations>
+      batteryLevelProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'batteryLevel');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DateTime, QQueryOperations>
+      createdAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'createdAt');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, String, QQueryOperations>
+      firmwareVersionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'firmwareVersion');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, String?, QQueryOperations>
+      hardwareVersionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'hardwareVersion');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, String?, QQueryOperations>
+      hospitalIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'hospitalId');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, String, QQueryOperations> idProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DateTime, QQueryOperations>
+      lastHeartbeatProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'lastHeartbeat');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DateTime?, QQueryOperations>
+      lastReadingAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'lastReadingAt');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, String?, QQueryOperations> nameProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, DateTime?, QQueryOperations>
+      pairedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'pairedAt');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, String?, QQueryOperations>
+      patientIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'patientId');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, String, QQueryOperations>
+      serialNumberProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'serialNumber');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, int, QQueryOperations>
+      signalStrengthProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'signalStrength');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, String, QQueryOperations> statusProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'status');
+    });
+  }
+
+  QueryBuilder<DeviceCollection, String, QQueryOperations> typeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'type');
+    });
+  }
+}

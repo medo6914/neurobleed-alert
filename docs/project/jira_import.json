@@ -1,0 +1,745 @@
+{
+  "fields": {
+    "project": { "key": "NB" },
+    "issuetype": { "name": "Epic" },
+    "priority": { "name": "Highest" }
+  },
+  "issues": [
+    {
+      "summary": "EPIC 1: Enterprise Architecture",
+      "description": "Multi-Tenant Architecture, Organization, Hospital, Department, Branch Management",
+      "priority": "Highest",
+      "labels": ["enterprise"]
+    },
+    {
+      "summary": "Multi-Tenant Database Schema",
+      "description": "Separate data per hospital/organization via tenant_id column on all tables.",
+      "epic": "EPIC 1: Enterprise Architecture",
+      "priority": "Highest",
+      "labels": ["enterprise", "database"],
+      "customfield_phase": "Phase 5"
+    },
+    {
+      "summary": "Tenant Isolation Middleware",
+      "description": "Automatically scope all queries to current tenant. Middleware extracts tenant from JWT and filters all DB queries.",
+      "epic": "EPIC 1: Enterprise Architecture",
+      "priority": "Highest",
+      "labels": ["enterprise", "backend"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "Organization CRUD API",
+      "description": "Create/read/update/delete organizations. Each organization is a tenant root.",
+      "epic": "EPIC 1: Enterprise Architecture",
+      "priority": "Highest",
+      "labels": ["enterprise", "api"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "Hospital CRUD API",
+      "description": "Hospitals belong to organizations. Scoped by tenant_id.",
+      "epic": "EPIC 1: Enterprise Architecture",
+      "priority": "Highest",
+      "labels": ["enterprise", "api"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "Department CRUD API",
+      "description": "Departments within hospitals. Scoped by tenant and hospital.",
+      "epic": "EPIC 1: Enterprise Architecture",
+      "priority": "High",
+      "labels": ["enterprise", "api"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "Branch CRUD API",
+      "description": "Branches within hospitals. Scoped by tenant and hospital.",
+      "epic": "EPIC 1: Enterprise Architecture",
+      "priority": "High",
+      "labels": ["enterprise", "api"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "Super Admin Panel",
+      "description": "Flutter Web dashboard for super admins to manage tenants, hospitals, branches.",
+      "epic": "EPIC 1: Enterprise Architecture",
+      "priority": "High",
+      "labels": ["enterprise", "dashboard"],
+      "customfield_phase": "Phase 3"
+    },
+    {
+      "summary": "EPIC 2: Identity & Security",
+      "description": "RBAC, Permissions, Audit, Sessions, Refresh Tokens, MFA architecture",
+      "priority": "Highest",
+      "labels": ["security"]
+    },
+    {
+      "summary": "RBAC Role Definitions",
+      "description": "Define roles: Super Admin, Hospital Admin, Doctor, Nurse, Paramedic. Each role has a set of permissions.",
+      "epic": "EPIC 2: Identity & Security",
+      "priority": "Highest",
+      "labels": ["security", "backend"],
+      "customfield_phase": "Phase 6"
+    },
+    {
+      "summary": "Permission Matrix Design",
+      "description": "Define all permissions per resource + action (e.g. patient:read, patient:write, alert:acknowledge).",
+      "epic": "EPIC 2: Identity & Security",
+      "priority": "Highest",
+      "labels": ["security", "backend"],
+      "customfield_phase": "Phase 6"
+    },
+    {
+      "summary": "Fine-Grained Permission Enforcement",
+      "description": "Middleware checks permissions per endpoint. Rejects requests without required permission.",
+      "epic": "EPIC 2: Identity & Security",
+      "priority": "Highest",
+      "labels": ["security", "backend"],
+      "customfield_phase": "Phase 6"
+    },
+    {
+      "summary": "Audit Log System",
+      "description": "Log all state-changing operations to audit_log table. Includes user, action, resource, timestamp, IP.",
+      "epic": "EPIC 2: Identity & Security",
+      "priority": "Highest",
+      "labels": ["security", "backend"],
+      "customfield_phase": "Phase 6"
+    },
+    {
+      "summary": "Session Management API",
+      "description": "List active sessions for user. Revoke session by ID. Force logout from other devices.",
+      "epic": "EPIC 2: Identity & Security",
+      "priority": "Highest",
+      "labels": ["security", "backend"],
+      "customfield_phase": "Phase 6"
+    },
+    {
+      "summary": "Refresh Token Rotation",
+      "description": "Rotate refresh tokens on each use. 30-day expiry. Revoke on logout.",
+      "epic": "EPIC 2: Identity & Security",
+      "priority": "Highest",
+      "labels": ["security", "backend"],
+      "customfield_phase": "Phase 6"
+    },
+    {
+      "summary": "MFA Architecture (Future)",
+      "description": "Design for future TOTP or WebAuthn multi-factor authentication. NOT implemented in v1.0.",
+      "epic": "EPIC 2: Identity & Security",
+      "priority": "Lowest",
+      "labels": ["security", "future"],
+      "customfield_phase": ""
+    },
+    {
+      "summary": "EPIC 3: API & Integration",
+      "description": "API Versioning, OpenAPI, WebSocket, MQTT, FHIR, HL7",
+      "priority": "High",
+      "labels": ["api"]
+    },
+    {
+      "summary": "API Versioning Strategy",
+      "description": "URL-prefix versioning /v1/, /v2/. Include version in response headers.",
+      "epic": "EPIC 3: API & Integration",
+      "priority": "Highest",
+      "labels": ["api", "backend"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "OpenAPI / Swagger Documentation",
+      "description": "Auto-generated from FastAPI routes. Available at /docs and /redoc.",
+      "epic": "EPIC 3: API & Integration",
+      "priority": "Highest",
+      "labels": ["api", "docs"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "WebSocket Server",
+      "description": "Real-time vital sign broadcasting to Flutter clients. Auto-reconnect with exponential backoff.",
+      "epic": "EPIC 3: API & Integration",
+      "priority": "Highest",
+      "labels": ["realtime", "backend"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "MQTT Broker Integration",
+      "description": "Device telemetry ingestion via MQTT. Bridge between MQTT topics and Redis Streams.",
+      "epic": "EPIC 3: API & Integration",
+      "priority": "High",
+      "labels": ["device", "backend"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "FHIR R4 API Adapter",
+      "description": "Translate internal models to/from FHIR R4 resources. Enable hospital EMR integration.",
+      "epic": "EPIC 3: API & Integration",
+      "priority": "Medium",
+      "labels": ["medical", "integration"],
+      "customfield_phase": "Phase 8"
+    },
+    {
+      "summary": "HL7 v2 Message Parser",
+      "description": "Parse HL7 v2 messages (ADT, ORU, ORM) for hospital system integration.",
+      "epic": "EPIC 3: API & Integration",
+      "priority": "Medium",
+      "labels": ["medical", "integration"],
+      "customfield_phase": "Phase 8"
+    },
+    {
+      "summary": "Third-Party API Rate Limiter",
+      "description": "Configurable rate limits per external API integration. Prevent abuse of partner APIs.",
+      "epic": "EPIC 3: API & Integration",
+      "priority": "High",
+      "labels": ["api", "security"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "EPIC 4: Localization",
+      "description": "Arabic, English, RTL, LTR, Dynamic Language Switching",
+      "priority": "Highest",
+      "labels": ["i18n"]
+    },
+    {
+      "summary": "Arabic Translation Strings",
+      "description": "All UI strings translated to Arabic. Medical terminology verified.",
+      "epic": "EPIC 4: Localization",
+      "priority": "Highest",
+      "labels": ["i18n", "flutter"],
+      "customfield_phase": "Phase 2"
+    },
+    {
+      "summary": "English Translation Strings",
+      "description": "All UI strings in English (default language).",
+      "epic": "EPIC 4: Localization",
+      "priority": "Highest",
+      "labels": ["i18n", "flutter"],
+      "customfield_phase": "Phase 2"
+    },
+    {
+      "summary": "RTL Layout Support",
+      "description": "Flutter RTL rendering for Arabic. Mirror layout for all screens.",
+      "epic": "EPIC 4: Localization",
+      "priority": "Highest",
+      "labels": ["i18n", "flutter"],
+      "customfield_phase": "Phase 2"
+    },
+    {
+      "summary": "Dynamic Language Switcher",
+      "description": "Switch language at runtime without app restart. Persist preference.",
+      "epic": "EPIC 4: Localization",
+      "priority": "Highest",
+      "labels": ["i18n", "flutter"],
+      "customfield_phase": "Phase 2"
+    },
+    {
+      "summary": "Backend Localized Messages",
+      "description": "API error messages in Arabic/English based on Accept-Language header.",
+      "epic": "EPIC 4: Localization",
+      "priority": "High",
+      "labels": ["i18n", "backend"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "EPIC 5: Observability",
+      "description": "Centralized Logging, Metrics, Tracing, Prometheus, Grafana, Health Checks, Alerting",
+      "priority": "High",
+      "labels": ["ops"]
+    },
+    {
+      "summary": "Centralized Logging (Loki)",
+      "description": "Collect all service logs in Loki. Queryable via Grafana.",
+      "epic": "EPIC 5: Observability",
+      "priority": "High",
+      "labels": ["ops", "logging"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Application Metrics (Prometheus)",
+      "description": "Expose metrics from FastAPI (request count, latency, errors) and Flutter (crash rate, screen views).",
+      "epic": "EPIC 5: Observability",
+      "priority": "High",
+      "labels": ["ops", "metrics"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Distributed Tracing (Tempo)",
+      "description": "Trace requests across services. Identify bottlenecks in end-to-end flows.",
+      "epic": "EPIC 5: Observability",
+      "priority": "Medium",
+      "labels": ["ops", "tracing"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Grafana Dashboards",
+      "description": "4 dashboards: System (CPU, memory, disk), Medical (patients, alerts), AI (model performance), Devices (connected, battery).",
+      "epic": "EPIC 5: Observability",
+      "priority": "High",
+      "labels": ["ops", "dashboard"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Health Check Endpoints",
+      "description": "/health for all services. Includes DB connection, Redis ping, queue status.",
+      "epic": "EPIC 5: Observability",
+      "priority": "Highest",
+      "labels": ["ops", "backend"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "Alerting Rules (Grafana)",
+      "description": "Alert on critical metric thresholds: high latency, error rate spike, disk space low, service down.",
+      "epic": "EPIC 5: Observability",
+      "priority": "Medium",
+      "labels": ["ops", "alerting"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Sentry Error Tracking",
+      "description": "Flutter + Python crash reporting. Source map upload for Flutter Web.",
+      "epic": "EPIC 5: Observability",
+      "priority": "High",
+      "labels": ["ops", "error-tracking"],
+      "customfield_phase": "Phase 2"
+    },
+    {
+      "summary": "EPIC 6: Performance & Scalability",
+      "description": "Horizontal Scaling, Load Balancer, Redis, Caching, Connection Pooling, Rate Limiting, Workers, Queue",
+      "priority": "High",
+      "labels": ["performance"]
+    },
+    {
+      "summary": "Horizontal Scaling Design",
+      "description": "Stateless services behind load balancer. Session affinity via Redis.",
+      "epic": "EPIC 6: Performance & Scalability",
+      "priority": "High",
+      "labels": ["ops", "scaling"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Load Balancer Config (Nginx)",
+      "description": "Nginx reverse proxy with round-robin. TLS termination. WebSocket upgrade support.",
+      "epic": "EPIC 6: Performance & Scalability",
+      "priority": "High",
+      "labels": ["ops", "infra"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Redis Cache Layer",
+      "description": "Cache frequent queries (patient list, device status). Session store. Rate limiter backend.",
+      "epic": "EPIC 6: Performance & Scalability",
+      "priority": "Highest",
+      "labels": ["cache", "backend"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "Database Connection Pooling",
+      "description": "SQLAlchemy async engine with connection pooling. Pool size based on expected concurrency.",
+      "epic": "EPIC 6: Performance & Scalability",
+      "priority": "Highest",
+      "labels": ["db", "backend"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "API Rate Limiting",
+      "description": "Enforce rate limits per endpoint, per tenant. Redis-backed sliding window counter.",
+      "epic": "EPIC 6: Performance & Scalability",
+      "priority": "Highest",
+      "labels": ["security", "backend"],
+      "customfield_phase": "Phase 6"
+    },
+    {
+      "summary": "Background Workers (ARQ)",
+      "description": "Async task processing for sync operations, report generation, notification dispatch.",
+      "epic": "EPIC 6: Performance & Scalability",
+      "priority": "High",
+      "labels": ["backend", "async"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "Redis Streams Queue",
+      "description": "Message queue for telemetry ingestion and alert dispatch. Consumer groups for parallel processing.",
+      "epic": "EPIC 6: Performance & Scalability",
+      "priority": "Highest",
+      "labels": ["messaging", "backend"],
+      "customfield_phase": "Phase 4"
+    },
+    {
+      "summary": "EPIC 7: Backup & Reliability",
+      "description": "Automatic Backup, Point In Time Recovery, Disaster Recovery, Replication, High Availability",
+      "priority": "High",
+      "labels": ["reliability"]
+    },
+    {
+      "summary": "Automatic Database Backup",
+      "description": "Daily pg_dump to S3-compatible storage. 7-day retention. Encrypted backups.",
+      "epic": "EPIC 7: Backup & Reliability",
+      "priority": "High",
+      "labels": ["ops", "backup"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Point-in-Time Recovery",
+      "description": "WAL archiving for PITR. Restore database to any point in time within retention window.",
+      "epic": "EPIC 7: Backup & Reliability",
+      "priority": "Medium",
+      "labels": ["ops", "backup"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Disaster Recovery Playbook",
+      "description": "Documented recovery procedures for each failure scenario: DB loss, service crash, region outage.",
+      "epic": "EPIC 7: Backup & Reliability",
+      "priority": "High",
+      "labels": ["ops", "docs"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Streaming Replication",
+      "description": "PostgreSQL hot standby for read scaling and failover.",
+      "epic": "EPIC 7: Backup & Reliability",
+      "priority": "Medium",
+      "labels": ["ops", "db"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "High Availability Docker Config",
+      "description": "Multi-instance failover setup. Health checks and auto-restart for all services.",
+      "epic": "EPIC 7: Backup & Reliability",
+      "priority": "Medium",
+      "labels": ["ops", "infra"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "EPIC 8: AI Platform",
+      "description": "AI Gateway, TinyML, Cloud AI, RAG, Medical Knowledge Base, PubMed, Explainable AI, Monitoring",
+      "priority": "High",
+      "labels": ["ai"]
+    },
+    {
+      "summary": "AI Gateway Microservice",
+      "description": "FastAPI-based gateway for all AI services. Routes requests to appropriate engine. Rate limiting and caching.",
+      "epic": "EPIC 8: AI Platform",
+      "priority": "High",
+      "labels": ["ai", "backend"],
+      "customfield_phase": "Phase 7"
+    },
+    {
+      "summary": "Cloud AI Risk Engine (XGBoost)",
+      "description": "XGBoost ensemble for ICH risk assessment. 18 features. Returns risk score + level + confidence.",
+      "epic": "EPIC 8: AI Platform",
+      "priority": "High",
+      "labels": ["ai", "ml"],
+      "customfield_phase": "Phase 7"
+    },
+    {
+      "summary": "TinyML Model Export",
+      "description": "Convert trained XGBoost model to TFLite for edge deployment. INT8 quantized.",
+      "epic": "EPIC 8: AI Platform",
+      "priority": "Medium",
+      "labels": ["ai", "edge"],
+      "customfield_phase": "Phase 7"
+    },
+    {
+      "summary": "RAG Engine (LangChain + FAISS)",
+      "description": "Retrieval-augmented generation for clinical queries. Vector similarity search over medical knowledge base.",
+      "epic": "EPIC 8: AI Platform",
+      "priority": "Medium",
+      "labels": ["ai", "rag"],
+      "customfield_phase": "Phase 7"
+    },
+    {
+      "summary": "Medical Knowledge Base",
+      "description": "PostgreSQL + pgvector for storing and querying medical embeddings. Literature and guidelines.",
+      "epic": "EPIC 8: AI Platform",
+      "priority": "Medium",
+      "labels": ["ai", "data"],
+      "customfield_phase": "Phase 7"
+    },
+    {
+      "summary": "PubMed Integration",
+      "description": "Fetch and index medical literature from PubMed API. Scheduled updates.",
+      "epic": "EPIC 8: AI Platform",
+      "priority": "Medium",
+      "labels": ["ai", "integration"],
+      "customfield_phase": "Phase 7"
+    },
+    {
+      "summary": "Explainable AI (SHAP/LIME)",
+      "description": "Feature importance per prediction. Show which factors contributed most to risk score.",
+      "epic": "EPIC 8: AI Platform",
+      "priority": "Medium",
+      "labels": ["ai", "xai"],
+      "customfield_phase": "Phase 7"
+    },
+    {
+      "summary": "AI Monitoring Dashboard",
+      "description": "Monitor model drift, prediction latency, accuracy against ground truth, data distribution shifts.",
+      "epic": "EPIC 8: AI Platform",
+      "priority": "Medium",
+      "labels": ["ai", "monitoring"],
+      "customfield_phase": "Phase 7"
+    },
+    {
+      "summary": "EPIC 9: Medical Platform",
+      "description": "Patient, Device, Alert Management, Clinical Reports, Risk Assessment, Emergency",
+      "priority": "Highest",
+      "labels": ["medical"]
+    },
+    {
+      "summary": "Patient CRUD Backend API",
+      "description": "Create, read, update, delete patients. Search by name/ID, filter by hospital/department.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "Highest",
+      "labels": ["medical", "backend"],
+      "customfield_phase": "Phase 8"
+    },
+    {
+      "summary": "Patient List Screen (Mobile)",
+      "description": "Search, filter, sort patients. Pull-to-refresh. Offline-cached list.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "Highest",
+      "labels": ["medical", "flutter"],
+      "customfield_phase": "Phase 2"
+    },
+    {
+      "summary": "Patient Detail Screen (Mobile)",
+      "description": "Full patient info, vital signs, alert history, risk score. Real-time updates via WebSocket.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "Highest",
+      "labels": ["medical", "flutter"],
+      "customfield_phase": "Phase 2"
+    },
+    {
+      "summary": "Patient Management (Web Dashboard)",
+      "description": "Full CRUD dashboard for hospital admin. Charts and analytics.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "Highest",
+      "labels": ["medical", "dashboard"],
+      "customfield_phase": "Phase 3"
+    },
+    {
+      "summary": "Device CRUD Backend API",
+      "description": "Register, pair, update, delete devices. Associate with patient, hospital.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "Highest",
+      "labels": ["medical", "backend"],
+      "customfield_phase": "Phase 8"
+    },
+    {
+      "summary": "Device Management Screen",
+      "description": "List paired devices, diagnostics, battery level, signal quality. Pair new device.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "Highest",
+      "labels": ["medical", "flutter"],
+      "customfield_phase": "Phase 2"
+    },
+    {
+      "summary": "Alert CRUD Backend API",
+      "description": "Create alerts (from AI or rules), list with filters, acknowledge, escalate.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "Highest",
+      "labels": ["medical", "backend"],
+      "customfield_phase": "Phase 8"
+    },
+    {
+      "summary": "Alert List Screen (Mobile)",
+      "description": "Filter by severity (critical/warning/info). Acknowledge with one tap. Real-time updates.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "Highest",
+      "labels": ["medical", "flutter"],
+      "customfield_phase": "Phase 2"
+    },
+    {
+      "summary": "Clinical Reports Generator",
+      "description": "Generate PDF reports: patient summary, vital trends, alert history. Email or download.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "High",
+      "labels": ["medical", "backend"],
+      "customfield_phase": "Phase 8"
+    },
+    {
+      "summary": "Risk Assessment Dashboard",
+      "description": "Display AI risk scores per patient. Trend view. Drill down to contributing factors.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "High",
+      "labels": ["medical", "dashboard"],
+      "customfield_phase": "Phase 8"
+    },
+    {
+      "summary": "Knowledge Center",
+      "description": "Searchable medical guidelines and references. Backed by RAG engine.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "Medium",
+      "labels": ["medical", "knowledge"],
+      "customfield_phase": "Phase 8"
+    },
+    {
+      "summary": "Emergency Workflow",
+      "description": "SOS button triggers emergency workflow. Notify on-call staff via SMS/WebSocket. Track response time.",
+      "epic": "EPIC 9: Medical Platform",
+      "priority": "High",
+      "labels": ["medical", "emergency"],
+      "customfield_phase": "Phase 8"
+    },
+    {
+      "summary": "EPIC 10: Hardware Platform",
+      "description": "FROZEN — Awaiting 'ابدأ جزء الجهاز' command. Firmware, Drivers, BLE, Cellular, OTA, PCB",
+      "priority": "Highest",
+      "labels": ["hardware", "frozen"]
+    },
+    {
+      "summary": "Device Registration API",
+      "description": "Register device and associate with patient/hospital. Return device credentials.",
+      "epic": "EPIC 10: Hardware Platform",
+      "priority": "Highest",
+      "labels": ["hardware", "backend"],
+      "customfield_phase": "Phase 9"
+    },
+    {
+      "summary": "Device Diagnostics API",
+      "description": "Read device diagnostics: battery, signal quality, firmware version, uptime, error count.",
+      "epic": "EPIC 10: Hardware Platform",
+      "priority": "High",
+      "labels": ["hardware", "backend"],
+      "customfield_phase": "Phase 9"
+    },
+    {
+      "summary": "EPIC 11: Testing",
+      "description": "Unit, Widget, Integration, API, Performance, Security, Firmware, Hardware Validation",
+      "priority": "Highest",
+      "labels": ["testing"]
+    },
+    {
+      "summary": "Flutter Unit Tests",
+      "description": "Test all entities, utils, tokens. 90%+ coverage target.",
+      "epic": "EPIC 11: Testing",
+      "priority": "Highest",
+      "labels": ["testing", "flutter"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Flutter Widget Tests",
+      "description": "Test all components and screens. 80%+ coverage target.",
+      "epic": "EPIC 11: Testing",
+      "priority": "Highest",
+      "labels": ["testing", "flutter"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Flutter Integration Tests",
+      "description": "Critical flows: auth, patients, alerts, offline sync.",
+      "epic": "EPIC 11: Testing",
+      "priority": "Highest",
+      "labels": ["testing", "flutter"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Backend API Tests (pytest)",
+      "description": "Test all endpoints. 90%+ coverage target. Async test client.",
+      "epic": "EPIC 11: Testing",
+      "priority": "Highest",
+      "labels": ["testing", "backend"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Backend Unit Tests (pytest)",
+      "description": "Test services, models, utilities.",
+      "epic": "EPIC 11: Testing",
+      "priority": "Highest",
+      "labels": ["testing", "backend"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Performance / Load Tests",
+      "description": "k6 or locust for API endpoints. Verify 2x expected traffic with <1s P99 latency.",
+      "epic": "EPIC 11: Testing",
+      "priority": "High",
+      "labels": ["testing", "performance"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Security Tests",
+      "description": "OWASP Top 10 scan. Dependency vulnerability scan. Penetration test.",
+      "epic": "EPIC 11: Testing",
+      "priority": "High",
+      "labels": ["testing", "security"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Firmware Tests",
+      "description": "Hardware-in-the-loop testing. Frozen until hardware phase starts.",
+      "epic": "EPIC 11: Testing",
+      "priority": "Lowest",
+      "labels": ["testing", "firmware", "frozen"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Hardware Validation",
+      "description": "Sensor accuracy vs gold standard. Battery life validation. Signal quality across distances.",
+      "epic": "EPIC 11: Testing",
+      "priority": "Lowest",
+      "labels": ["testing", "hardware", "frozen"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "EPIC 12: DevOps",
+      "description": "Docker, CI/CD, GitHub Actions, Release Pipeline, Environment, Secrets",
+      "priority": "Highest",
+      "labels": ["devops"]
+    },
+    {
+      "summary": "Docker Compose Development",
+      "description": "PostgreSQL, Redis, FastAPI services. Easy one-command startup.",
+      "epic": "EPIC 12: DevOps",
+      "priority": "Highest",
+      "labels": ["devops", "docker"],
+      "customfield_phase": "Phase 1"
+    },
+    {
+      "summary": "Docker Compose Production",
+      "description": "Multi-service with monitoring stack (Prometheus, Grafana, Loki, Tempo).",
+      "epic": "EPIC 12: DevOps",
+      "priority": "High",
+      "labels": ["devops", "docker"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "CI Pipeline (GitHub Actions)",
+      "description": "Lint, test, build for all packages. Flutter analyze + pytest.",
+      "epic": "EPIC 12: DevOps",
+      "priority": "Highest",
+      "labels": ["devops", "ci"],
+      "customfield_phase": "Phase 1"
+    },
+    {
+      "summary": "CD Pipeline (GitHub Actions)",
+      "description": "Deploy to staging on tag push. Docker build and push.",
+      "epic": "EPIC 12: DevOps",
+      "priority": "High",
+      "labels": ["devops", "cd"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Release Pipeline",
+      "description": "Versioning, changelog generation, release artifacts.",
+      "epic": "EPIC 12: DevOps",
+      "priority": "High",
+      "labels": ["devops", "release"],
+      "customfield_phase": "Phase 14"
+    },
+    {
+      "summary": "Environment Management",
+      "description": ".env files per environment. Docker profiles for dev/staging/prod.",
+      "epic": "EPIC 12: DevOps",
+      "priority": "Highest",
+      "labels": ["devops", "config"],
+      "customfield_phase": "Phase 1"
+    },
+    {
+      "summary": "Secrets Management",
+      "description": "GitHub Secrets for CI/CD. Docker secrets for production.",
+      "epic": "EPIC 12: DevOps",
+      "priority": "Highest",
+      "labels": ["devops", "security"],
+      "customfield_phase": "Phase 1"
+    }
+  ]
+}
