@@ -33,7 +33,7 @@ dependencies:
   isar_community: ^3.3.2
   isar_community_flutter_libs: ^3.3.2
   web_socket_channel: ^3.0.0
-  flutter_blue_plus: ^1.32.0
+  flutter_blue_plus: ^2.3.11
   connectivity_plus: ^6.0.0
   cached_network_image: ^3.3.1
   shimmer: ^3.0.0
