@@ -6,9 +6,10 @@ Graduation project presentation links and demo guide.
 
 ## Links
 
-- **Android APK**: `../../apps/mobile_flutter/build/app/outputs/flutter-apk/app-debug.apk` (see `apk_link.txt`)
-- **Flutter Web App (Mobile UI)**: see `web_link.txt`
-- **Admin Dashboard (Flutter Web)**: see `admin_link.txt`
+- **Web App (deployed)**: `https://medo6914.github.io/neurobleed-alert/`
+- **Presentation Landing Page (deployed)**: `https://medo6914.github.io/neurobleed-alert/presentation/`
+- **Android APK (GitHub Release)**: `https://github.com/medo6914/neurobleed-alert/releases/latest/download/app-debug.apk`
+- **GitHub Repo**: `https://github.com/medo6914/neurobleed-alert`
 - **QR Code**: `qr_demo.png` / `qr_demo.svg` (points to the web app URL)
 - **Backend API**: `http://localhost:8000` (Swagger: `http://localhost:8000/docs`)
 
