@@ -165,7 +165,7 @@ class VitalsHistoryScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('اتجاه معدل ضربات القلب', style: NeuroTypography.h3?.copyWith(
+              Text('اتجاه معدل ضربات القلب', style: NeuroTypography.h3.copyWith(
                 color: NeuroColors.textPrimary,
                 fontWeight: FontWeight.w600,
               )),
@@ -273,7 +273,7 @@ class VitalsHistoryScreen extends ConsumerWidget {
         ),
         child: Column(
           children: [
-            Text(value, style: NeuroTypography.h3?.copyWith(
+            Text(value, style: NeuroTypography.h3.copyWith(
               color: NeuroColors.textPrimary,
               fontWeight: FontWeight.w600,
             )),

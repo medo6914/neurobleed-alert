@@ -95,7 +95,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            user.email ?? '',
+            user.email,
             style: NeuroTypography.caption,
           ),
           const SizedBox(height: NeuroSpacing.md),
@@ -141,8 +141,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         return 'باحث';
       case UserRole.family:
         return 'عائلة';
-      default:
-        return role.name;
     }
   }
 
@@ -152,14 +150,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         padding: const EdgeInsets.all(NeuroSpacing.lg),
         child: Column(
           children: [
-            _infoRow(Icons.email_outlined, 'البريد الإلكتروني', user.email ?? '—'),
+            _infoRow(Icons.email_outlined, 'البريد الإلكتروني', user.email),
             const Divider(color: NeuroColors.bgCard),
             _infoRow(Icons.phone_outlined, 'رقم الهاتف', user.phone ?? '—'),
             const Divider(color: NeuroColors.bgCard),
             _infoRow(
               Icons.badge_outlined,
               'المعرف',
-              user.id ?? '—',
+              user.id,
               monospace: true,
             ),
             const Divider(color: NeuroColors.bgCard),
@@ -185,7 +183,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         Flexible(
           child: Text(
             value,
-            style: NeuroTypography.bodyMedium?.copyWith(
+            style: NeuroTypography.bodyMedium.copyWith(
               color: NeuroColors.textPrimary,
               fontFamily: monospace ? 'monospace' : null,
               fontSize: monospace ? 11 : null,

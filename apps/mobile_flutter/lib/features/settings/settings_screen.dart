@@ -79,7 +79,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       Text(
                         'دكتور',
-                        style: NeuroTypography.h3?.copyWith(
+                        style: NeuroTypography.h3.copyWith(
                           color: NeuroColors.textPrimary,
                         ),
                       ),
@@ -228,7 +228,7 @@ class _SettingsTile extends StatelessWidget {
         leading: Icon(icon, color: NeuroColors.textBody, size: 22),
         title: Text(
           label,
-          style: NeuroTypography.bodyMedium?.copyWith(
+          style: NeuroTypography.bodyMedium.copyWith(
             color: NeuroColors.textPrimary,
           ),
         ),
