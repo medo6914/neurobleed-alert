@@ -32,6 +32,22 @@ async def create_reading(
         "timestamp": reading.timestamp.isoformat() if reading.timestamp else None,
     })
 
+    from app.api.v1.device_ws import manager
+
+    await manager.broadcast_reading({
+        "type": "vitals_update",
+        "patient_id": str(reading.patient_id),
+        "device_id": str(reading.device_id) if reading.device_id else None,
+        "heart_rate": reading.heart_rate,
+        "spo2": reading.spo2,
+        "rso2": reading.rso2,
+        "signal_quality": reading.signal_quality,
+        "motion_artifact": reading.motion_artifact,
+        "risk_score": reading.risk_score,
+        "risk_level": reading.risk_level.value if hasattr(reading.risk_level, "value") else str(reading.risk_level),
+        "timestamp": reading.timestamp.isoformat() if reading.timestamp else None,
+    })
+
     return reading
 
 

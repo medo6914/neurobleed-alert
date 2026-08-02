@@ -39,6 +39,7 @@ export 'use_cases/devices/device_use_cases.dart';
 
 export 'network/dtos/device/device_dtos.dart';
 export 'network/dtos/ai/ai_dtos.dart';
+export 'network/dtos/analytics/analytics_dtos.dart';
 
 export 'validators/device_validator.dart';
 

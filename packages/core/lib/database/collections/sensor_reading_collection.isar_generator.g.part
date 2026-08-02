@@ -14,7 +14,7 @@ extension GetSensorReadingCollectionCollection on Isar {
 
 const SensorReadingCollectionSchema = CollectionSchema(
   name: r'SensorReadingCollection',
-  id: 246774917276030655,
+  id: 3580537398023898,
   properties: {
     r'cpp': PropertySchema(
       id: 0,
@@ -104,7 +104,7 @@ const SensorReadingCollectionSchema = CollectionSchema(
   idName: r'isarId',
   indexes: {
     r'id': IndexSchema(
-      id: -3268401673993471357,
+      id: -7795543777232615,
       name: r'id',
       unique: true,
       replace: false,
@@ -117,7 +117,7 @@ const SensorReadingCollectionSchema = CollectionSchema(
       ],
     ),
     r'deviceId': IndexSchema(
-      id: 4442814072367132509,
+      id: 2264839779823946,
       name: r'deviceId',
       unique: false,
       replace: false,
@@ -130,7 +130,7 @@ const SensorReadingCollectionSchema = CollectionSchema(
       ],
     ),
     r'patientId': IndexSchema(
-      id: 403389457658259617,
+      id: 7072690449656013,
       name: r'patientId',
       unique: false,
       replace: false,
@@ -143,7 +143,7 @@ const SensorReadingCollectionSchema = CollectionSchema(
       ],
     ),
     r'timestamp': IndexSchema(
-      id: 1852253767416892198,
+      id: 5777920194989043,
       name: r'timestamp',
       unique: false,
       replace: false,

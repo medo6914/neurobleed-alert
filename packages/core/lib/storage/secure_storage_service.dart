@@ -13,6 +13,7 @@ class SecureStorageService {
   static const _onboardingKey = 'onboarding_complete';
   static const _themeModeKey = 'theme_mode';
   static const _localeKey = 'app_locale';
+  static const _rememberMeKey = 'remember_me';
 
   Future<void> saveToken(String token) async {
     await _storage.write(key: _tokenKey, value: token);
@@ -103,5 +104,14 @@ class SecureStorageService {
 
   Future<void> clearLocale() async {
     await _storage.delete(key: _localeKey);
+  }
+
+  Future<void> saveRememberMe(bool remember) async {
+    await _storage.write(key: _rememberMeKey, value: '$remember');
+  }
+
+  Future<bool> getRememberMe() async {
+    final value = await _storage.read(key: _rememberMeKey);
+    return value == 'true';
   }
 }

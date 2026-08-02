@@ -49,6 +49,7 @@ class Patient(TimestampMixin, SoftDeleteMixin, VersionMixin, AuditMixin, FHIRMix
     alerts = relationship("Alert", back_populates="patient")
     sensor_readings = relationship("SensorReading", back_populates="patient")
     ai_reports = relationship("AIReport", back_populates="patient")
+    clinical_reports = relationship("ClinicalReport", back_populates="patient")
     department = relationship("Department")
 
     def __repr__(self) -> str:

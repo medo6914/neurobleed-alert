@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
+import 'package:core/core.dart';
 import 'package:shared/shared.dart';
 import '../providers/device_providers.dart';
 import '../widgets/device_widgets.dart';
+import 'device_diagnostics_screen.dart';
 
 class DeviceDetailScreen extends ConsumerWidget {
   final String deviceId;
@@ -160,6 +162,8 @@ class _OverviewTab extends StatelessWidget {
               ],
             ),
           ),
+          SizedBox(height: NeuroSpacing.md),
+          _ConnectionActions(device: device),
           SizedBox(height: NeuroSpacing.md),
 
           Row(
@@ -702,6 +706,130 @@ class _HistoryTile extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Connect / Disconnect Actions ────────────────────────────────────
+class _ConnectionActions extends ConsumerStatefulWidget {
+  final Device device;
+
+  const _ConnectionActions({required this.device});
+
+  @override
+  ConsumerState<_ConnectionActions> createState() => _ConnectionActionsState();
+}
+
+class _ConnectionActionsState extends ConsumerState<_ConnectionActions> {
+  bool _busy = false;
+
+  Future<void> _setStatus(DeviceStatus status) async {
+    setState(() => _busy = true);
+    try {
+      final api = ref.read(apiClientProvider);
+      await api.patch(
+        '/v1/devices/${widget.device.id}/status',
+        data: {
+          'status': status.name,
+        },
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              status == DeviceStatus.online
+                  ? 'تم توصيل الجهاز بنجاح'
+                  : 'تم فصل الجهاز',
+            ),
+          ),
+        );
+        ref.invalidate(deviceDetailProvider(widget.device.id));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'فشل تحديث حالة الجهاز: $e',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final device = widget.device;
+    final isOnline = device.status == DeviceStatus.online;
+
+    return AppCard(
+      child: Padding(
+        padding: const EdgeInsets.all(NeuroSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Connectivity',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+            ),
+            const SizedBox(height: NeuroSpacing.sm),
+            Row(
+              children: [
+                if (isOnline)
+                  Expanded(
+                    child: FilledButton.icon(
+                      icon: const Icon(Icons.link_off, size: 18),
+                      label: Text(_busy ? 'Disconnecting...' : 'Disconnect'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                      ),
+                      onPressed: _busy
+                          ? null
+                          : () => _setStatus(DeviceStatus.offline),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: FilledButton.icon(
+                      icon: const Icon(Icons.link, size: 18),
+                      label: Text(_busy ? 'Connecting...' : 'Connect'),
+                      onPressed: _busy
+                          ? null
+                          : () => _setStatus(DeviceStatus.online),
+                    ),
+                  ),
+                const SizedBox(width: NeuroSpacing.md),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.medical_services_outlined, size: 18),
+                    label: const Text('Diagnostics'),
+                    onPressed: _busy
+                        ? null
+                        : () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    DeviceDiagnosticsScreen(deviceId: device.id),
+                              ),
+                            ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: NeuroSpacing.sm),
+            DeviceMetricTile(
+              icon: Icons.history_toggle_off,
+              label: 'Last Connected',
+              value: device.lastHeartbeat.toLocal().toString().substring(0, 16),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -54,7 +54,7 @@ class AuditHistoryScreen extends ConsumerWidget {
                       children: [
                         Text('${record.resourceType}${record.resourceId != null ? ' #${record.resourceId!.substring(0, 8)}' : ''}'),
                         if (record.userName != null) Text('by ${record.userName} (${record.userRole ?? "N/A"})'),
-                        Text(record.timestamp.toLocal().toString().substring(0, 16), style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                        Text(record.timestamp.toLocal().toString().substring(0, 16), style: TextStyle(fontSize: 12, color: NeuroColors.textSecondary)),
                       ],
                     ),
                     isThreeLine: true,

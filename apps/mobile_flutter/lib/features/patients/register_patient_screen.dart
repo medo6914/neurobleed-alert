@@ -98,8 +98,6 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth >= 768;
 
     return Scaffold(
       appBar: AppBar(

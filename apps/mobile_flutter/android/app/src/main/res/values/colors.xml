@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="neurobleed_primary">#FF1B409A</color>
+    <color name="neurobleed_primary_dark">#FF020C23</color>
+    <color name="neurobleed_splash_bg">#FF020C23</color>
+</resources>

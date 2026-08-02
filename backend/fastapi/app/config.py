@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str | None = None
     SMTP_FROM_EMAIL: str = "noreply@neurobleed.com"
 
+    REPORT_STORAGE_PATH: str = "./reports"
+    REPORT_BASE_URL: str = "/reports"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

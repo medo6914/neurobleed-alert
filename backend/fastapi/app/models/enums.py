@@ -110,3 +110,74 @@ class KnowledgeUpdateAction(str, enum.Enum):
     DELETE = "delete"
     PUBLISH = "publish"
     UNPUBLISH = "unpublish"
+
+
+class ReportFormat(str, enum.Enum):
+    PDF = "pdf"
+    HTML = "html"
+    DOCX = "docx"
+
+
+class ReportStatus(str, enum.Enum):
+    PENDING = "pending"
+    GENERATING = "generating"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class EmergencyEventStatus(str, enum.Enum):
+    TRIGGERED = "triggered"
+    CONTACTING = "contacting"
+    ACKNOWLEDGED = "acknowledged"
+    ESCALATED = "escalated"
+    RESOLVED = "resolved"
+
+
+class TicketStatus(str, enum.Enum):
+    OPEN = "open"
+    IN_PROGRESS = "in_progress"
+    RESOLVED = "resolved"
+    CLOSED = "closed"
+
+
+class TicketPriority(str, enum.Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    URGENT = "urgent"
+
+
+class SubscriptionTier(str, enum.Enum):
+    FREE = "free"
+    BASIC = "basic"
+    PROFESSIONAL = "professional"
+    ENTERPRISE = "enterprise"
+
+
+class SubscriptionStatus(str, enum.Enum):
+    ACTIVE = "active"
+    PAST_DUE = "past_due"
+    CANCELED = "canceled"
+    EXPIRED = "expired"
+
+
+class ProvisioningKeyStatus(str, enum.Enum):
+    ACTIVE = "active"
+    USED = "used"
+    EXPIRED = "expired"
+    REVOKED = "revoked"
+
+
+class DeviceEventType(str, enum.Enum):
+    REGISTERED = "registered"
+    ASSIGNED = "assigned"
+    UNASSIGNED = "unassigned"
+    PROVISIONED = "provisioned"
+    OTA_STARTED = "ota_started"
+    OTA_COMPLETED = "ota_completed"
+    OTA_FAILED = "ota_failed"
+    HEARTBEAT_LOST = "heartbeat_lost"
+    CONNECTED = "connected"
+    DISCONNECTED = "disconnected"
+    ERROR = "error"
+    DIAGNOSTIC_REPORTED = "diagnostic_reported"

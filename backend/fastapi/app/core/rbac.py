@@ -18,6 +18,9 @@ class Permission(str, Enum):
     MONITORING_VIEW = "monitoring:view"
 
     ALERT_LIST = "alert:list"
+    ALERT_VIEW = "alert:view"
+    ALERT_CREATE = "alert:create"
+    ALERT_UPDATE = "alert:update"
     ALERT_ACKNOWLEDGE = "alert:acknowledge"
 
     REPORT_VIEW = "report:view"
@@ -56,12 +59,16 @@ def _get_role_permissions() -> dict[str, set[Permission]]:
             Permission.USER_LIST,
             Permission.AI_ASSESS,
             Permission.AI_VIEW,
+            Permission.ALERT_VIEW,
+            Permission.ALERT_CREATE,
+            Permission.ALERT_UPDATE,
         },
         "nurse": {
             Permission.PATIENT_LIST,
             Permission.PATIENT_VIEW,
             Permission.MONITORING_VIEW,
             Permission.ALERT_LIST,
+            Permission.ALERT_VIEW,
             Permission.ALERT_ACKNOWLEDGE,
         },
         "technician": {
@@ -76,6 +83,7 @@ def _get_role_permissions() -> dict[str, set[Permission]]:
             Permission.PATIENT_VIEW,
             Permission.MONITORING_VIEW,
             Permission.ALERT_LIST,
+            Permission.ALERT_VIEW,
         },
     }
 

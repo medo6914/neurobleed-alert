@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/ai_providers.dart';
-import '../widgets/ai_widgets.dart';
 
 class RiskHistoryScreen extends ConsumerStatefulWidget {
   final String patientId;

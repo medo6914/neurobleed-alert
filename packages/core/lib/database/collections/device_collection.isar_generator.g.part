@@ -13,7 +13,7 @@ extension GetDeviceCollectionCollection on Isar {
 
 const DeviceCollectionSchema = CollectionSchema(
   name: r'DeviceCollection',
-  id: -1164842041873454857,
+  id: -2913338011867018,
   properties: {
     r'batteryLevel': PropertySchema(
       id: 0,
@@ -98,7 +98,7 @@ const DeviceCollectionSchema = CollectionSchema(
   idName: r'isarId',
   indexes: {
     r'id': IndexSchema(
-      id: -3268401673993471357,
+      id: -7795543777232615,
       name: r'id',
       unique: true,
       replace: false,
@@ -111,7 +111,7 @@ const DeviceCollectionSchema = CollectionSchema(
       ],
     ),
     r'serialNumber': IndexSchema(
-      id: 135203776617746534,
+      id: 95787796631669,
       name: r'serialNumber',
       unique: true,
       replace: false,
@@ -124,7 +124,7 @@ const DeviceCollectionSchema = CollectionSchema(
       ],
     ),
     r'patientId': IndexSchema(
-      id: 403389457658259617,
+      id: 7072690449656013,
       name: r'patientId',
       unique: false,
       replace: false,
@@ -137,7 +137,7 @@ const DeviceCollectionSchema = CollectionSchema(
       ],
     ),
     r'hospitalId': IndexSchema(
-      id: 6952312329871491669,
+      id: 7761704466187608,
       name: r'hospitalId',
       unique: false,
       replace: false,

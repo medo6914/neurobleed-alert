@@ -1,0 +1,13 @@
+{
+  "flutter": {
+    "platforms": [
+      "android",
+      "ios",
+      "web",
+      "windows"
+    ]
+  },
+  "firebase": {
+    "project": "neurobleed-alert"
+  }
+}

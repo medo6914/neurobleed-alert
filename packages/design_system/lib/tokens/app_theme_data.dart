@@ -8,87 +8,110 @@ import 'app_radius.dart';
 class NeuroThemeData {
   NeuroThemeData._();
 
-  static ThemeData light({required String fontFamily}) {
-    final colorScheme = ColorScheme.light(
-      primary: NeuroColors.primary,
-      onPrimary: NeuroColors.textOnPrimary,
-      primaryContainer: NeuroColors.primaryLight,
-      secondary: NeuroColors.info,
-      error: NeuroColors.error,
-      surface: NeuroColors.surface,
-      onSurface: NeuroColors.textPrimary,
+  static ThemeData _baseTheme({
+    required Brightness brightness,
+    required Color scaffoldBg,
+    required Color surfaceColor,
+    required Color appBarBg,
+    required Color appBarFg,
+    required Color navBg,
+    required Color navActive,
+    required Color navInactive,
+    required Color primaryClr,
+    required Color primaryContainerClr,
+    required Color onPrimaryClr,
+    required Color secondaryClr,
+    required Color errorClr,
+    required Color onSurfaceClr,
+    required Color inputFill,
+    required Color cardBg,
+    required Color dividerClr,
+    required Color hintClr,
+  }) {
+    final colorScheme = ColorScheme(
+      brightness: brightness,
+      primary: primaryClr,
+      onPrimary: onPrimaryClr,
+      primaryContainer: primaryContainerClr,
+      secondary: secondaryClr,
+      onSecondary: onPrimaryClr,
+      error: errorClr,
+      onError: Colors.white,
+      surface: surfaceColor,
+      onSurface: onSurfaceClr,
     );
 
     final textTheme = NeuroTypography.textTheme;
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
+      brightness: brightness,
       colorScheme: colorScheme,
-      textTheme: textTheme,
-      scaffoldBackgroundColor: NeuroColors.background,
+      textTheme: textTheme.apply(
+        bodyColor: onSurfaceClr,
+        displayColor: NeuroColors.textPrimary,
+      ),
+      scaffoldBackgroundColor: scaffoldBg,
       cardTheme: CardThemeData(
-        color: NeuroColors.surface,
+        color: cardBg,
         elevation: 2,
         shadowColor: NeuroShadows.card.color,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.lg),
+          borderRadius: BorderRadius.circular(NeuroRadius.card),
         ),
         margin: EdgeInsets.zero,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: NeuroColors.surface,
-        foregroundColor: NeuroColors.textPrimary,
+        backgroundColor: appBarBg,
+        foregroundColor: appBarFg,
         elevation: 0,
-        centerTitle: true,
+        centerTitle: false,
         titleTextStyle: textTheme.titleLarge?.copyWith(
           color: NeuroColors.textPrimary,
         ),
-        iconTheme: const IconThemeData(color: NeuroColors.textPrimary),
+        iconTheme: IconThemeData(color: NeuroColors.textBody),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: NeuroColors.surface,
-        selectedItemColor: NeuroColors.primary,
-        unselectedItemColor: NeuroColors.textSecondary,
+        backgroundColor: navBg,
+        selectedItemColor: navActive,
+        unselectedItemColor: navInactive,
         type: BottomNavigationBarType.fixed,
-        elevation: 8,
+        elevation: 0,
+        selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        unselectedLabelStyle: const TextStyle(fontSize: 11),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: NeuroColors.primary,
-        foregroundColor: NeuroColors.textOnPrimary,
+        backgroundColor: primaryClr,
+        foregroundColor: onPrimaryClr,
         elevation: 4,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.xl),
+          borderRadius: BorderRadius.circular(NeuroRadius.lg),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: NeuroColors.background,
-        hintStyle: textTheme.bodyMedium?.copyWith(
-          color: NeuroColors.textSecondary,
-        ),
-        labelStyle: textTheme.labelLarge?.copyWith(
-          color: NeuroColors.textSecondary,
-        ),
+        fillColor: inputFill,
+        hintStyle: textTheme.bodyMedium?.copyWith(color: hintClr),
+        labelStyle: textTheme.labelLarge?.copyWith(color: hintClr),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
-          borderSide: const BorderSide(color: NeuroColors.chartGrid),
+          borderRadius: BorderRadius.circular(NeuroRadius.input),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
-          borderSide: const BorderSide(color: NeuroColors.chartGrid),
+          borderRadius: BorderRadius.circular(NeuroRadius.input),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
+          borderRadius: BorderRadius.circular(NeuroRadius.input),
           borderSide: const BorderSide(color: NeuroColors.primary, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
-          borderSide: const BorderSide(color: NeuroColors.error),
+          borderRadius: BorderRadius.circular(NeuroRadius.input),
+          borderSide: BorderSide(color: errorClr),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
-          borderSide: const BorderSide(color: NeuroColors.error, width: 2),
+          borderRadius: BorderRadius.circular(NeuroRadius.input),
+          borderSide: BorderSide(color: errorClr, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: NeuroSpacing.lg,
@@ -97,104 +120,95 @@ class NeuroThemeData {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: NeuroColors.primary,
-          foregroundColor: NeuroColors.textOnPrimary,
-          disabledBackgroundColor: NeuroColors.chartGrid,
-          disabledForegroundColor: NeuroColors.textSecondary,
+          backgroundColor: primaryClr,
+          foregroundColor: onPrimaryClr,
+          disabledBackgroundColor: hintClr.withValues(alpha: 0.3),
+          disabledForegroundColor: hintClr,
           elevation: 0,
           padding: const EdgeInsets.symmetric(
             horizontal: NeuroSpacing.xl,
             vertical: NeuroSpacing.md,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(NeuroRadius.md),
+            borderRadius: BorderRadius.circular(NeuroRadius.button),
           ),
-          textStyle: textTheme.labelLarge,
+          textStyle: NeuroTypography.button,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: NeuroColors.primary,
-          disabledForegroundColor: NeuroColors.textSecondary,
-          side: const BorderSide(color: NeuroColors.primary),
+          foregroundColor: primaryClr,
+          disabledForegroundColor: hintClr,
+          side: BorderSide(color: primaryClr),
           padding: const EdgeInsets.symmetric(
             horizontal: NeuroSpacing.xl,
             vertical: NeuroSpacing.md,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(NeuroRadius.md),
+            borderRadius: BorderRadius.circular(NeuroRadius.button),
           ),
-          textStyle: textTheme.labelLarge,
+          textStyle: NeuroTypography.button,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: NeuroColors.primary,
-          disabledForegroundColor: NeuroColors.textSecondary,
+          foregroundColor: primaryClr,
+          disabledForegroundColor: hintClr,
           padding: const EdgeInsets.symmetric(
             horizontal: NeuroSpacing.lg,
             vertical: NeuroSpacing.sm,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(NeuroRadius.md),
+            borderRadius: BorderRadius.circular(NeuroRadius.button),
           ),
-          textStyle: textTheme.labelLarge,
+          textStyle: NeuroTypography.button,
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: NeuroColors.surface,
+        backgroundColor: cardBg,
         elevation: 8,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.xl),
+          borderRadius: BorderRadius.circular(NeuroRadius.xxl),
         ),
-        titleTextStyle: textTheme.headlineSmall?.copyWith(
-          color: NeuroColors.textPrimary,
-        ),
-        contentTextStyle: textTheme.bodyMedium?.copyWith(
-          color: NeuroColors.textSecondary,
-        ),
+        titleTextStyle: textTheme.headlineSmall?.copyWith(color: NeuroColors.textPrimary),
+        contentTextStyle: textTheme.bodyMedium?.copyWith(color: NeuroColors.textBody),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: NeuroColors.textPrimary,
-        contentTextStyle: textTheme.bodyMedium?.copyWith(
-          color: NeuroColors.textOnPrimary,
-        ),
+        backgroundColor: NeuroColors.bgElevated,
+        contentTextStyle: textTheme.bodyMedium?.copyWith(color: NeuroColors.textPrimary),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(NeuroRadius.md),
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: NeuroColors.background,
-        labelStyle: textTheme.labelMedium?.copyWith(
-          color: NeuroColors.textPrimary,
-        ),
+        backgroundColor: NeuroColors.bgCard,
+        labelStyle: textTheme.labelMedium?.copyWith(color: NeuroColors.textBody),
         padding: const EdgeInsets.symmetric(
-          horizontal: NeuroSpacing.sm,
-          vertical: NeuroSpacing.xxs,
+          horizontal: NeuroSpacing.md,
+          vertical: NeuroSpacing.xs,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.full),
+          borderRadius: BorderRadius.circular(NeuroRadius.chip),
         ),
+        side: BorderSide.none,
       ),
       dividerTheme: DividerThemeData(
-        color: NeuroColors.chartGrid,
+        color: dividerClr,
         thickness: 1,
         space: NeuroSpacing.lg,
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: NeuroColors.primary,
-        linearTrackColor: NeuroColors.chartGrid,
-        circularTrackColor: NeuroColors.chartGrid,
+        color: primaryClr,
+        linearTrackColor: dividerClr,
+        circularTrackColor: dividerClr,
       ),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: NeuroColors.textPrimary,
+          color: NeuroColors.bgElevated,
           borderRadius: BorderRadius.circular(NeuroRadius.sm),
         ),
-        textStyle: textTheme.bodySmall?.copyWith(
-          color: NeuroColors.textOnPrimary,
-        ),
+        textStyle: textTheme.bodySmall?.copyWith(color: NeuroColors.textPrimary),
         padding: const EdgeInsets.symmetric(
           horizontal: NeuroSpacing.sm,
           vertical: NeuroSpacing.xs,
@@ -203,269 +217,79 @@ class NeuroThemeData {
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return NeuroColors.primary;
+            return primaryClr;
           }
           return Colors.transparent;
         }),
-        checkColor: WidgetStateProperty.all(NeuroColors.textOnPrimary),
+        checkColor: WidgetStateProperty.all(onPrimaryClr),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.sm),
+          borderRadius: BorderRadius.circular(NeuroRadius.xs),
         ),
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return NeuroColors.primary;
-          }
-          return NeuroColors.textSecondary;
+          if (states.contains(WidgetState.selected)) return primaryClr;
+          return hintClr;
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return NeuroColors.primaryLight;
+            return primaryClr.withValues(alpha: 0.5);
           }
-          return NeuroColors.chartGrid;
+          return hintClr.withValues(alpha: 0.3);
         }),
       ),
       radioTheme: RadioThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return NeuroColors.primary;
-          }
-          return NeuroColors.textSecondary;
+          if (states.contains(WidgetState.selected)) return primaryClr;
+          return hintClr;
         }),
       ),
     );
   }
 
   static ThemeData dark({required String fontFamily}) {
-    final colorScheme = ColorScheme.dark(
-      primary: NeuroColors.primaryLight,
-      onPrimary: NeuroColors.textPrimary,
-      primaryContainer: NeuroColors.primaryDark,
-      secondary: NeuroColors.info,
-      error: NeuroColors.error,
-      surface: NeuroColors.surfaceDark,
-      onSurface: NeuroColors.textOnPrimary,
-    );
-
-    final textTheme = NeuroTypography.textTheme;
-
-    return ThemeData(
-      useMaterial3: true,
+    return _baseTheme(
       brightness: Brightness.dark,
-      colorScheme: colorScheme,
-      textTheme: textTheme.apply(
-        bodyColor: NeuroColors.textOnPrimary,
-        displayColor: NeuroColors.textOnPrimary,
-      ),
-      scaffoldBackgroundColor: NeuroColors.backgroundDark,
-      cardTheme: CardThemeData(
-        color: NeuroColors.surfaceDark,
-        elevation: 2,
-        shadowColor: Colors.black38,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.lg),
-        ),
-        margin: EdgeInsets.zero,
-      ),
-      appBarTheme: AppBarTheme(
-        backgroundColor: NeuroColors.surfaceDark,
-        foregroundColor: NeuroColors.textOnPrimary,
-        elevation: 0,
-        centerTitle: true,
-        titleTextStyle: textTheme.titleLarge?.copyWith(
-          color: NeuroColors.textOnPrimary,
-        ),
-        iconTheme: const IconThemeData(color: NeuroColors.textOnPrimary),
-      ),
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: NeuroColors.surfaceDark,
-        selectedItemColor: NeuroColors.primaryLight,
-        unselectedItemColor: NeuroColors.textSecondary,
-        type: BottomNavigationBarType.fixed,
-        elevation: 8,
-      ),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: NeuroColors.primaryLight,
-        foregroundColor: NeuroColors.textPrimary,
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.xl),
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: NeuroColors.backgroundDark,
-        hintStyle: textTheme.bodyMedium?.copyWith(
-          color: NeuroColors.textSecondary,
-        ),
-        labelStyle: textTheme.labelLarge?.copyWith(
-          color: NeuroColors.textSecondary,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
-          borderSide: const BorderSide(color: NeuroColors.textSecondary, width: 0.5),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
-          borderSide: const BorderSide(color: NeuroColors.textSecondary, width: 0.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
-          borderSide: const BorderSide(color: NeuroColors.primaryLight, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
-          borderSide: const BorderSide(color: NeuroColors.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
-          borderSide: const BorderSide(color: NeuroColors.error, width: 2),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: NeuroSpacing.lg,
-          vertical: NeuroSpacing.md,
-        ),
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: NeuroColors.primaryLight,
-          foregroundColor: NeuroColors.textPrimary,
-          disabledBackgroundColor: NeuroColors.textSecondary.withValues(alpha: 0.3),
-          disabledForegroundColor: NeuroColors.textSecondary,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(
-            horizontal: NeuroSpacing.xl,
-            vertical: NeuroSpacing.md,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(NeuroRadius.md),
-          ),
-          textStyle: textTheme.labelLarge,
-        ),
-      ),
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: NeuroColors.primaryLight,
-          disabledForegroundColor: NeuroColors.textSecondary,
-          side: const BorderSide(color: NeuroColors.primaryLight),
-          padding: const EdgeInsets.symmetric(
-            horizontal: NeuroSpacing.xl,
-            vertical: NeuroSpacing.md,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(NeuroRadius.md),
-          ),
-          textStyle: textTheme.labelLarge,
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: NeuroColors.primaryLight,
-          disabledForegroundColor: NeuroColors.textSecondary,
-          padding: const EdgeInsets.symmetric(
-            horizontal: NeuroSpacing.lg,
-            vertical: NeuroSpacing.sm,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(NeuroRadius.md),
-          ),
-          textStyle: textTheme.labelLarge,
-        ),
-      ),
-      dialogTheme: DialogThemeData(
-        backgroundColor: NeuroColors.surfaceDark,
-        elevation: 8,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.xl),
-        ),
-        titleTextStyle: textTheme.headlineSmall?.copyWith(
-          color: NeuroColors.textOnPrimary,
-        ),
-        contentTextStyle: textTheme.bodyMedium?.copyWith(
-          color: NeuroColors.textSecondary,
-        ),
-      ),
-      snackBarTheme: SnackBarThemeData(
-        backgroundColor: const Color(0xFF2C2C2C),
-        contentTextStyle: textTheme.bodyMedium?.copyWith(
-          color: NeuroColors.textOnPrimary,
-        ),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
-        ),
-      ),
-      chipTheme: ChipThemeData(
-        backgroundColor: NeuroColors.backgroundDark,
-        labelStyle: textTheme.labelMedium?.copyWith(
-          color: NeuroColors.textOnPrimary,
-        ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: NeuroSpacing.sm,
-          vertical: NeuroSpacing.xxs,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.full),
-        ),
-      ),
-      dividerTheme: DividerThemeData(
-        color: NeuroColors.textSecondary.withValues(alpha: 0.3),
-        thickness: 1,
-        space: NeuroSpacing.lg,
-      ),
-      progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: NeuroColors.primaryLight,
-        linearTrackColor: NeuroColors.textSecondary.withValues(alpha: 0.3),
-        circularTrackColor: NeuroColors.textSecondary.withValues(alpha: 0.3),
-      ),
-      tooltipTheme: TooltipThemeData(
-        decoration: BoxDecoration(
-          color: NeuroColors.textSecondary,
-          borderRadius: BorderRadius.circular(NeuroRadius.sm),
-        ),
-        textStyle: textTheme.bodySmall?.copyWith(
-          color: NeuroColors.textOnPrimary,
-        ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: NeuroSpacing.sm,
-          vertical: NeuroSpacing.xs,
-        ),
-      ),
-      checkboxTheme: CheckboxThemeData(
-        fillColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return NeuroColors.primaryLight;
-          }
-          return Colors.transparent;
-        }),
-        checkColor: WidgetStateProperty.all(NeuroColors.textPrimary),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(NeuroRadius.sm),
-        ),
-      ),
-      switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return NeuroColors.primaryLight;
-          }
-          return NeuroColors.textSecondary;
-        }),
-        trackColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return NeuroColors.primaryLight.withValues(alpha: 0.5);
-          }
-          return NeuroColors.textSecondary.withValues(alpha: 0.3);
-        }),
-      ),
-      radioTheme: RadioThemeData(
-        fillColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return NeuroColors.primaryLight;
-          }
-          return NeuroColors.textSecondary;
-        }),
-      ),
+      scaffoldBg: NeuroColors.bgPrimary,
+      surfaceColor: NeuroColors.bgSurface,
+      appBarBg: NeuroColors.headerGradTop,
+      appBarFg: NeuroColors.textPrimary,
+      navBg: NeuroColors.navBg,
+      navActive: NeuroColors.navActive,
+      navInactive: NeuroColors.navInactive,
+      primaryClr: NeuroColors.primary,
+      primaryContainerClr: NeuroColors.primaryDark,
+      onPrimaryClr: Colors.white,
+      secondaryClr: NeuroColors.info,
+      errorClr: NeuroColors.critical,
+      onSurfaceClr: NeuroColors.textPrimary,
+      inputFill: NeuroColors.bgInput,
+      cardBg: NeuroColors.bgCard,
+      dividerClr: NeuroColors.chartGrid,
+      hintClr: NeuroColors.textSecondary,
+    );
+  }
+
+  static ThemeData light({required String fontFamily}) {
+    return _baseTheme(
+      brightness: Brightness.light,
+      scaffoldBg: const Color(0xFFF0F2F5),
+      surfaceColor: Colors.white,
+      appBarBg: Colors.white,
+      appBarFg: const Color(0xFF1A1A2E),
+      navBg: Colors.white,
+      navActive: NeuroColors.primary,
+      navInactive: const Color(0xFF9E9E9E),
+      primaryClr: NeuroColors.primary,
+      primaryContainerClr: const Color(0xFFD6E4FF),
+      onPrimaryClr: Colors.white,
+      secondaryClr: NeuroColors.info,
+      errorClr: NeuroColors.critical,
+      onSurfaceClr: const Color(0xFF1A1A2E),
+      inputFill: const Color(0xFFF5F5F5),
+      cardBg: Colors.white,
+      dividerClr: const Color(0xFFE0E0E0),
+      hintClr: const Color(0xFF9E9E9E),
     );
   }
 }

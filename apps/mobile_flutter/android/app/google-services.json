@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "85904350158",
+    "project_id": "neurobleed-alert",
+    "storage_bucket": "neurobleed-alert.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:85904350158:android:eeba64ee389dd4719c699f",
+        "android_client_info": {
+          "package_name": "com.example.neurobleed_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDu6vcbGdJcXeTZ-9dYAUZ6ZRotTDlQ4LY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

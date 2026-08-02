@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:design_system/design_system.dart';
 import 'package:core/core.dart';
 import '../alerts/widgets/alert_overlay.dart';
 
@@ -50,32 +51,68 @@ class _ShellScreenState extends ConsumerState<ShellScreen> {
     return AlertOverlay(
       child: Scaffold(
         body: widget.child,
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: currentIndex,
-          onTap: (index) => _onTap(index, location),
-          type: BottomNavigationBarType.fixed,
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.dashboard_rounded),
-              label: AppLocalizations.of(context).translate(L10n.dashboard) ?? 'Dashboard',
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: NeuroColors.navBg,
+            border: Border(
+              top: BorderSide(
+                color: NeuroColors.bgPrimary.withValues(alpha: 0.5),
+                width: 1,
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.people_rounded),
-              label: AppLocalizations.of(context).translate(L10n.patients) ?? 'Patients',
+          ),
+          child: SafeArea(
+            top: false,
+            child: SizedBox(
+              height: 58,
+              child: BottomNavigationBar(
+                currentIndex: currentIndex,
+                onTap: (index) => _onTap(index, location),
+                type: BottomNavigationBarType.fixed,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                selectedItemColor: NeuroColors.navActive,
+                unselectedItemColor: NeuroColors.navInactive,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.home_outlined),
+                    activeIcon: const Icon(Icons.home),
+                    label:
+                        AppLocalizations.of(context).translate(L10n.dashboard) ??
+                            'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.people_outlined),
+                    activeIcon: const Icon(Icons.people),
+                    label:
+                        AppLocalizations.of(context).translate(L10n.patients) ??
+                            'Patients',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.monitor_heart_outlined),
+                    activeIcon: const Icon(Icons.monitor_heart),
+                    label:
+                        AppLocalizations.of(context).translate(L10n.monitoring) ??
+                            'Monitoring',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.notifications_outlined),
+                    activeIcon: const Icon(Icons.notifications),
+                    label:
+                        AppLocalizations.of(context).translate(L10n.alerts) ??
+                            'Alerts',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: const Icon(Icons.settings_outlined),
+                    activeIcon: const Icon(Icons.settings),
+                    label:
+                        AppLocalizations.of(context).translate(L10n.settings) ??
+                            'Settings',
+                  ),
+                ],
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.monitor_heart_rounded),
-              label: AppLocalizations.of(context).translate(L10n.monitoring) ?? 'Monitoring',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.notifications_rounded),
-              label: AppLocalizations.of(context).translate(L10n.alerts) ?? 'Alerts',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Icons.settings_rounded),
-              label: AppLocalizations.of(context).translate(L10n.settings) ?? 'Settings',
-            ),
-          ],
+          ),
         ),
       ),
     );

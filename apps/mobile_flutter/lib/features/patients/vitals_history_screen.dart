@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:design_system/design_system.dart';
@@ -70,7 +71,10 @@ class VitalsHistoryScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              SizedBox(height: NeuroSpacing.md),
+              const SizedBox(height: NeuroSpacing.md),
+              // Trend chart (reference IMG-0195)
+              _buildTrendChart(context, vitals),
+              const SizedBox(height: NeuroSpacing.md),
 
               Text('History', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
               SizedBox(height: NeuroSpacing.sm),
@@ -123,11 +127,160 @@ class VitalsHistoryScreen extends ConsumerWidget {
   Widget _vitalWidget(String label, String value, String unit, Color color) {
     return Column(
       children: [
-        Text(label, style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+        Text(label, style: TextStyle(fontSize: 11, color: NeuroColors.textSecondary)),
         SizedBox(height: 2),
         Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-        Text(unit, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+        Text(unit, style: TextStyle(fontSize: 10, color: NeuroColors.textSecondary)),
       ],
+    );
+  }
+
+  // ─── Trend chart (reference IMG-0195) ─────────────────────────────
+  Widget _buildTrendChart(BuildContext context, List<dynamic> vitals) {
+    final heartRates = vitals
+        .map((v) => v.heartRate)
+        .whereType<double>()
+        .toList()
+        .reversed
+        .toList();
+    if (heartRates.length < 2) return const SizedBox.shrink();
+
+    final minY = (heartRates.reduce((a, b) => a < b ? a : b) - 10).floorToDouble();
+    final maxY = (heartRates.reduce((a, b) => a > b ? a : b) + 10).ceilToDouble();
+    final spots = <FlSpot>[
+      for (var i = 0; i < heartRates.length; i++)
+        FlSpot(i.toDouble(), heartRates[i]),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      decoration: BoxDecoration(
+        color: NeuroColors.bgCard,
+        borderRadius: BorderRadius.circular(NeuroRadius.card),
+        boxShadow: const [NeuroShadows.card],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('اتجاه معدل ضربات القلب', style: NeuroTypography.h3?.copyWith(
+                color: NeuroColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              )),
+              Text('24h', style: NeuroTypography.caption),
+            ],
+          ),
+          const SizedBox(height: NeuroSpacing.md),
+          SizedBox(
+            height: 160,
+            child: LineChart(
+              LineChartData(
+                minY: minY,
+                maxY: maxY,
+                gridData: FlGridData(
+                  show: true,
+                  drawHorizontalLine: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: (maxY - minY) / 4,
+                  getDrawingHorizontalLine: (value) => FlLine(
+                    color: NeuroColors.chartGrid,
+                    strokeWidth: 1,
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 36,
+                      getTitlesWidget: (value, meta) => Text(
+                        value.toInt().toString(),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: NeuroColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  bottomTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: spots,
+                    isCurved: true,
+                    color: NeuroColors.chartLine,
+                    barWidth: 2.5,
+                    isStrokeCapRound: true,
+                    dotData: const FlDotData(show: false),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          NeuroColors.chartBlue.withValues(alpha: 0.5),
+                          NeuroColors.chartFill.withValues(alpha: 0.05),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Threshold line (reference: red dashed #D01010)
+                  LineChartBarData(
+                    spots: const [FlSpot(0, 100), FlSpot(999, 100)],
+                    color: NeuroColors.chartThreshold,
+                    barWidth: 1.5,
+                    dashArray: [6, 4],
+                    dotData: const FlDotData(show: false),
+                    isCurved: false,
+                  ),
+                ],
+                lineTouchData: const LineTouchData(enabled: true),
+              ),
+            ),
+          ),
+          const SizedBox(height: NeuroSpacing.md),
+          // Stats row
+          Row(
+            children: [
+              _chartStat('أدنى', '${heartRates.reduce((a, b) => a < b ? a : b).toInt()}'),
+              _chartStat('متوسط', '${(heartRates.reduce((a, b) => a + b) / heartRates.length).toInt()}'),
+              _chartStat('أعلى', '${heartRates.reduce((a, b) => a > b ? a : b).toInt()}'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _chartStat(String label, String value) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: NeuroSpacing.sm),
+        decoration: BoxDecoration(
+          color: const Color(0xFF071736),
+          borderRadius: BorderRadius.circular(NeuroRadius.md),
+        ),
+        child: Column(
+          children: [
+            Text(value, style: NeuroTypography.h3?.copyWith(
+              color: NeuroColors.textPrimary,
+              fontWeight: FontWeight.w600,
+            )),
+            Text(label, style: NeuroTypography.caption),
+          ],
+        ),
+      ),
     );
   }
 

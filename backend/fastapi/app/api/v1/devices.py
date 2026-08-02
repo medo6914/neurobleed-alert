@@ -2,6 +2,7 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
 from typing import Literal
 from uuid import UUID
 
@@ -9,12 +10,17 @@ from app.database import get_db
 from app.core.dependencies import get_current_user, require_permission
 from app.core.rbac import Permission
 from app.models.device import Device
+from app.models.device_event_log import DeviceEventLog
+from app.models.device_diagnostic_log import DeviceDiagnosticLog
 from app.models.user import User
-from app.models.enums import DeviceType, DeviceStatus
+from app.models.enums import DeviceType, DeviceStatus, DeviceEventType
 from app.schemas.device import (
     DeviceCreate, DeviceUpdate, DeviceResponse, DeviceListResponse,
     DeviceStatusUpdate, DeviceAssignRequest, DeviceDiagnosticResponse,
     DeviceHeartbeatRequest, DeviceCertRequest, BulkDeviceOperation,
+)
+from app.schemas.diagnostic_log import (
+    DiagnosticLogCreate, DiagnosticLogResponse, DiagnosticLogListResponse,
 )
 from app.services.device_service import DeviceService
 
@@ -151,6 +157,99 @@ async def device_diagnostics(
     current_user: User = Depends(require_permission(Permission.DEVICE_VIEW)),
 ):
     return await service.get_diagnostics(device_id)
+
+
+@router.post("/{device_id}/diagnostics/log", response_model=DiagnosticLogResponse, status_code=status.HTTP_201_CREATED)
+async def log_device_diagnostics(
+    device_id: UUID,
+    data: DiagnosticLogCreate,
+    service: DeviceService = Depends(get_device_service),
+):
+    from datetime import datetime, timezone
+    log_entry = DeviceDiagnosticLog(
+        device_id=device_id,
+        status=data.status,
+        battery_level=data.battery_level,
+        signal_strength=data.signal_strength,
+        temperature=data.temperature,
+        charging_status=data.charging_status,
+        lte_signal=data.lte_signal,
+        sim_status=data.sim_status,
+        ble_status=data.ble_status,
+        wifi_status=data.wifi_status,
+        memory_usage=data.memory_usage,
+        storage_usage=data.storage_usage,
+        firmware_version=data.firmware_version,
+        uptime_seconds=data.uptime_seconds,
+        error_code=data.error_code,
+        error_message=data.error_message,
+        raw_data=data.raw_data,
+        recorded_at=data.recorded_at or datetime.now(timezone.utc),
+    )
+    service.db.add(log_entry)
+    await service.db.commit()
+    await service.db.refresh(log_entry)
+    return log_entry
+
+
+@router.get("/{device_id}/diagnostics/logs", response_model=DiagnosticLogListResponse)
+async def list_device_diagnostics_log(
+    device_id: UUID,
+    page: int = Query(1, ge=1),
+    per_page: int = Query(50, ge=1, le=200),
+    service: DeviceService = Depends(get_device_service),
+    current_user: User = Depends(require_permission(Permission.DEVICE_VIEW)),
+):
+    query = select(DeviceDiagnosticLog).where(
+        DeviceDiagnosticLog.device_id == device_id,
+    ).order_by(DeviceDiagnosticLog.recorded_at.desc())
+
+    count_query = select(func.count()).select_from(query.subquery())
+    total_result = await service.db.execute(count_query)
+    total = total_result.scalar() or 0
+
+    query = query.offset((page - 1) * per_page).limit(per_page)
+    result = await service.db.execute(query)
+    logs = result.scalars().all()
+
+    total_pages = max(1, (total + per_page - 1) // per_page)
+    return DiagnosticLogListResponse(
+        items=[DiagnosticLogResponse.model_validate(l) for l in logs],
+        total=total, page=page, per_page=per_page,
+        total_pages=total_pages,
+        has_next=page < total_pages, has_prev=page > 1,
+    )
+
+
+# ===== Event Log =====
+
+
+@router.get("/{device_id}/events", response_model=list[dict])
+async def list_device_events(
+    device_id: UUID,
+    event_type: DeviceEventType | None = None,
+    limit: int = Query(50, le=200),
+    service: DeviceService = Depends(get_device_service),
+    current_user: User = Depends(require_permission(Permission.DEVICE_VIEW)),
+):
+    query = select(DeviceEventLog).where(
+        DeviceEventLog.device_id == device_id,
+    )
+    if event_type:
+        query = query.where(DeviceEventLog.event_type == event_type)
+    query = query.order_by(DeviceEventLog.event_time.desc()).limit(limit)
+    result = await service.db.execute(query)
+    events = result.scalars().all()
+    return [
+        {
+            "id": str(e.id),
+            "event_type": e.event_type.value,
+            "description": e.description,
+            "event_time": e.event_time.isoformat() if e.event_time else None,
+            "metadata": e.event_metadata,
+        }
+        for e in events
+    ]
 
 
 # ===== Bulk Operations =====

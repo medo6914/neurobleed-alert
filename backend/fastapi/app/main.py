@@ -13,6 +13,7 @@ from app.core.rate_limiter import add_rate_limiting
 from app.core.audit import log_action, generate_correlation_id
 from app.core.redis import init_redis, close_redis
 from app.services.monitoring_service import register_handlers
+from app.ai.service import ai_service
 from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.middleware.tenant_isolation import apply_tenant_isolation
 from app.api.v1 import router as v1_router
@@ -25,6 +26,7 @@ async def lifespan(app: FastAPI):
     init_firebase()
     await init_redis()
     register_handlers()
+    await ai_service.initialize()
     yield
     await close_redis()
 

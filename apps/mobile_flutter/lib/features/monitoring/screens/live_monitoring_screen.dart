@@ -29,6 +29,16 @@ class _LiveMonitoringScreenState extends ConsumerState<LiveMonitoringScreen> {
     }
   }
 
+  String _formatTimestamp(String? iso) {
+    if (iso == null || iso.isEmpty) return '—';
+    try {
+      final dt = DateTime.parse(iso).toLocal();
+      return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
+    } catch (_) {
+      return '—';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final connectionState = ref.watch(webSocketConnectionProvider);
@@ -98,13 +108,43 @@ class _LiveMonitoringScreenState extends ConsumerState<LiveMonitoringScreen> {
 
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: PatientMonitorCard(
-                      patientId: patientId,
-                      patientName: 'Patient ${patientId.substring(0, 8)}',
-                      vitals: vitals,
-                      onTap: () {
-                        context.push('/monitoring/$patientId');
-                      },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        PatientMonitorCard(
+                          patientId: patientId,
+                          patientName: 'Patient ${patientId.substring(0, 8)}',
+                          vitals: vitals,
+                          onTap: () {
+                            context.push('/monitoring/$patientId');
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 4,
+                            left: 12,
+                            right: 12,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              const Icon(
+                                Icons.schedule,
+                                size: 12,
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'آخر تحديث: ${_formatTimestamp(vitals['timestamp'] as String?)}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },

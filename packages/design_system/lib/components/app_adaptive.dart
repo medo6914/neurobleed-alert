@@ -1,5 +1,5 @@
-import 'dart:io' show Platform;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import '../foundations/breakpoints.dart';
 
@@ -18,11 +18,7 @@ class AppAdaptive extends StatelessWidget {
   });
 
   static bool get _isCupertinoStyle {
-    try {
-      return Platform.isIOS;
-    } catch (_) {
-      return false;
-    }
+    return defaultTargetPlatform == TargetPlatform.iOS;
   }
 
   @override

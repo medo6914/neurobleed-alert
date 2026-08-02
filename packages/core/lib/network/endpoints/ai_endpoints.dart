@@ -7,7 +7,12 @@ class AIEndpoints {
   static const String riskBatch = '/v1/ai/risk/batch';
   static String riskHistory(String patientId) => '/v1/ai/risk/history/$patientId';
   static const String knowledgeSearch = '/v1/ai/knowledge/search';
+  static const String knowledgeIngest = '/v1/ai/knowledge/ingest';
   static const String health = '/v1/ai/health';
+  static const String modelTrain = '/v1/ai/model/train';
+  static const String modelStatus = '/v1/ai/model/status';
+  static const String modelExport = '/v1/ai/model/export';
+  static const String dashboardStats = '/v1/ai/dashboard/stats';
 }
 
 class AIApi {
@@ -29,4 +34,19 @@ class AIApi {
 
   Future<Response> health() =>
       _client.get(AIEndpoints.health);
+
+  Future<Response> trainModel(Map<String, dynamic> data) =>
+      _client.post(AIEndpoints.modelTrain, data: data);
+
+  Future<Response> getModelStatus() =>
+      _client.get(AIEndpoints.modelStatus);
+
+  Future<Response> exportModel(Map<String, dynamic> data) =>
+      _client.post(AIEndpoints.modelExport, data: data);
+
+  Future<Response> ingestKnowledge(Map<String, dynamic> data) =>
+      _client.post(AIEndpoints.knowledgeIngest, data: data);
+
+  Future<Response> getDashboardStats() =>
+      _client.get(AIEndpoints.dashboardStats);
 }

@@ -7,6 +7,9 @@ class RiskAssessmentResponse {
   final List<String> rulesTriggered;
   final String? modelVersion;
   final double inferenceTimeMs;
+  final List<double>? shapValues;
+  final List<String>? featureNames;
+  final Map<String, dynamic>? explanation;
 
   const RiskAssessmentResponse({
     required this.riskScore,
@@ -17,6 +20,9 @@ class RiskAssessmentResponse {
     this.rulesTriggered = const [],
     this.modelVersion,
     this.inferenceTimeMs = 0.0,
+    this.shapValues,
+    this.featureNames,
+    this.explanation,
   });
 
   factory RiskAssessmentResponse.fromJson(Map<String, dynamic> json) {
@@ -31,6 +37,12 @@ class RiskAssessmentResponse {
       rulesTriggered: (json['rules_triggered'] as List<dynamic>?)?.cast<String>() ?? [],
       modelVersion: json['model_version'] as String?,
       inferenceTimeMs: (json['inference_time_ms'] as num?)?.toDouble() ?? 0.0,
+      shapValues: (json['shap_values'] as List<dynamic>?)
+          ?.map((e) => (e as num).toDouble())
+          .toList(),
+      featureNames: (json['feature_names'] as List<dynamic>?)
+          ?.cast<String>(),
+      explanation: json['explanation'] as Map<String, dynamic>?,
     );
   }
 

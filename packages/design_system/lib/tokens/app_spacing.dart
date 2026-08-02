@@ -11,8 +11,10 @@ class NeuroSpacing {
   static const double xxxl = 48;
   static const double xxxxl = 64;
 
-  static const double screenPadding = lg;
+  // Named aliases matching DESIGN_SYSTEM.md
+  static const double pagePadding = lg;
   static const double cardPadding = lg;
   static const double listItemPadding = md;
   static const double sectionSpacing = xl;
+  static const double itemGap = md;
 }

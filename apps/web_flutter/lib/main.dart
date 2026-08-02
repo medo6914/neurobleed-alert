@@ -21,7 +21,7 @@ class NeuroBleedWebApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       locale: const Locale('en', 'US'),
       supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: [
+      localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

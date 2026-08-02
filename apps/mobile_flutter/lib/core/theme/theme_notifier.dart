@@ -5,7 +5,7 @@ import 'package:core/core.dart';
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   final SecureStorageService _storage;
 
-  ThemeModeNotifier(this._storage) : super(ThemeMode.system) {
+  ThemeModeNotifier(this._storage) : super(ThemeMode.dark) {
     _loadThemeMode();
   }
 

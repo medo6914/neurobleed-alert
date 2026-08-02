@@ -60,7 +60,7 @@ class RiskHistoryScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Level: ${risk.level}'),
-                        Text(risk.timestamp.toLocal().toString().substring(0, 16), style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                        Text(risk.timestamp.toLocal().toString().substring(0, 16), style: TextStyle(fontSize: 12, color: NeuroColors.textSecondary)),
                       ],
                     ),
                     trailing: Container(

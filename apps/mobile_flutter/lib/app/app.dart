@@ -10,9 +10,11 @@ class NeuroBleedApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    debugPrint('[APP] NeuroBleedApp.build');
     final router = ref.watch(routerProvider);
     final themeMode = ref.watch(themeModeProvider);
     final locale = ref.watch(localeProvider);
+    debugPrint('[APP] router + theme ready, themeMode=$themeMode');
 
     return MaterialApp.router(
       title: 'NeuroBleed Alert',

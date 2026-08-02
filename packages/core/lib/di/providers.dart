@@ -7,6 +7,7 @@ import '../error/error_handler.dart';
 import '../logging/logger.dart';
 import '../network/api_client.dart';
 import '../network/app_interceptors.dart';
+import '../network/endpoints/analytics_endpoints.dart';
 import '../network/network_info.dart';
 import '../security/encryption_service.dart';
 import '../storage/local_database_service.dart';
@@ -95,4 +96,9 @@ final encryptionServiceProvider = Provider<EncryptionService>((ref) {
 final analyticsProvider = Provider<AnalyticsService>((ref) {
   final logger = ref.watch(loggerProvider);
   return AnalyticsService(logger: logger);
+});
+
+final analyticsApiProvider = Provider<AnalyticsApi>((ref) {
+  final client = ref.watch(apiClientProvider);
+  return AnalyticsApi(client);
 });

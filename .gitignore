@@ -34,6 +34,17 @@ Thumbs.db
 .env.local
 .env.production
 
+# Secrets — NEVER commit
+*.jks
+*.keystore
+*firebase-adminsdk*.json
+*service-account*.json
+*service_account*.json
+firebase-debug.log
+credentials/
+*.pem
+*.key
+
 # Database
 *.db
 *.sqlite
@@ -47,6 +58,11 @@ Thumbs.db
 *.egg-info/
 .venv/
 venv/
+
+# Generated data (models, FAISS index, cache)
+**/data/
+server_pid.txt
+server_output.log
 
 # Hardware
 **/build/

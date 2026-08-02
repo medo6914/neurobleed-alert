@@ -14,7 +14,7 @@ extension GetHospitalCollectionCollection on Isar {
 
 const HospitalCollectionSchema = CollectionSchema(
   name: r'HospitalCollection',
-  id: -1889263738002199454,
+  id: -6759093761332335,
   properties: {
     r'address': PropertySchema(
       id: 0,
@@ -69,7 +69,7 @@ const HospitalCollectionSchema = CollectionSchema(
   idName: r'isarId',
   indexes: {
     r'id': IndexSchema(
-      id: -3268401673993471357,
+      id: -7795543777232615,
       name: r'id',
       unique: true,
       replace: false,
@@ -82,7 +82,7 @@ const HospitalCollectionSchema = CollectionSchema(
       ],
     ),
     r'name': IndexSchema(
-      id: 879695947855722453,
+      id: 5997620145846326,
       name: r'name',
       unique: false,
       replace: false,

@@ -13,6 +13,13 @@ class AppRouter {
     redirect: _authGuard.guard,
     routes: [
       GoRoute(
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const Scaffold(
+          body: Center(child: Text('Loading...')),
+        ),
+      ),
+      GoRoute(
         path: '/login',
         name: 'login',
         builder: (context, state) => const Scaffold(

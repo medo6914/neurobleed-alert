@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:design_system/design_system.dart';
 
 import '../providers/ai_providers.dart';
 import '../widgets/ai_widgets.dart';
@@ -10,7 +12,8 @@ class RiskAssessmentScreen extends ConsumerStatefulWidget {
   const RiskAssessmentScreen({super.key, required this.patientId});
 
   @override
-  ConsumerState<RiskAssessmentScreen> createState() => _RiskAssessmentScreenState();
+  ConsumerState<RiskAssessmentScreen> createState() =>
+      _RiskAssessmentScreenState();
 }
 
 class _RiskAssessmentScreenState extends ConsumerState<RiskAssessmentScreen> {
@@ -36,16 +39,16 @@ class _RiskAssessmentScreenState extends ConsumerState<RiskAssessmentScreen> {
 
   void _assess() {
     ref.read(riskAssessmentProvider.notifier).assessRisk(
-      patientId: widget.patientId,
-      heartRate: double.tryParse(_hrCtrl.text),
-      spo2: double.tryParse(_spo2Ctrl.text),
-      rso2: double.tryParse(_rso2Ctrl.text),
-      systolicBp: double.tryParse(_sbpCtrl.text),
-      diastolicBp: double.tryParse(_dbpCtrl.text),
-      gcs: double.tryParse(_gcsCtrl.text),
-      signalQuality: _signalQuality,
-      motionArtifact: _motionArtifact,
-    );
+          patientId: widget.patientId,
+          heartRate: double.tryParse(_hrCtrl.text),
+          spo2: double.tryParse(_spo2Ctrl.text),
+          rso2: double.tryParse(_rso2Ctrl.text),
+          systolicBp: double.tryParse(_sbpCtrl.text),
+          diastolicBp: double.tryParse(_dbpCtrl.text),
+          gcs: double.tryParse(_gcsCtrl.text),
+          signalQuality: _signalQuality,
+          motionArtifact: _motionArtifact,
+        );
   }
 
   @override
@@ -54,192 +57,466 @@ class _RiskAssessmentScreenState extends ConsumerState<RiskAssessmentScreen> {
     final result = state.result;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Risk Assessment')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Card(
+      body: Column(
+        children: [
+          // Gradient header (reference: #020C23 → #2F3C55)
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  NeuroColors.headerGradTop,
+                  Color(0xFF2F3C55),
+                ],
+              ),
+            ),
+            child: SafeArea(
+              bottom: false,
               child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: NeuroSpacing.sm,
+                  vertical: NeuroSpacing.sm,
+                ),
+                child: Row(
                   children: [
-                    Text('Input Vitals',
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 12),
-                    _buildTextField(_hrCtrl, 'Heart Rate (bpm)', Icons.favorite),
-                    _buildTextField(_spo2Ctrl, 'SpO2 (%)', Icons.air),
-                    _buildTextField(_rso2Ctrl, 'rSO2 (%)', Icons.psychology),
-                    _buildTextField(_sbpCtrl, 'Systolic BP (mmHg)', Icons.water_drop),
-                    _buildTextField(_dbpCtrl, 'Diastolic BP (mmHg)', Icons.water_drop),
-                    _buildTextField(_gcsCtrl, 'GCS Score', Icons.healing),
-                    const SizedBox(height: 16),
-                    Text('Signal Quality',
-                        style: Theme.of(context).textTheme.bodyMedium),
-                    Slider(
-                      value: _signalQuality,
-                      onChanged: (v) => setState(() => _signalQuality = v),
-                      min: 0,
-                      max: 1,
-                      divisions: 20,
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      color: NeuroColors.textBody,
+                      onPressed: () => Navigator.of(context).maybePop(),
                     ),
-                    Text('Motion Artifact',
-                        style: Theme.of(context).textTheme.bodyMedium),
-                    Slider(
-                      value: _motionArtifact,
-                      onChanged: (v) => setState(() => _motionArtifact = v),
-                      min: 0,
-                      max: 1,
-                      divisions: 20,
+                    Text(
+                      'Risk Assessment',
+                      style: NeuroTypography.h3?.copyWith(
+                        color: NeuroColors.textPrimary,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: state.isAssessing ? null : _assess,
-                icon: state.isAssessing
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.assessment),
-                label: Text(state.isAssessing ? 'Assessing...' : 'Assess Risk'),
-              ),
-            ),
-            if (state.error != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text(
-                  state.error!,
-                  style: TextStyle(color: Colors.red.shade700),
-                ),
-              ),
-            if (result != null) ...[
-              const SizedBox(height: 24),
-              Card(
-                color: result.riskScore >= 0.6
-                    ? Colors.red.withValues(alpha: 0.05)
-                    : result.riskScore >= 0.3
-                        ? Colors.amber.withValues(alpha: 0.05)
-                        : Colors.green.withValues(alpha: 0.05),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      RiskScoreIndicator(
-                        score: result.riskScore,
-                        level: result.riskLevel,
-                        confidence: result.confidence,
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(NeuroSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Input card
+                  Container(
+                    padding: const EdgeInsets.all(NeuroSpacing.lg),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          NeuroColors.cardGradTop,
+                          NeuroColors.cardGradBottom,
+                        ],
                       ),
-                      const SizedBox(height: 16),
-                      if (result.trend != null)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              result.trend == 'worsening'
-                                  ? Icons.trending_up
-                                  : result.trend == 'improving'
-                                      ? Icons.trending_down
-                                      : Icons.trending_flat,
-                              color: result.trend == 'worsening'
-                                  ? Colors.red
-                                  : result.trend == 'improving'
-                                      ? Colors.green
-                                      : Colors.grey,
+                      borderRadius: BorderRadius.circular(NeuroRadius.card),
+                      boxShadow: const [NeuroShadows.card],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'إدخال العلامات الحيوية',
+                          style: NeuroTypography.h2,
+                        ),
+                        const SizedBox(height: NeuroSpacing.md),
+                        _buildTextField(
+                            _hrCtrl, 'Heart Rate (bpm)', Icons.favorite),
+                        _buildTextField(
+                            _spo2Ctrl, 'SpO2 (%)', Icons.air),
+                        _buildTextField(
+                            _rso2Ctrl, 'rSO2 (%)', Icons.psychology),
+                        _buildTextField(
+                            _sbpCtrl, 'Systolic BP (mmHg)', Icons.water_drop),
+                        _buildTextField(
+                            _dbpCtrl, 'Diastolic BP (mmHg)', Icons.water_drop),
+                        _buildTextField(_gcsCtrl, 'GCS Score', Icons.healing),
+                        const SizedBox(height: NeuroSpacing.lg),
+                        Text(
+                          'جودة الإشارة',
+                          style: NeuroTypography.bodyMedium,
+                        ),
+                        Slider(
+                          value: _signalQuality,
+                          activeColor: NeuroColors.primaryLight,
+                          inactiveColor: NeuroColors.chartGrid,
+                          onChanged: (v) =>
+                              setState(() => _signalQuality = v),
+                          min: 0,
+                          max: 1,
+                          divisions: 20,
+                        ),
+                        Text(
+                          'تشويش الحركة',
+                          style: NeuroTypography.bodyMedium,
+                        ),
+                        Slider(
+                          value: _motionArtifact,
+                          activeColor: NeuroColors.primaryLight,
+                          inactiveColor: NeuroColors.chartGrid,
+                          onChanged: (v) =>
+                              setState(() => _motionArtifact = v),
+                          min: 0,
+                          max: 1,
+                          divisions: 20,
+                        ),
+                        const SizedBox(height: NeuroSpacing.sm),
+                        AppButton(
+                          label: state.isAssessing ? 'جارِ التقييم...' : 'تقييم الخطر',
+                          icon: Icons.assessment,
+                          onPressed: state.isAssessing ? null : _assess,
+                          isLoading: state.isAssessing,
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (state.error != null) ...[
+                    const SizedBox(height: NeuroSpacing.md),
+                    AlertBanner(
+                      severity: AlertSeverity.critical,
+                      title: state.error!,
+                    ),
+                  ],
+                  if (result != null) ...[
+                    const SizedBox(height: NeuroSpacing.xl),
+                    // Risk score gauge card
+                    Container(
+                      padding: const EdgeInsets.all(NeuroSpacing.lg),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF16233B),
+                        borderRadius: BorderRadius.circular(NeuroRadius.card),
+                        boxShadow: const [NeuroShadows.card],
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'درجة الخطر',
+                            style: NeuroTypography.h2,
+                          ),
+                          const SizedBox(height: NeuroSpacing.md),
+                          _RiskGauge(score: result.riskScore),
+                          const SizedBox(height: NeuroSpacing.md),
+                          _RiskLevelBadge(level: result.riskLevel),
+                          const SizedBox(height: NeuroSpacing.sm),
+                          Text(
+                            'الثقة: ${(result.confidence * 100).toStringAsFixed(1)}%',
+                            style: NeuroTypography.caption,
+                          ),
+                          if (result.trend != null) ...[
+                            const SizedBox(height: NeuroSpacing.sm),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  result.trend == 'worsening'
+                                      ? Icons.trending_up
+                                      : result.trend == 'improving'
+                                          ? Icons.trending_down
+                                          : Icons.trending_flat,
+                                  color: result.trend == 'worsening'
+                                      ? NeuroColors.criticalBright
+                                      : result.trend == 'improving'
+                                          ? NeuroColors.low
+                                          : NeuroColors.textSecondary,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'التحول: ${result.trend!.toUpperCase()}',
+                                  style: NeuroTypography.caption.copyWith(
+                                    color: result.trend == 'worsening'
+                                        ? NeuroColors.criticalBright
+                                        : result.trend == 'improving'
+                                            ? NeuroColors.low
+                                            : NeuroColors.textSecondary,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 4),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: NeuroSpacing.lg),
+                    // Contributing factors card
+                    if (result.contributingFactors.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.all(NeuroSpacing.lg),
+                        decoration: BoxDecoration(
+                          color: NeuroColors.bgCard,
+                          borderRadius: BorderRadius.circular(NeuroRadius.card),
+                          boxShadow: const [NeuroShadows.card],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              'Trend: ${result.trend!.toUpperCase()}',
-                              style: TextStyle(
-                                color: result.trend == 'worsening'
-                                    ? Colors.red
-                                    : result.trend == 'improving'
-                                        ? Colors.green
-                                        : Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              'العوامل المساهمة',
+                              style: NeuroTypography.h2,
+                            ),
+                            const SizedBox(height: NeuroSpacing.md),
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              children: result.contributingFactors
+                                  .map((f) =>
+                                      ContributingFactorsChip(factor: f))
+                                  .toList(),
                             ),
                           ],
                         ),
-                      if (result.contributingFactors.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        Text('Contributing Factors',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
+                      ),
+                    const SizedBox(height: NeuroSpacing.lg),
+                    // Rules triggered card
+                    if (result.rulesTriggered.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.all(NeuroSpacing.lg),
+                        decoration: BoxDecoration(
+                          color: NeuroColors.bgCard,
+                          borderRadius: BorderRadius.circular(NeuroRadius.card),
+                          boxShadow: const [NeuroShadows.card],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'القواعد المُفعّلة',
+                              style: NeuroTypography.h2,
+                            ),
+                            const SizedBox(height: NeuroSpacing.md),
+                            ...result.rulesTriggered.map((r) => Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 2),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.rule,
+                                        size: 16,
+                                        color: NeuroColors.high,
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          r,
+                                          style: NeuroTypography.bodyMedium,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 )),
-                        const SizedBox(height: 8),
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 6,
-                          children: result.contributingFactors
-                              .map((f) => ContributingFactorsChip(factor: f))
-                              .toList(),
+                          ],
+                        ),
+                      ),
+                    const SizedBox(height: NeuroSpacing.lg),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'النموذج: ${result.modelVersion ?? "N/A"}',
+                          style: NeuroTypography.caption,
+                        ),
+                        Text(
+                          'الاستدلال: ${result.inferenceTimeMs.toStringAsFixed(1)}ms',
+                          style: NeuroTypography.caption,
                         ),
                       ],
-                      if (result.rulesTriggered.isNotEmpty) ...[
-                        const SizedBox(height: 12),
-                        Text('Rules Triggered',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                )),
-                        const SizedBox(height: 8),
-                        ...result.rulesTriggered.map((r) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 2),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.rule, size: 16, color: Colors.orange.shade700),
-                                  const SizedBox(width: 6),
-                                  Expanded(
-                                    child: Text(r, style: const TextStyle(fontSize: 12)),
-                                  ),
-                                ],
-                              ),
-                            )),
-                      ],
-                      const SizedBox(height: 12),
-                      Text(
-                        'Model: ${result.modelVersion ?? "N/A"}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey,
-                            ),
-                      ),
-                      Text(
-                        'Inference: ${result.inferenceTimeMs.toStringAsFixed(1)}ms',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                  ],
+                ],
               ),
-            ],
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildTextField(TextEditingController ctrl, String label, IconData icon) {
+  Widget _buildTextField(
+      TextEditingController ctrl, String label, IconData icon) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: TextField(
         controller: ctrl,
         keyboardType: TextInputType.numberWithOptions(decimal: true),
+        style: NeuroTypography.bodyLarge?.copyWith(
+          color: NeuroColors.textPrimary,
+        ),
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon),
-          border: const OutlineInputBorder(),
+          labelStyle: NeuroTypography.caption,
+          prefixIcon: Icon(icon, color: NeuroColors.textBody, size: 22),
+          filled: true,
+          fillColor: NeuroColors.bgInput,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(NeuroRadius.input),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(NeuroRadius.input),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(NeuroRadius.input),
+            borderSide: const BorderSide(
+              color: NeuroColors.primary,
+              width: 2,
+            ),
+          ),
           isDense: true,
         ),
+      ),
+    );
+  }
+}
+
+// ─── Risk Gauge (reference IMG-0194: circular gauge with gradient arc) ──
+class _RiskGauge extends StatelessWidget {
+  final double score;
+
+  const _RiskGauge({required this.score});
+
+  Color get _color {
+    if (score >= 0.7) return NeuroColors.criticalBright;
+    if (score >= 0.4) return NeuroColors.high;
+    return NeuroColors.low;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 180,
+      height: 180,
+      child: CustomPaint(
+        painter: _GaugePainter(score: score, color: _color),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '${(score * 100).toStringAsFixed(0)}',
+                style: NeuroTypography.displayLarge?.copyWith(
+                  fontSize: 56,
+                  color: _color,
+                ),
+              ),
+              Text(
+                '/ 100',
+                style: NeuroTypography.caption,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GaugePainter extends CustomPainter {
+  final double score;
+  final Color color;
+
+  _GaugePainter({required this.score, required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2 - 12;
+    const startAngle = -pi / 2;
+    final sweepAngle = pi * 2 * score.clamp(0.0, 1.0);
+
+    // Background track
+    final trackPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 16
+      ..strokeCap = StrokeCap.round
+      ..color = const Color(0xFF1A2A4A);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      pi * 2,
+      false,
+      trackPaint,
+    );
+
+    // Gradient arc (green → yellow → red)
+    final arcPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 16
+      ..strokeCap = StrokeCap.round
+      ..shader = SweepGradient(
+        startAngle: -pi / 2,
+        endAngle: -pi / 2 + pi * 2,
+        colors: [
+          NeuroColors.low,
+          NeuroColors.medium,
+          NeuroColors.high,
+          NeuroColors.criticalBright,
+        ],
+        stops: const [0.0, 0.4, 0.7, 1.0],
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      sweepAngle,
+      false,
+      arcPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _GaugePainter oldDelegate) {
+    return oldDelegate.score != score || oldDelegate.color != color;
+  }
+}
+
+class _RiskLevelBadge extends StatelessWidget {
+  final String level;
+
+  const _RiskLevelBadge({required this.level});
+
+  @override
+  Widget build(BuildContext context) {
+    final normalized = level.toLowerCase();
+    final Color color;
+    switch (normalized) {
+      case 'critical':
+        color = NeuroColors.criticalBright;
+        break;
+      case 'high':
+        color = NeuroColors.high;
+        break;
+      case 'medium':
+        color = NeuroColors.medium;
+        break;
+      default:
+        color = NeuroColors.low;
+    }
+    final label = normalized == 'critical'
+        ? 'حرج'
+        : normalized == 'high'
+            ? 'مرتفع'
+            : normalized == 'medium'
+                ? 'متوسط'
+                : 'منخفض';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: NeuroSpacing.lg,
+        vertical: NeuroSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(NeuroRadius.chip),
+        border: Border.all(color: color),
+      ),
+      child: Text(
+        label,
+        style: NeuroTypography.h3?.copyWith(color: color),
       ),
     );
   }

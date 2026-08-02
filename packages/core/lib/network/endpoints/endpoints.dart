@@ -5,3 +5,5 @@ export 'documents_endpoints.dart';
 export 'vitals_endpoints.dart';
 export 'device_endpoints.dart';
 export 'ai_endpoints.dart';
+export 'emergency_endpoints.dart';
+export 'analytics_endpoints.dart';

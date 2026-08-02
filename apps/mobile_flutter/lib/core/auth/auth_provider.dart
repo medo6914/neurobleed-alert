@@ -64,6 +64,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       return;
     }
 
+    if (!await _storage.getRememberMe()) {
+      await _storage.clearAll();
+      state = state.copyWith(status: AuthStatus.unauthenticated);
+      return;
+    }
+
     try {
       final response = await _api.get('/v1/auth/me');
       final data = response.data;
@@ -96,9 +102,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> login(String email, String password) async {
+  Future<void> login(String email, String password, {bool rememberMe = true}) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
+      await _storage.saveRememberMe(rememberMe);
       final response = await _api.post('/v1/auth/login', data: {
         'email': email,
         'password': password,

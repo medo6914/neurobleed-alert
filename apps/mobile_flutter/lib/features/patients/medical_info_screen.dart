@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:design_system/design_system.dart';
-import 'package:shared/shared.dart';
 import 'package:core/core.dart';
 import 'providers/patients_providers.dart';
 

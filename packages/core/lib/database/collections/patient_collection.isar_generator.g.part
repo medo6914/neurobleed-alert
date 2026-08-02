@@ -13,7 +13,7 @@ extension GetPatientCollectionCollection on Isar {
 
 const PatientCollectionSchema = CollectionSchema(
   name: r'PatientCollection',
-  id: 8833788203413140484,
+  id: 6732933766969304,
   properties: {
     r'allergies': PropertySchema(
       id: 0,
@@ -123,7 +123,7 @@ const PatientCollectionSchema = CollectionSchema(
   idName: r'isarId',
   indexes: {
     r'id': IndexSchema(
-      id: -3268401673993471357,
+      id: -7795543777232615,
       name: r'id',
       unique: true,
       replace: false,
@@ -136,7 +136,7 @@ const PatientCollectionSchema = CollectionSchema(
       ],
     ),
     r'mrn': IndexSchema(
-      id: -6310523176093027170,
+      id: -5483697774333470,
       name: r'mrn',
       unique: false,
       replace: false,
@@ -149,7 +149,7 @@ const PatientCollectionSchema = CollectionSchema(
       ],
     ),
     r'hospitalId': IndexSchema(
-      id: 6952312329871491669,
+      id: 7761704466187608,
       name: r'hospitalId',
       unique: false,
       replace: false,

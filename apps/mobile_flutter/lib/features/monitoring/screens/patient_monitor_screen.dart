@@ -1,9 +1,13 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:design_system/design_system.dart';
 import 'package:core/core.dart';
+import 'package:shared/entities/vitals_record.dart';
 import '../providers/monitoring_providers.dart';
 import '../widgets/vital_sign_gauge.dart';
+import '../../patients/providers/patient_vitals_provider.dart';
 
 class PatientMonitorScreen extends ConsumerStatefulWidget {
   final String patientId;
@@ -11,11 +15,14 @@ class PatientMonitorScreen extends ConsumerStatefulWidget {
   const PatientMonitorScreen({super.key, required this.patientId});
 
   @override
-  ConsumerState<PatientMonitorScreen> createState() => _PatientMonitorScreenState();
+  ConsumerState<PatientMonitorScreen> createState() =>
+      _PatientMonitorScreenState();
 }
 
 class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
   bool _subscribed = false;
+  final List<FlSpot> _heartRateHistory = [];
+  static const _maxPoints = 40;
 
   @override
   void initState() {
@@ -46,7 +53,26 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
   @override
   Widget build(BuildContext context) {
     final vitals = ref.watch(patientLiveVitalsProvider(widget.patientId));
+    final latestVitalsAsync = ref.watch(latestVitalsProvider(widget.patientId));
     final theme = Theme.of(context);
+
+    ref.listen<Map<String, dynamic>?>(
+      patientLiveVitalsProvider(widget.patientId),
+      (prev, next) {
+        final hr = next?['heart_rate'];
+        if (hr is num && next!['timestamp'] is String) {
+          final time = DateTime.parse(next['timestamp'] as String)
+              .toLocal()
+              .millisecondsSinceEpoch;
+          setState(() {
+            _heartRateHistory.add(FlSpot(time.toDouble(), hr.toDouble()));
+            if (_heartRateHistory.length > _maxPoints) {
+              _heartRateHistory.removeAt(0);
+            }
+          });
+        }
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -62,9 +88,16 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
               children: [
                 Icon(Icons.person, color: NeuroColors.primary),
                 const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Patient: ${widget.patientId.substring(0, 8)}',
+                    style: theme.textTheme.titleMedium,
+                  ),
+                ),
                 Text(
-                  'Patient: ${widget.patientId.substring(0, 8)}',
-                  style: theme.textTheme.titleMedium,
+                  _formatLastUpdate(vitals, latestVitalsAsync.valueOrNull),
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: Colors.grey),
                 ),
               ],
             ),
@@ -132,32 +165,9 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              AppCard(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Risk Assessment', style: theme.textTheme.titleSmall),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          _buildInfoChip('Risk Score',
-                              '${((vitals['risk_score'] as num?)?.toDouble() ?? 0) * 100}%'),
-                          const SizedBox(width: 12),
-                          _buildInfoChip('Level',
-                              (vitals['risk_level'] as String? ?? '--').toUpperCase()),
-                          const SizedBox(width: 12),
-                          _buildInfoChip('Trend',
-                              (vitals['trend'] as String? ?? '--').toUpperCase()),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ] else
+            ] else if (latestVitalsAsync.valueOrNull != null)
+              _buildLatestVitalsCard(latestVitalsAsync.valueOrNull!, theme)
+            else
               Center(
                 child: Padding(
                   padding: const EdgeInsets.all(48),
@@ -175,10 +185,229 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
                   ),
                 ),
               ),
+            const SizedBox(height: 16),
+            _buildVitalsSummaryCard(vitals, latestVitalsAsync.valueOrNull, theme),
+            const SizedBox(height: 16),
+            _buildLiveChartCard(theme),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildLatestVitalsCard(VitalsRecord latest, ThemeData theme) {
+    return AppCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                VitalSignGauge(
+                  label: 'BP Systolic',
+                  value: latest.systolicBP,
+                  unit: 'mmHg',
+                  normalRange: Range(90, 120),
+                  icon: Icons.speed,
+                ),
+                VitalSignGauge(
+                  label: 'BP Diastolic',
+                  value: latest.diastolicBP,
+                  unit: 'mmHg',
+                  normalRange: Range(60, 80),
+                  icon: Icons.speed,
+                ),
+                VitalSignGauge(
+                  label: 'Temperature',
+                  value: latest.temperature,
+                  unit: '°C',
+                  normalRange: Range(36.0, 37.5),
+                  icon: Icons.thermostat,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVitalsSummaryCard(
+    Map<String, dynamic>? vitals,
+    VitalsRecord? latest,
+    ThemeData theme,
+  ) {
+    final bp = vitals?['systolic_bp'] ?? latest?.systolicBP;
+    final bpDiastolic = vitals?['diastolic_bp'] ?? latest?.diastolicBP;
+    final temp = vitals?['temperature'] ?? latest?.temperature;
+    final respiratory = vitals?['respiratory_rate'] ?? latest?.respiratoryRate;
+
+    return AppCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('BP & Temperature', style: theme.textTheme.titleSmall),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildMetric('ضغط الدم',
+                    bp != null ? '$bp/${bpDiastolic ?? '--'}' : '--',
+                    'mmHg'),
+                _buildMetric('درجة الحرارة',
+                    temp != null ? '$temp°C' : '--', ''),
+                _buildMetric(
+                    'معدل التنفس',
+                    respiratory != null
+                        ? '${respiratory.toStringAsFixed(0)}'
+                        : '--',
+                    '/min'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetric(String label, String value, String unit) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: NeuroColors.primary,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(label,
+            style: const TextStyle(fontSize: 12, color: NeuroColors.textSecondary)),
+        if (unit.isNotEmpty)
+          Text(unit, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+      ],
+    );
+  }
+
+  Widget _buildLiveChartCard(ThemeData theme) {
+    return AppCard(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Live Heart Rate Trend',
+                    style: theme.textTheme.titleSmall),
+                if (_heartRateHistory.isNotEmpty)
+                  Text(
+                    '${_heartRateHistory.last.y.toStringAsFixed(0)} bpm',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: NeuroColors.primary,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (_heartRateHistory.length < 2)
+              SizedBox(
+                height: 140,
+                child: Center(
+                  child: Text(
+                    'بانتظار وصول بيانات حية...',
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: Colors.grey),
+                  ),
+                ),
+              )
+            else
+              SizedBox(
+                height: 140,
+                child: LineChart(
+                  LineChartData(
+                    minY: _chartMinY(),
+                    maxY: _chartMaxY(),
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      getDrawingHorizontalLine: (v) => FlLine(
+                        color: Colors.white.withValues(alpha: 0.06),
+                        strokeWidth: 1,
+                      ),
+                    ),
+                    titlesData: const FlTitlesData(
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: _heartRateHistory,
+                        isCurved: true,
+                        curveSmoothness: 0.2,
+                        color: NeuroColors.primary,
+                        barWidth: 2,
+                        dotData: const FlDotData(show: false),
+                        belowBarData: BarAreaData(
+                          show: true,
+                          color: NeuroColors.primary.withValues(alpha: 0.15),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  double _chartMinY() {
+    final values = _heartRateHistory.map((s) => s.y);
+    final min = values.reduce(math.min);
+    return (min - 10).clamp(0, double.infinity);
+  }
+
+  double _chartMaxY() {
+    final values = _heartRateHistory.map((s) => s.y);
+    final max = values.reduce(math.max);
+    return max + 10;
+  }
+
+  String _formatLastUpdate(
+    Map<String, dynamic>? vitals,
+    VitalsRecord? latest,
+  ) {
+    final ts = vitals?['timestamp'];
+    if (ts is String) {
+      try {
+        final dt = DateTime.parse(ts).toLocal();
+        return 'آخر تحديث: ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}:${dt.second.toString().padLeft(2, '0')}';
+      } catch (_) {}
+    }
+    if (latest?.timestamp != null) {
+      final dt = latest!.timestamp!.toLocal();
+      return 'آخر تحديث: ${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    }
+    return '';
   }
 
   Widget _buildInfoChip(String label, String value) {

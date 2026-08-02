@@ -8,3 +8,4 @@ export 'bulk_operation_request.dart';
 export 'device_list_response.dart';
 export 'device_diagnostics.dart';
 export 'device_mapper.dart';
+export 'provisioning_dtos.dart';

@@ -283,4 +283,16 @@ class DeviceRepository {
       return Left(_errorHandler.handle(e));
     }
   }
+
+  Future<Either<Failure, ProvisioningClaimResponse>> claimDevice(
+    ProvisioningClaimRequest request,
+  ) async {
+    try {
+      final response = await _deviceApi.claimDevice(request.toJson());
+      return Right(ProvisioningClaimResponse.fromJson(
+          response.data as Map<String, dynamic>));
+    } catch (e) {
+      return Left(_errorHandler.handle(e));
+    }
+  }
 }

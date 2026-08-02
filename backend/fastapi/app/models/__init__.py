@@ -16,6 +16,12 @@ from app.models.session import Session
 from app.models.refresh_token import RefreshToken
 from app.models.department import Department
 from app.models.organization import Organization
+from app.models.clinical_report import ClinicalReport
+from app.models.emergency import EmergencyContact, EmergencyEvent
+from app.models.subscription import Subscription, Invoice
+from app.models.device_provisioning import DeviceProvisioningKey
+from app.models.device_event_log import DeviceEventLog
+from app.models.device_diagnostic_log import DeviceDiagnosticLog
 
 __all__ = [
     "Hospital",
@@ -25,6 +31,7 @@ __all__ = [
     "SensorReading",
     "Alert",
     "AIReport",
+    "ClinicalReport",
     "KnowledgeBase",
     "KnowledgeUpdateLog",
     "AuditLog",
@@ -36,4 +43,11 @@ __all__ = [
     "RefreshToken",
     "Department",
     "Organization",
+    "EmergencyContact",
+    "EmergencyEvent",
+    "Subscription",
+    "Invoice",
+    "DeviceProvisioningKey",
+    "DeviceEventLog",
+    "DeviceDiagnosticLog",
 ]

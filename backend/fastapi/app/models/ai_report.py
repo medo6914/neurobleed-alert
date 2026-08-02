@@ -33,6 +33,8 @@ class AIReport(TimestampMixin, SoftDeleteMixin, VersionMixin, AuditMixin, FHIRMi
     model_version: Mapped[str | None] = mapped_column(String(50), nullable=True)
     input_data: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     raw_output: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    explanation: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    shap_values: Mapped[list | None] = mapped_column(JSON, nullable=True)
     reviewed_by: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )

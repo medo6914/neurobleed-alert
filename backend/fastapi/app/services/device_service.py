@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -8,7 +8,8 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.device import Device
-from app.models.enums import DeviceStatus
+from app.models.device_event_log import DeviceEventLog
+from app.models.enums import DeviceStatus, DeviceEventType
 from app.schemas.device import (
     DeviceCreate, DeviceUpdate, DeviceStatusUpdate, DeviceAssignRequest,
     DeviceHeartbeatRequest, BulkDeviceOperation,
@@ -22,6 +23,25 @@ class DeviceService:
         self.db = db
         self.redis = redis_client
 
+    async def _log_event(
+        self, device_id: UUID, event_type: DeviceEventType,
+        description: str | None = None,
+        prev_value: str | None = None,
+        new_value: str | None = None,
+        metadata: dict | None = None,
+        triggered_by_id: UUID | None = None,
+    ) -> None:
+        log = DeviceEventLog(
+            device_id=device_id,
+            event_type=event_type,
+            description=description,
+            previous_value=prev_value,
+            new_value=new_value,
+            metadata=metadata,
+            triggered_by_id=triggered_by_id,
+        )
+        self.db.add(log)
+
     async def register_device(self, data: DeviceCreate) -> Device:
         existing = await self.db.execute(
             select(Device).where(Device.serial_number == data.serial_number)
@@ -31,6 +51,15 @@ class DeviceService:
 
         device = Device(**data.model_dump(exclude_none=True))
         self.db.add(device)
+        await self.db.flush()
+
+        await self._log_event(
+            device_id=device.id,
+            event_type=DeviceEventType.REGISTERED,
+            description=f"Device registered with serial {data.serial_number}",
+            new_value=data.serial_number,
+        )
+
         await self.db.commit()
         await self.db.refresh(device)
 
@@ -115,6 +144,15 @@ class DeviceService:
     async def delete_device(self, device_id: UUID) -> None:
         device = await self.get_device(device_id)
         device.is_active = False
+
+        await self._log_event(
+            device_id=device.id,
+            event_type=DeviceEventType.ERROR,
+            description=f"Device deactivated",
+            prev_value="active",
+            new_value="inactive",
+        )
+
         await self.db.commit()
         logger.info("Device deactivated", extra={"device_id": str(device.id)})
 
@@ -141,6 +179,7 @@ class DeviceService:
 
     async def assign_device(self, device_id: UUID, data: DeviceAssignRequest) -> Device:
         device = await self.get_device(device_id)
+        old_patient_id = device.patient_id
         if data.patient_id is not None:
             existing = await self.db.execute(
                 select(Device).where(
@@ -154,6 +193,18 @@ class DeviceService:
         device.patient_id = data.patient_id
         device.hospital_id = data.hospital_id
         device.department = data.department
+        await self.db.flush()
+
+        event_type = DeviceEventType.UNASSIGNED if data.patient_id is None else DeviceEventType.ASSIGNED
+        await self._log_event(
+            device_id=device.id,
+            event_type=event_type,
+            description=f"Device {'unassigned from' if data.patient_id is None else 'assigned to patient'} {data.patient_id or old_patient_id}",
+            prev_value=str(old_patient_id) if old_patient_id else None,
+            new_value=str(data.patient_id) if data.patient_id else None,
+            metadata={"hospital_id": str(data.hospital_id) if data.hospital_id else None} if data.hospital_id else None,
+        )
+
         await self.db.commit()
         await self.db.refresh(device)
         logger.info("Device assigned", extra={

@@ -13,7 +13,7 @@ extension GetAlertCollectionCollection on Isar {
 
 const AlertCollectionSchema = CollectionSchema(
   name: r'AlertCollection',
-  id: 4434960980047074828,
+  id: 3418946714507256,
   properties: {
     r'acknowledgedAt': PropertySchema(
       id: 0,
@@ -98,7 +98,7 @@ const AlertCollectionSchema = CollectionSchema(
   idName: r'isarId',
   indexes: {
     r'id': IndexSchema(
-      id: -3268401673993471357,
+      id: -7795543777232615,
       name: r'id',
       unique: true,
       replace: false,
@@ -111,7 +111,7 @@ const AlertCollectionSchema = CollectionSchema(
       ],
     ),
     r'patientId': IndexSchema(
-      id: 403389457658259617,
+      id: 7072690449656013,
       name: r'patientId',
       unique: false,
       replace: false,
@@ -124,7 +124,7 @@ const AlertCollectionSchema = CollectionSchema(
       ],
     ),
     r'createdAt': IndexSchema(
-      id: -3433535483987302584,
+      id: -1792567930985013,
       name: r'createdAt',
       unique: false,
       replace: false,

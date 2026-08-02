@@ -16,16 +16,36 @@ from app.ai.schemas import (
     KnowledgeSearchResponse,
     RiskExplanationRequest,
     RiskExplanationResponse,
+    ModelStatusResponse,
+    TrainModelRequest,
+    ExportModelRequest,
+    ExportModelResponse,
+    DashboardStatsResponse,
+    IngestKnowledgeRequest,
+    IngestKnowledgeResponse,
 )
 from app.ai.service import ai_service
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
 
+@router.get("/health", summary="AI service health check")
+async def ai_health():
+    return {
+        "status": "ok",
+        "service": "ai-gateway",
+        "model_version": ai_service.risk_engine.MODEL_VERSION,
+        "rules_loaded": hasattr(ai_service.rules_engine, "rules") and len(ai_service.rules_engine.rules) > 0,
+        "risk_engine_ready": True,
+        "model_trained": ai_service.risk_engine.is_trained(),
+        "rag_loaded": ai_service.rag_engine.get_stats()["loaded"],
+    }
+
+
 @router.post(
     "/risk/assess",
     response_model=RiskAssessmentResponse,
-    summary="Real-time risk assessment from sensor data",
+    summary="Real-time risk assessment from sensor data with SHAP explanation",
 )
 async def assess_risk(
     data: RiskAssessmentRequest,
@@ -51,7 +71,7 @@ async def batch_risk(
 @router.get(
     "/risk/history/{patient_id}",
     response_model=list[dict],
-    summary="Get patient risk assessment history",
+    summary="Get patient risk assessment history with SHAP explanations",
 )
 async def get_risk_history(
     patient_id: UUID,
@@ -65,7 +85,7 @@ async def get_risk_history(
 @router.post(
     "/knowledge/search",
     response_model=KnowledgeSearchResponse,
-    summary="Search medical knowledge base",
+    summary="Search medical knowledge base with semantic RAG search",
 )
 async def search_knowledge(
     data: KnowledgeSearchRequest,
@@ -75,15 +95,78 @@ async def search_knowledge(
     return await ai_service.search_knowledge(data, db)
 
 
-@router.get(
-    "/health",
-    summary="AI service health check",
+@router.post(
+    "/knowledge/ingest",
+    response_model=IngestKnowledgeResponse,
+    summary="Ingest knowledge from manual entry or PubMed",
 )
-async def ai_health():
-    return {
-        "status": "ok",
-        "service": "ai-gateway",
-        "model_version": "NB-RISK-1.0.0",
-        "rules_loaded": hasattr(ai_service.rules_engine, "rules") and len(ai_service.rules_engine.rules) > 0,
-        "risk_engine_ready": True,
-    }
+async def ingest_knowledge(
+    data: IngestKnowledgeRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_permission(Permission.REPORT_CREATE)),
+):
+    return await ai_service.ingest_knowledge(data, db)
+
+
+@router.post(
+    "/model/train",
+    response_model=ModelStatusResponse,
+    summary="Train XGBoost model with synthetic clinical data",
+)
+async def train_model(
+    data: TrainModelRequest,
+    current_user: User = Depends(require_permission(Permission.REPORT_CREATE)),
+):
+    X, y = ai_service.model_manager.generate_synthetic_training_data(data.n_samples)
+    result = ai_service.model_manager.train_model(X, y)
+    return ModelStatusResponse(**result)
+
+
+@router.get(
+    "/model/status",
+    response_model=ModelStatusResponse,
+    summary="Get model training status and info",
+)
+async def model_status(
+    current_user: User = Depends(get_current_user),
+):
+    return await ai_service.get_model_status()
+
+
+@router.post(
+    "/model/export",
+    response_model=ExportModelResponse,
+    summary="Export model to ONNX or TFLite format",
+)
+async def export_model(
+    data: ExportModelRequest,
+    current_user: User = Depends(require_permission(Permission.REPORT_CREATE)),
+):
+    if data.format == "onnx":
+        path = ai_service.model_manager.export_onnx()
+    elif data.format == "tflite":
+        path = ai_service.model_manager.export_tflite()
+    else:
+        raise HTTPException(status_code=400, detail=f"Unsupported format: {data.format}")
+
+    if not path:
+        raise HTTPException(status_code=400, detail="Model not trained yet")
+
+    return ExportModelResponse(
+        success=True,
+        model_path=path,
+        format=data.format,
+        message=f"Model exported to {data.format} at {path}",
+    )
+
+
+@router.get(
+    "/dashboard/stats",
+    response_model=DashboardStatsResponse,
+    summary="Get AI monitoring dashboard statistics",
+)
+async def dashboard_stats(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_permission(Permission.REPORT_VIEW)),
+):
+    return await ai_service.get_dashboard_stats(db)

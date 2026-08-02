@@ -32,6 +32,8 @@ import '../../features/patients/audit_history_screen.dart';
 import '../../features/ai/screens/risk_assessment_screen.dart';
 import '../../features/ai/screens/risk_history_screen.dart' as ai;
 import '../../features/ai/screens/ai_dashboard_screen.dart';
+import '../../features/emergency/sos_screen.dart';
+import '../../features/knowledge/knowledge_center_screen.dart';
 import '../../features/devices/screens/device_list_screen.dart';
 import '../../features/devices/screens/device_detail_screen.dart';
 import '../../features/devices/screens/register_device_screen.dart';
@@ -42,8 +44,20 @@ import '../../features/devices/screens/device_diagnostics_screen.dart';
 import '../../features/devices/screens/device_history_screen.dart';
 import '../../features/devices/screens/ota_update_screen.dart';
 import '../../features/devices/screens/pair_device_screen.dart';
+import '../../features/devices/screens/provision_device_screen.dart';
 import '../../features/monitoring/screens/live_monitoring_screen.dart';
 import '../../features/monitoring/screens/patient_monitor_screen.dart';
+import '../../features/analytics/screens/dashboard_screen.dart' as analytics;
+import '../../features/analytics/screens/patient_analytics_screen.dart';
+import '../../features/analytics/screens/device_fleet_screen.dart';
+import '../../features/analytics/screens/alert_analytics_screen.dart';
+import '../../features/analytics/screens/hospital_admin_screen.dart';
+import '../../features/bluetooth_test/screens/ble_diagnostic_screen.dart';
+import '../../features/reports/screens/reports_screen.dart';
+import '../../features/notifications/screens/notifications_screen.dart';
+import '../../features/admin/screens/admin_panel_screen.dart';
+import '../../features/map/screens/map_screen.dart';
+import '../../features/profile/screens/profile_screen.dart';
 
 class AppRouter {
   final AuthGuard _authGuard;
@@ -74,6 +88,11 @@ class AppRouter {
         path: '/register',
         name: 'register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/ble-test',
+        name: 'bleTest',
+        builder: (context, state) => const BleDiagnosticScreen(),
       ),
       GoRoute(
         path: '/forgot-password',
@@ -110,6 +129,33 @@ class AppRouter {
             path: '/dashboard',
             name: 'dashboard',
             builder: (context, state) => const DashboardScreen(),
+          ),
+          GoRoute(
+            path: '/analytics',
+            name: 'analytics',
+            builder: (context, state) => const analytics.DashboardScreen(),
+            routes: [
+              GoRoute(
+                path: 'patients',
+                name: 'analytics-patients',
+                builder: (context, state) => const PatientAnalyticsScreen(),
+              ),
+              GoRoute(
+                path: 'devices',
+                name: 'analytics-devices',
+                builder: (context, state) => const DeviceFleetScreen(),
+              ),
+              GoRoute(
+                path: 'alerts',
+                name: 'analytics-alerts',
+                builder: (context, state) => const AlertAnalyticsScreen(),
+              ),
+              GoRoute(
+                path: 'hospitals',
+                name: 'analytics-hospitals',
+                builder: (context, state) => const HospitalAdminScreen(),
+              ),
+            ],
           ),
           GoRoute(
             path: '/patients',
@@ -252,6 +298,14 @@ class AppRouter {
                       return AuditHistoryScreen(patientId: id);
                     },
                   ),
+                  GoRoute(
+                    path: 'sos',
+                    name: 'patient-sos',
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return SosScreen(patientId: id);
+                    },
+                  ),
                 ],
               ),
             ],
@@ -270,6 +324,11 @@ class AppRouter {
                 path: 'pair',
                 name: 'device-pair',
                 builder: (context, state) => const PairDeviceScreen(),
+              ),
+              GoRoute(
+                path: 'provision',
+                name: 'device-provision',
+                builder: (context, state) => const ProvisionDeviceScreen(),
               ),
               GoRoute(
                 path: ':id',
@@ -377,16 +436,27 @@ class AppRouter {
           GoRoute(
             path: '/reports',
             name: 'reports',
-            builder: (context, state) => const Scaffold(
-              body: Center(child: Text('Reports')),
-            ),
+            builder: (context, state) => const ReportsScreen(),
+          ),
+          GoRoute(
+            path: '/knowledge',
+            name: 'knowledge',
+            builder: (context, state) => const KnowledgeCenterScreen(),
           ),
           GoRoute(
             path: '/notifications',
             name: 'notifications',
-            builder: (context, state) => const Scaffold(
-              body: Center(child: Text('Notifications')),
-            ),
+            builder: (context, state) => const NotificationsScreen(),
+          ),
+          GoRoute(
+            path: '/map',
+            name: 'map',
+            builder: (context, state) => const MapScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            name: 'profile',
+            builder: (context, state) => const ProfileScreen(),
           ),
           GoRoute(
             path: '/settings',
@@ -396,9 +466,7 @@ class AppRouter {
           GoRoute(
             path: '/admin',
             name: 'admin',
-            builder: (context, state) => const Scaffold(
-              body: Center(child: Text('Admin Panel')),
-            ),
+            builder: (context, state) => const AdminPanelScreen(),
           ),
         ],
       ),

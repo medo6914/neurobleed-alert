@@ -16,11 +16,9 @@ class PatientDetailScreen extends ConsumerWidget {
 
     return patientAsync.when(
       loading: () => const Scaffold(
-        appBar: _DetailAppBar(title: ''),
         body: Center(child: AppLoading()),
       ),
       error: (error, stack) => Scaffold(
-        appBar: const _DetailAppBar(title: ''),
         body: AppErrorState(
           title: 'Error Loading Patient',
           message: error.toString(),
@@ -30,28 +28,6 @@ class PatientDetailScreen extends ConsumerWidget {
       data: (patient) => _PatientDetailContent(patient: patient),
     );
   }
-}
-
-class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  const _DetailAppBar({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(title),
-      centerTitle: true,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () => context.push('/patients/$title/edit'),
-        ),
-      ],
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class _PatientDetailContent extends ConsumerStatefulWidget {
@@ -81,40 +57,134 @@ class _PatientDetailContentState extends ConsumerState<_PatientDetailContent>
   @override
   Widget build(BuildContext context) {
     final patient = widget.patient;
-    final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${patient.firstName} ${patient.lastName}'),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => context.push('/patients/${patient.id}/edit'),
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabs: const [
-            Tab(text: 'Profile'),
-            Tab(text: 'Medical'),
-            Tab(text: 'History'),
-            Tab(text: 'Documents'),
-            Tab(text: 'Vitals'),
-            Tab(text: 'Alerts'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
+      backgroundColor: NeuroColors.bgPrimary,
+      body: Column(
         children: [
-          _ProfileTab(patient: patient),
-          _MedicalTab(patient: patient),
-          _HistoryTab(patientId: patient.id),
-          _DocumentsTab(patientId: patient.id),
-          _VitalsTab(patientId: patient.id),
-          _AlertsTab(patientId: patient.id),
+          // Patient header (reference IMG-0205: bg #011132)
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xFF011132), Color(0xFF021B3F)],
+              ),
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        color: NeuroColors.textBody,
+                        onPressed: () => context.pop(),
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Patient Details',
+                          style: NeuroTypography.h3?.copyWith(
+                            color: NeuroColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.edit_outlined,
+                          color: NeuroColors.textBody,
+                        ),
+                        onPressed: () =>
+                            context.push('/patients/${patient.id}/edit'),
+                      ),
+                    ],
+                  ),
+                  // Patient info
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      NeuroSpacing.lg,
+                      NeuroSpacing.xs,
+                      NeuroSpacing.lg,
+                      NeuroSpacing.lg,
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 32,
+                          backgroundColor:
+                              NeuroColors.primary.withValues(alpha: 0.3),
+                          child: Text(
+                            '${patient.firstName[0]}${patient.lastName[0]}',
+                            style: TextStyle(
+                              color: NeuroColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: NeuroSpacing.lg),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${patient.firstName} ${patient.lastName}',
+                                style: NeuroTypography.h3?.copyWith(
+                                  color: NeuroColors.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'MRN: ${patient.mrn}  •  ${patient.gender.name}',
+                                style: NeuroTypography.caption,
+                              ),
+                            ],
+                          ),
+                        ),
+                        _StatusBadge(status: patient.status),
+                      ],
+                    ),
+                  ),
+                  // Tab bar (reference: bg #011030)
+                  Container(
+                    color: const Color(0xFF011030),
+                    child: TabBar(
+                      controller: _tabController,
+                      isScrollable: true,
+                      labelColor: NeuroColors.primaryLight,
+                      unselectedLabelColor: NeuroColors.textSecondary,
+                      indicatorColor: NeuroColors.primaryLight,
+                      indicatorSize: TabBarIndicatorSize.label,
+                      labelStyle: NeuroTypography.labelMedium,
+                      tabs: const [
+                        Tab(text: 'Profile'),
+                        Tab(text: 'Medical'),
+                        Tab(text: 'History'),
+                        Tab(text: 'Documents'),
+                        Tab(text: 'Vitals'),
+                        Tab(text: 'Alerts'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _ProfileTab(patient: patient),
+                _MedicalTab(patient: patient),
+                _HistoryTab(patientId: patient.id),
+                _DocumentsTab(patientId: patient.id),
+                _VitalsTab(patientId: patient.id),
+                _AlertsTab(patientId: patient.id),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -307,6 +377,11 @@ class _ProfileTab extends StatelessWidget {
               leading: const Icon(Icons.history),
               title: const Text('Audit Log'),
               onTap: () { Navigator.pop(context); context.push('/patients/${patient.id}/audit'); },
+            ),
+            ListTile(
+              leading: const Icon(Icons.warning, color: Colors.red),
+              title: const Text('Emergency SOS', style: TextStyle(color: Colors.red)),
+              onTap: () { Navigator.pop(context); context.push('/patients/${patient.id}/sos'); },
             ),
             ListTile(
               leading: Icon(Icons.archive, color: Colors.orange),
@@ -768,16 +843,21 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isActive = status == PatientStatus.active;
+    final color = isActive ? NeuroColors.low : NeuroColors.high;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: NeuroSpacing.sm, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: NeuroSpacing.sm,
+        vertical: NeuroSpacing.xs,
+      ),
       decoration: BoxDecoration(
-        color: (isActive ? Colors.green : Colors.orange).withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(NeuroRadius.sm),
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(NeuroRadius.badge),
+        border: Border.all(color: color),
       ),
       child: Text(
         status.name.toUpperCase(),
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: isActive ? Colors.green : Colors.orange,
+        style: NeuroTypography.badge.copyWith(
+          color: color,
           fontWeight: FontWeight.w600,
         ),
       ),

@@ -1,32 +1,27 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
-class _SimulatedDevice {
-  final String name;
-  final String identifier;
-  final int signalStrength;
+import '../services/ble_service.dart';
 
-  const _SimulatedDevice({
-    required this.name,
-    required this.identifier,
-    required this.signalStrength,
-  });
-}
+final bleServiceProvider = Provider<BleService>((ref) {
+  final service = BleService();
+  ref.onDispose(() => service.dispose());
+  return service;
+});
 
-final _simulatedDevicesProvider = FutureProvider<List<_SimulatedDevice>>((ref) async {
-  await Future.delayed(const Duration(seconds: 2));
-  return const [
-    _SimulatedDevice(name: 'NB-01 Headband', identifier: 'NB-01-0042', signalStrength: -65),
-    _SimulatedDevice(name: 'NB-02 Wearable', identifier: 'NB-02-0017', signalStrength: -72),
-    _SimulatedDevice(name: 'NB-01 Headband', identifier: 'NB-01-0089', signalStrength: -81),
-    _SimulatedDevice(name: 'NB-02 Wearable', identifier: 'NB-02-0033', signalStrength: -58),
-    _SimulatedDevice(name: 'Bedside Monitor', identifier: 'BSM-0001', signalStrength: -45),
-  ];
+final bleScanStateProvider = StateProvider<bool>((ref) => false);
+
+final bleDevicesProvider = StreamProvider<List<BleDevice>>((ref) {
+  final service = ref.watch(bleServiceProvider);
+  return service.devicesStream;
 });
 
 class PairDeviceScreen extends ConsumerStatefulWidget {
-  const PairDeviceScreen({super.key});
+  final String? deviceId;
+
+  const PairDeviceScreen({super.key, this.deviceId});
 
   @override
   ConsumerState<PairDeviceScreen> createState() => _PairDeviceScreenState();
@@ -35,7 +30,6 @@ class PairDeviceScreen extends ConsumerStatefulWidget {
 class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _scanAnimation;
-  bool _isScanning = false;
   String? _pairingDeviceId;
 
   @override
@@ -53,42 +47,59 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
     super.dispose();
   }
 
-  void _startScan() {
-    setState(() => _isScanning = true);
+  Future<void> _startScan() async {
+    final service = ref.read(bleServiceProvider);
+    ref.read(bleScanStateProvider.notifier).state = true;
     _scanAnimation.repeat();
-    ref.invalidate(_simulatedDevicesProvider);
+    await service.initialize();
+    await service.startScan();
   }
 
   void _stopScan() {
-    setState(() => _isScanning = false);
+    final service = ref.read(bleServiceProvider);
+    service.stopScan();
+    ref.read(bleScanStateProvider.notifier).state = false;
     _scanAnimation.stop();
     _scanAnimation.reset();
   }
 
-  Future<void> _pairDevice(String identifier) async {
-    setState(() => _pairingDeviceId = identifier);
-
-    await Future.delayed(const Duration(seconds: 3));
-
+  Future<void> _pairDevice(BleDevice device) async {
+    setState(() => _pairingDeviceId = device.id);
+    final service = ref.read(bleServiceProvider);
+    final success = await service.connectToDevice(device.id);
     setState(() => _pairingDeviceId = null);
 
     if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Paired with $identifier successfully')),
-    );
-    context.pop();
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Paired with ${device.name} successfully')),
+      );
+      context.pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Pairing failed'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final devicesAsync = _isScanning ? ref.watch(_simulatedDevicesProvider) : null;
+    final isScanning = ref.watch(bleScanStateProvider);
+    final devicesAsync = ref.watch(bleDevicesProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pair Device'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.vpn_key),
+            tooltip: 'Provision Device',
+            onPressed: () => context.push('/devices/provision'),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -105,18 +116,18 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: theme.colorScheme.primary.withValues(
-                          alpha: _isScanning ? 0.3 - (_scanAnimation.value * 0.2) : 0.1,
+                          alpha: isScanning ? 0.3 - (_scanAnimation.value * 0.2) : 0.1,
                         ),
                         border: Border.all(
                           color: theme.colorScheme.primary.withValues(
-                            alpha: _isScanning ? 0.6 - (_scanAnimation.value * 0.4) : 0.3,
+                            alpha: isScanning ? 0.6 - (_scanAnimation.value * 0.4) : 0.3,
                           ),
                           width: 2,
                         ),
                       ),
                       child: Center(
                         child: Icon(
-                          _isScanning ? Icons.bluetooth_searching : Icons.bluetooth,
+                          isScanning ? Icons.bluetooth_searching : Icons.bluetooth,
                           size: 36,
                           color: theme.colorScheme.primary,
                         ),
@@ -126,7 +137,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                 ),
                 SizedBox(height: NeuroSpacing.md),
                 Text(
-                  _isScanning ? 'Scanning for devices...' : 'Ready to pair',
+                  isScanning ? 'Scanning for devices...' : 'Ready to pair',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -136,10 +147,10 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                   width: 180,
                   height: 40,
                   child: AppButton(
-                    label: _isScanning ? 'Stop Scan' : 'Scan for Devices',
-                    icon: _isScanning ? Icons.stop : Icons.search,
-                    variant: _isScanning ? ButtonVariant.secondary : ButtonVariant.primary,
-                    onPressed: _isScanning ? _stopScan : _startScan,
+                    label: isScanning ? 'Stop Scan' : 'Scan for Devices',
+                    icon: isScanning ? Icons.stop : Icons.search,
+                    variant: isScanning ? ButtonVariant.secondary : ButtonVariant.primary,
+                    onPressed: isScanning ? _stopScan : _startScan,
                   ),
                 ),
               ],
@@ -147,15 +158,21 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
           ),
           Divider(height: 1),
           Expanded(
-            child: _buildDeviceList(context, devicesAsync),
+            child: _buildDeviceList(context, devicesAsync, isScanning),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDeviceList(BuildContext context, AsyncValue<List<_SimulatedDevice>>? devicesAsync) {
-    if (!_isScanning) {
+  Widget _buildDeviceList(
+    BuildContext context,
+    AsyncValue<List<BleDevice>> devicesAsync,
+    bool isScanning,
+  ) {
+    final theme = Theme.of(context);
+
+    if (!isScanning) {
       return AppEmptyState(
         icon: Icons.bluetooth_disabled,
         title: 'Not Scanning',
@@ -163,7 +180,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
       );
     }
 
-    return devicesAsync!.when(
+    return devicesAsync.when(
       loading: () => const Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -195,13 +212,12 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
           itemCount: devices.length,
           itemBuilder: (context, index) {
             final device = devices[index];
-            final isPairing = _pairingDeviceId == device.identifier;
-            final theme = Theme.of(context);
+            final isPairing = _pairingDeviceId == device.id;
 
             return Padding(
               padding: EdgeInsets.only(bottom: NeuroSpacing.sm),
               child: AppCard(
-                onTap: isPairing ? null : () => _pairDevice(device.identifier),
+                onTap: isPairing ? null : () => _pairDevice(device),
                 child: Padding(
                   padding: EdgeInsets.all(NeuroSpacing.md),
                   child: Row(
@@ -212,11 +228,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                           color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(NeuroRadius.md),
                         ),
-                        child: Icon(
-                          Icons.bluetooth,
-                          size: 24,
-                          color: theme.colorScheme.primary,
-                        ),
+                        child: Icon(Icons.bluetooth, size: 24, color: theme.colorScheme.primary),
                       ),
                       SizedBox(width: NeuroSpacing.md),
                       Expanded(
@@ -225,13 +237,11 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                           children: [
                             Text(
                               device.name,
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                             ),
                             SizedBox(height: 2),
                             Text(
-                              'ID: ${device.identifier}',
+                              'ID: ${device.id}',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurfaceVariant,
                               ),
@@ -242,7 +252,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          _SignalStrengthIndicator(strength: device.signalStrength),
+                          _SignalStrengthIndicator(strength: device.rssi),
                           SizedBox(height: 4),
                           if (isPairing)
                             SizedBox(
@@ -251,10 +261,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           else
-                            Icon(
-                              Icons.chevron_right,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
+                            Icon(Icons.chevron_right, color: theme.colorScheme.onSurfaceVariant),
                         ],
                       ),
                     ],

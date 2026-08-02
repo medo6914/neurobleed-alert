@@ -1,15 +1,15 @@
 import time
 import numpy as np
-from sklearn.ensemble import RandomForestRegressor
+import xgboost as xgb
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from app.ai.schemas import RiskAssessmentRequest, RiskAssessmentResponse
+from app.ai.schemas import RiskAssessmentRequest, RiskAssessmentResponse, ShapExplanation
 from app.ai.medical_rules_engine import MedicalRulesEngine
 
 
 class RiskEngine:
-    MODEL_VERSION = "NB-RISK-1.0.0"
+    MODEL_VERSION = "NB-RISK-XGB-2.0.0"
     FEATURE_NAMES = [
         "heart_rate", "spo2", "rso2", "ir_value", "red_value",
         "systolic_bp", "diastolic_bp", "gcs",
@@ -21,45 +21,45 @@ class RiskEngine:
         self.rules_engine = rules_engine or MedicalRulesEngine()
         self.pipeline = self._build_pipeline()
         self._trained = False
+        self._feature_importance = None
 
     def _build_pipeline(self) -> Pipeline:
         return Pipeline([
             ("scaler", StandardScaler()),
-            ("model", RandomForestRegressor(
-                n_estimators=100,
-                max_depth=10,
-                min_samples_leaf=5,
+            ("model", xgb.XGBRegressor(
+                n_estimators=200,
+                max_depth=6,
+                min_child_weight=3,
+                learning_rate=0.05,
+                subsample=0.8,
+                colsample_bytree=0.8,
                 random_state=42,
                 n_jobs=-1,
+                verbosity=0,
             )),
         ])
 
-    def _extract_features(self, data: RiskAssessmentRequest) -> np.ndarray:
+    def _extract_features(self, data: RiskAssessmentRequest) -> list[float]:
         hr = data.heart_rate or 75.0
         spo2 = data.spo2 or 98.0
         rso2 = data.rso2 or 65.0
+        sbp = data.systolic_bp or 120.0
 
-        features = np.zeros(len(self.FEATURE_NAMES))
-        feature_map = {
-            "heart_rate": hr,
-            "spo2": spo2,
-            "rso2": rso2,
-            "ir_value": data.ir_value or 0.5,
-            "red_value": data.red_value or 0.5,
-            "systolic_bp": data.systolic_bp or 120.0,
-            "diastolic_bp": data.diastolic_bp or 80.0,
-            "gcs": data.gcs or 15.0,
-            "signal_quality": data.signal_quality,
-            "motion_artifact": data.motion_artifact,
-            "hr_spo2_ratio": hr / max(spo2, 1.0),
-            "rso2_drop": max(0, 65.0 - rso2),
-            "shock_index": hr / max(data.systolic_bp or 120.0, 1.0),
-        }
-
-        for i, name in enumerate(self.FEATURE_NAMES):
-            features[i] = feature_map.get(name, 0.0)
-
-        return features.reshape(1, -1)
+        return [
+            hr,
+            spo2,
+            rso2,
+            data.ir_value or 0.5,
+            data.red_value or 0.5,
+            sbp,
+            data.diastolic_bp or 80.0,
+            data.gcs or 15.0,
+            data.signal_quality,
+            data.motion_artifact,
+            hr / max(spo2, 1.0),
+            max(0, 65.0 - rso2),
+            hr / max(sbp, 1.0),
+        ]
 
     def _compute_heuristic_risk(self, data: RiskAssessmentRequest) -> float:
         hr = data.heart_rate or 75.0
@@ -131,23 +131,65 @@ class RiskEngine:
         except Exception:
             return None
 
+    def _compute_explanation(self, features: list[float], raw_score: float) -> ShapExplanation:
+        if not self._trained:
+            base_contributions = {name: 0.0 for name in self.FEATURE_NAMES}
+            return ShapExplanation(
+                shap_values=base_contributions,
+                expected_value=0.5,
+                base_risk=0.5,
+            )
+
+        try:
+            xgb_model = self.pipeline.named_steps["model"]
+            booster = xgb_model.get_booster()
+            features_arr = np.array(features, dtype=np.float32).reshape(1, -1)
+            dmat = xgb.DMatrix(features_arr)
+            contribs = booster.predict(dmat, pred_contribs=True)
+
+            shap_contribs = contribs[0]
+            expected_val = float(shap_contribs[-1])
+            contrib_values = shap_contribs[:-1]
+
+            base_risk = 1.0 / (1.0 + np.exp(-expected_val))
+
+            contributions = {}
+            for i, name in enumerate(self.FEATURE_NAMES):
+                contributions[name] = round(float(contrib_values[i]), 6)
+
+            return ShapExplanation(
+                shap_values=contributions,
+                expected_value=round(expected_val, 6),
+                base_risk=round(float(base_risk), 6),
+            )
+        except Exception:
+            return ShapExplanation(
+                shap_values={name: 0.0 for name in self.FEATURE_NAMES},
+                expected_value=raw_score,
+                base_risk=raw_score,
+            )
+
     def assess(self, data: RiskAssessmentRequest) -> RiskAssessmentResponse:
         start = time.perf_counter()
 
         heuristic_score = self._compute_heuristic_risk(data)
         features = self._extract_features(data)
+        features_arr = np.array(features, dtype=np.float32).reshape(1, -1)
 
         ml_score = 0.5
+        raw_score = 0.5
         if self._trained:
             try:
-                ml_pred = self.pipeline.predict(features)[0]
-                ml_score = float(np.clip(ml_pred, 0.0, 1.0))
+                raw_score = float(self.pipeline.predict(features_arr)[0])
+                ml_score = float(np.clip(raw_score, 0.0, 1.0))
             except Exception:
                 pass
 
         ensemble_score = 0.6 * heuristic_score + 0.4 * ml_score
         ensemble_score = min(max(ensemble_score, 0.0), 1.0)
         risk_level = self._risk_level_from_score(ensemble_score)
+
+        explanation = self._compute_explanation(features, raw_score)
 
         vitals = {
             "heart_rate": data.heart_rate or 75.0,
@@ -189,8 +231,22 @@ class RiskEngine:
             rules_triggered=rules_triggered,
             model_version=self.MODEL_VERSION,
             inference_time_ms=round(elapsed, 2),
+            explanation=explanation,
+            shap_values=list(explanation.shap_values.values()) if explanation.shap_values else [],
+            feature_names=self.FEATURE_NAMES,
         )
 
     def train(self, X: np.ndarray, y: np.ndarray):
         self.pipeline.fit(X, y)
         self._trained = True
+        xgb_model = self.pipeline.named_steps["model"]
+        self._feature_importance = dict(zip(
+            self.FEATURE_NAMES,
+            xgb_model.feature_importances_.tolist()
+        ))
+
+    def is_trained(self) -> bool:
+        return self._trained
+
+    def get_feature_importance(self) -> dict:
+        return self._feature_importance or {}

@@ -25,6 +25,7 @@ class Hospital(TimestampMixin, SoftDeleteMixin, VersionMixin, AuditMixin, FHIRMi
     patients = relationship("Patient", back_populates="hospital")
     devices = relationship("Device", back_populates="hospital")
     departments = relationship("Department", back_populates="hospital")
+    subscription = relationship("Subscription", back_populates="hospital", uselist=False)
 
     def __repr__(self) -> str:
         return f"<Hospital(id={self.id}, name='{self.name}')>"
