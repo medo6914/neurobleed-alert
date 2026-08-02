@@ -1,1 +1,2 @@
-PENDING_DEPLOY
+https://medo6914.github.io/neurobleed-alert/
+(Admin Dashboard: login as admin@neurobleed.com / Admin123! — role-based /admin panel in the same web app)

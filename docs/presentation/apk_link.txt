@@ -1,1 +1,1 @@
-PENDING_BUILD
+https://github.com/medo6914/neurobleed-alert/releases/latest/download/app-debug.apk

@@ -57,6 +57,12 @@ jobs:
             flutter build web --release
           fi
 
+      - name: Copy presentation landing page into web build
+        working-directory: apps/mobile_flutter
+        run: |
+          mkdir -p build/web/presentation
+          cp -r ../../docs/presentation/. build/web/presentation/
+
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
         with:
