@@ -1,0 +1,76 @@
+name: Web Build + GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'apps/mobile_flutter/**'
+      - 'packages/**'
+      - '.github/workflows/web.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-web:
+    name: Build Flutter Web
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter (Stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+          cache-key: flutter-web
+
+      - name: Cache Pub
+        uses: actions/cache@v4
+        with:
+          path: ~/.pub-cache
+          key: pub-cache-web-${{ runner.os }}-${{ hashFiles('apps/mobile_flutter/pubspec.lock', 'packages/core/pubspec.yaml', 'packages/design_system/pubspec.yaml', 'packages/shared/pubspec.yaml') }}
+          restore-keys: |
+            pub-cache-web-${{ runner.os }}-
+
+      - name: Flutter pub get
+        working-directory: apps/mobile_flutter
+        run: flutter pub get
+
+      - name: Build Web (release)
+        working-directory: apps/mobile_flutter
+        env:
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+        run: |
+          if [ -n "$API_BASE_URL" ]; then
+            flutter build web --release --dart-define=API_BASE_URL=$API_BASE_URL
+          else
+            flutter build web --release
+          fi
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/mobile_flutter/build/web
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: build-web
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
