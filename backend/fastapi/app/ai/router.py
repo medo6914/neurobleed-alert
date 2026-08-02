@@ -1,32 +1,39 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_db
-from app.core.dependencies import get_current_user, require_permission
-from app.core.rbac import Permission
-from app.models.user import User
+from app.ai.llm_gateway import llm_gateway
 from app.ai.schemas import (
-    RiskAssessmentRequest,
-    RiskAssessmentResponse,
     BatchRiskRequest,
     BatchRiskResponse,
-    KnowledgeSearchRequest,
-    KnowledgeSearchResponse,
-    RiskExplanationRequest,
-    RiskExplanationResponse,
-    ModelStatusResponse,
-    TrainModelRequest,
+    DashboardStatsResponse,
     ExportModelRequest,
     ExportModelResponse,
-    DashboardStatsResponse,
     IngestKnowledgeRequest,
     IngestKnowledgeResponse,
+    KnowledgeSearchRequest,
+    KnowledgeSearchResponse,
+    ModelStatusResponse,
+    RiskAssessmentRequest,
+    RiskAssessmentResponse,
+    TrainModelRequest,
 )
 from app.ai.service import ai_service
+from app.config import settings
+from app.core.dependencies import get_current_user, require_permission
+from app.core.rbac import Permission
+from app.database import get_db
+from app.models.user import User
 
 router = APIRouter(prefix="/ai", tags=["ai"])
+
+
+class ChatRequest(BaseModel):
+    message: str
+    system_prompt: str | None = None
+    provider: str | None = None
 
 
 @router.get("/health", summary="AI service health check")
@@ -170,3 +177,27 @@ async def dashboard_stats(
     current_user: User = Depends(require_permission(Permission.REPORT_VIEW)),
 ):
     return await ai_service.get_dashboard_stats(db)
+
+
+@router.get("/providers", summary="List configured LLM providers")
+async def llm_providers(
+    current_user: User = Depends(get_current_user),
+):
+    return {
+        "providers": llm_gateway.providers_available(),
+        "ollama": settings.OLLAMA_BASE_URL if settings.OLLAMA_BASE_URL else None,
+        "model": settings.OLLAMA_MODEL,
+    }
+
+
+@router.post("/chat", summary="Chat with the medical LLM assistant (Ollama/OpenAI/Gemini/HuggingFace)")
+async def chat(
+    data: ChatRequest,
+    current_user: User = Depends(get_current_user),
+):
+    system_prompt = data.system_prompt or (
+        "You are a clinical decision support assistant for NeuroBleed Alert, a neurocritical care platform "
+        "for intracranial hemorrhage patients. Give concise, evidence-based guidance. Always note that you "
+        "are not a substitute for professional medical judgment."
+    )
+    return await llm_gateway.chat(system_prompt, data.message, provider=data.provider)

@@ -1,13 +1,13 @@
 import logging
 from datetime import datetime, timezone
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.emergency import EmergencyContact, EmergencyEvent
-from app.models.patient import Patient
 from app.models.enums import EmergencyEventStatus
-from app.config import settings
+from app.models.patient import Patient
+from app.services.notification_service import notification_dispatcher
 
 logger = logging.getLogger(__name__)
 
@@ -94,40 +94,38 @@ class EmergencyService:
         db: AsyncSession,
     ) -> bool:
         try:
-            if settings.TWILIO_ACCOUNT_SID and settings.TWILIO_AUTH_TOKEN:
-                await self._send_sms(contact.phone, patient, event)
-            else:
+            patient_name = patient.full_name if patient else "a patient"
+            message = (
+                f"EMERGENCY ALERT from NeuroBleed Alert\n"
+                f"Patient: {patient_name}\n"
+                f"Event: {event.sos_type}\n"
+                f"Status: {event.status.value}\n"
+                + (f"Location: https://www.openstreetmap.org/?mlat={event.location_lat}&mlon={event.location_lng}#map=15/{event.location_lat}/{event.location_lng}\n" if event.location_lat and event.location_lng else "")
+                + "Please respond immediately."
+            )
+            results = await notification_dispatcher.dispatch_emergency(
+                phone=contact.phone,
+                email=contact.email,
+                fcm_token=None,
+                patient_name=patient_name,
+                risk_level=event.sos_type,
+                message=message,
+            )
+            delivered = bool(
+                results.get("sms")
+                or results.get("whatsapp")
+                or results.get("email")
+                or results.get("push")
+            )
+            if not delivered:
                 logger.info(
-                    "SMS not configured. Would send to %s: Emergency for %s",
-                    contact.phone, patient.full_name if patient else "unknown",
+                    "No notification channels configured. Would send to %s: %s",
+                    contact.phone, message,
                 )
-            return True
+            return delivered
         except Exception as e:
             logger.error("Failed to notify contact %s: %s", contact.id, e)
             return False
-
-    async def _send_sms(self, to_phone: str, patient, event: EmergencyEvent) -> None:
-        try:
-            from twilio.rest import Client
-            client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-            patient_name = patient.full_name if patient else "A patient"
-            message_body = (
-                f"EMERGENCY ALERT - {patient_name}\n"
-                f"An emergency event has been triggered.\n"
-                f"Type: {event.sos_type}\n"
-                f"Please respond immediately."
-            )
-            client.messages.create(
-                body=message_body,
-                from_=settings.TWILIO_PHONE_NUMBER,
-                to=to_phone,
-            )
-            logger.info("SMS sent to %s", to_phone)
-        except ImportError:
-            logger.warning("twilio not installed, SMS not sent to %s", to_phone)
-        except Exception as e:
-            logger.error("Twilio error for %s: %s", to_phone, e)
-            raise
 
 
 emergency_service = EmergencyService()

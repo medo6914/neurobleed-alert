@@ -37,3 +37,4 @@ sentence-transformers>=5.6.0
 skl2onnx>=1.17.0
 onnxmltools>=1.16.0
 onnxconverter-common>=1.16.0
+sentry-sdk>=2.30.0

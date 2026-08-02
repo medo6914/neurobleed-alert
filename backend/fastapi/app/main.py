@@ -1,3 +1,4 @@
+import logging
 import uuid
 from contextlib import asynccontextmanager
 
@@ -13,15 +14,43 @@ from app.core.rate_limiter import add_rate_limiting
 from app.core.audit import log_action, generate_correlation_id
 from app.core.redis import init_redis, close_redis
 from app.services.monitoring_service import register_handlers
+from app.services.maps_service import maps_service
+from app.services.weather_service import weather_service
+from app.services.medical_service import medical_service
+from app.services.payment_service import payment_service
+from app.services.file_service import file_service
+from app.services.notification_service import notification_dispatcher
 from app.ai.service import ai_service
+from app.ai.llm_gateway import llm_gateway
 from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.middleware.tenant_isolation import apply_tenant_isolation
 from app.api.v1 import router as v1_router
+
+logger = logging.getLogger(__name__)
+
+
+def init_sentry():
+    if not settings.SENTRY_DSN:
+        return False
+    try:
+        import sentry_sdk
+
+        sentry_sdk.init(
+            dsn=settings.SENTRY_DSN,
+            environment=settings.ENVIRONMENT,
+            traces_sample_rate=0.1,
+        )
+        logger.info("Sentry initialized")
+        return True
+    except Exception as e:
+        logger.warning("Sentry init failed: %s", e)
+        return False
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     validate_production_config()
+    init_sentry()
     await init_db()
     init_firebase()
     await init_redis()
@@ -29,6 +58,12 @@ async def lifespan(app: FastAPI):
     await ai_service.initialize()
     yield
     await close_redis()
+    await maps_service.aclose()
+    await weather_service.aclose()
+    await medical_service.aclose()
+    await payment_service.aclose()
+    await notification_dispatcher.aclose()
+    await llm_gateway.aclose()
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
@@ -75,7 +110,17 @@ app.add_middleware(
 
 @app.get("/health")
 async def health_check():
-    return {"status": "ok", "version": "0.1.0"}
+    return {
+        "status": "ok",
+        "version": "0.1.0",
+        "maps": "nominatim/osrm/overpass",
+        "llm_providers": llm_gateway.providers_available(),
+        "firebase": bool(settings.FIREBASE_CREDENTIALS_PATH),
+        "sentry": bool(settings.SENTRY_DSN),
+        "weather": weather_service.configured(),
+        "payments": payment_service.providers(),
+        "files": file_service.cloudinary_configured(),
+    }
 
 
 @app.middleware("http")

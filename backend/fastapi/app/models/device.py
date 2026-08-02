@@ -44,6 +44,7 @@ class Device(TimestampMixin, SoftDeleteMixin, VersionMixin, AuditMixin, FHIRMixi
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, server_default="1")
     certificate_thumbprint: Mapped[str | None] = mapped_column(String(255), nullable=True)
     public_key: Mapped[str | None] = mapped_column(Text, nullable=True)
+    fcm_token: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     patient = relationship("Patient", back_populates="device")
     hospital = relationship("Hospital", back_populates="devices")

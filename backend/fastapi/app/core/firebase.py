@@ -1,6 +1,11 @@
+import logging
+
 import firebase_admin
-from firebase_admin import credentials, auth as firebase_auth
+from firebase_admin import credentials, auth as firebase_auth, messaging
+
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 _firebase_app = None
 
@@ -10,6 +15,37 @@ def init_firebase():
     if _firebase_app is None and settings.FIREBASE_CREDENTIALS_PATH:
         cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS_PATH)
         _firebase_app = firebase_admin.initialize_app(cred)
+
+
+def firebase_available() -> bool:
+    return _firebase_app is not None
+
+
+async def send_push(
+    token: str,
+    title: str,
+    body: str,
+    data: dict | None = None,
+    topic: str | None = None,
+) -> bool:
+    """Send an FCM push notification. Returns False gracefully when unconfigured."""
+    try:
+        if not firebase_available():
+            logger.warning("FCM not configured, skipping push")
+            return False
+        message = messaging.Message(
+            token=token,
+            topic=topic,
+            notification=messaging.Notification(title=title, body=body),
+            data={str(k): str(v) for k, v in (data or {}).items()},
+            android=messaging.AndroidConfig(priority="high"),
+        )
+        response = messaging.send(message)
+        logger.info("FCM sent: %s", response)
+        return True
+    except Exception as e:
+        logger.warning("FCM send failed: %s", e)
+        return False
 
 
 async def verify_firebase_token(id_token: str) -> dict | None:

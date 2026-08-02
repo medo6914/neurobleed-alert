@@ -1,6 +1,7 @@
 import asyncio
 import sys
 
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 
@@ -34,3 +35,22 @@ async def get_db():
 async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        if _url and _url.startswith("postgresql"):
+            await conn.execute(
+                text(
+                    "ALTER TABLE hospitals ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION;"
+                    "ALTER TABLE hospitals ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION;"
+                    "ALTER TABLE devices ADD COLUMN IF NOT EXISTS fcm_token TEXT;"
+                )
+            )
+        elif _url and _url.startswith("sqlite"):
+            for table, column, ddl in (
+                ("hospitals", "latitude", "ALTER TABLE hospitals ADD COLUMN latitude REAL"),
+                ("hospitals", "longitude", "ALTER TABLE hospitals ADD COLUMN longitude REAL"),
+                ("devices", "fcm_token", "ALTER TABLE devices ADD COLUMN fcm_token TEXT"),
+            ):
+                has = await conn.execute(
+                    text(f"SELECT COUNT(*) FROM pragma_table_info('{table}') WHERE name = '{column}'")
+                )
+                if has.scalar() == 0:
+                    await conn.execute(text(ddl))

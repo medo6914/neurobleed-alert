@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>NeuroBleed Alert — Graduation Project</title>
 <link rel="icon" href="logo_brain.png" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <style>
   :root {
     --bg: #0b1020;
@@ -121,6 +122,12 @@
   .tech { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
   .tech span { padding: 10px 18px; border-radius: 12px; font-size: 13.5px; font-weight:600; border:1px solid var(--border); background: rgba(255,255,255,.05); }
 
+  #map { height: 460px; border-radius: var(--radius); z-index: 1; background: #0d1526; }
+  .leaflet-container { font-family: inherit; }
+  .leaflet-tile-pane { filter: brightness(.9) saturate(.9); }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #101a33; color: var(--text); border: 1px solid var(--border); }
+  .leaflet-popup-content { font-size: 13px; }
+
   footer { border-top: 1px solid var(--border); padding: 36px 0 46px; margin-top: 40px; text-align:center; }
   footer .btn-row { margin-bottom: 20px; }
   footer p { color: var(--muted); font-size: 13px; }
@@ -153,6 +160,7 @@
       <a href="#arch">البنية</a>
       <a href="#demo">التجربة</a>
       <a href="#qr">QR</a>
+      <a href="#map-sec">الخريطة</a>
       <a href="#team">الفريق</a>
       <a href="#tech">التقنيات</a>
     </nav>
@@ -182,7 +190,7 @@
       <div class="feat glass reveal"><div class="ico">📡</div><h3>Real-time Monitoring</h3><p>مراقبة حية للنبض، الأكسجين، ضغط الدم عبر WebSocket بلا تأخير.</p></div>
       <div class="feat glass reveal"><div class="ico">📶</div><h3>BLE Medical Device</h3><p>ربط الجهاز الطبي عبر البلوتوث مع محاكاة كاملة للاقتران.</p></div>
       <div class="feat glass reveal"><div class="ico">🚨</div><h3>SOS Emergency</h3><p>زر طوارئ يرسل الموقع والبيانات الحيوية مع العد التنازلي والاتصال المباشر.</p></div>
-      <div class="feat glass reveal"><div class="ico">🗺️</div><h3>Hospital Navigation</h3><p>خريطة أقرب المستشفيات مع فتح تطبيق الخرائط في خطوة واحدة.</p></div>
+      <div class="feat glass reveal"><div class="ico">🗺️</div><h3>Hospital Navigation</h3><p>خريطة تفاعلية مفتوحة المصدر (OpenStreetMap) تعرض أقرب المستشفيات مع البحث والاتجاهات.</p></div>
       <div class="feat glass reveal"><div class="ico">📄</div><h3>Medical Reports</h3><p>تقارير طبية قابلة للتصفية والتصدير PDF وعرض مباشر.</p></div>
       <div class="feat glass reveal"><div class="ico">🩺</div><h3>Doctor Dashboard</h3><p>لوحة أطباء: مرضى، أجهزة، قراءات حية، وتنبيهات خطورة.</p></div>
       <div class="feat glass reveal"><div class="ico">🛡</div><h3>Admin Dashboard</h3><p>إدارة المستخدمين والمستشفيات والأدوار والأنظمة في لوحة ويب كاملة.</p></div>
@@ -244,6 +252,13 @@
     </div>
   </section>
 
+  <section id="map-sec">
+    <h2 class="sec-title reveal">خريطة المستشفيات</h2>
+    <p class="sec-sub reveal">OpenStreetMap — لقطات حية للمستشفيات في القاهرة مع البحث والاتجاهات</p>
+    <div id="map" class="reveal"></div>
+    <p class="sec-sub reveal" style="margin-top:16px; font-size:13px">خرائط مفتوحة المصدر بالكامل: OpenStreetMap + Nominatim (بحث) + Overpass (مستشفيات) + OSRM (اتجاهات) — بدون رسوم وبدون بطاقة ائتمان</p>
+  </section>
+
   <section id="team">
     <h2 class="sec-title reveal">فريق المشروع</h2>
     <p class="sec-sub reveal">Graduation Project — تخرج 2026</p>
@@ -260,7 +275,7 @@
     <div class="tech reveal">
       <span>Flutter</span><span>Dart</span><span>FastAPI</span><span>Python</span>
       <span>Firebase</span><span>BLE</span><span>TensorFlow</span><span>SQLite / PostgreSQL</span>
-      <span>OpenAI</span><span>Google Maps</span>
+      <span>OpenAI</span><span>OpenStreetMap</span><span>Leaflet</span><span>Ollama</span>
     </div>
   </section>
 
@@ -276,12 +291,50 @@
 
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
   // Reveal on scroll
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Live OpenStreetMap map with Cairo hospitals
+  (function () {
+    const mapEl = document.getElementById('map');
+    if (!mapEl || typeof L === 'undefined') return;
+
+    const map = L.map('map', { scrollWheelZoom: false }).setView([30.0444, 31.2357], 12);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    const hospitals = [
+      { name: 'Ain Shams University Hospital', lat: 30.0772, lng: 31.2854 },
+      { name: 'Kasr El Aini Hospital', lat: 30.0286, lng: 31.2278 },
+      { name: 'Dar Al Fouad Hospital', lat: 30.0658, lng: 31.3196 },
+      { name: 'National Heart Institute', lat: 30.0648, lng: 31.2098 },
+      { name: 'Nasser Institute Hospital', lat: 30.0536, lng: 31.2367 },
+      { name: 'Demerdash Hospital', lat: 30.0827, lng: 31.2904 },
+      { name: 'El-Sahel Teaching Hospital', lat: 30.0964, lng: 31.2468 },
+      { name: 'Sheikh Zayed Specialized Hospital', lat: 30.0281, lng: 31.0004 },
+    ];
+
+    hospitals.forEach(h => {
+      L.marker([h.lat, h.lng])
+        .addTo(map)
+        .bindPopup(`<b>🏥 ${h.name}</b><br/><a href="https://www.openstreetmap.org/?mlat=${h.lat}&mlon=${h.lng}#map=16/${h.lat}/${h.lng}" target="_blank" rel="noopener">فتح في OpenStreetMap ↗</a>`);
+    });
+
+    L.marker([30.0444, 31.2357], { icon: L.divIcon({ className: 'patient-pin', html: '📍' }) })
+      .addTo(map)
+      .bindPopup('<b>موقع المريض (تجريبي)</b>');
+
+    map.on('click', (e) => {
+      window.open(`https://www.openstreetmap.org/?mlat=${e.latlng.lat}&mlon=${e.latlng.lng}#map=16/${e.latlng.lat}/${e.latlng.lng}`, '_blank');
+    });
+  })();
 
   // Resolve target links from files written by the deployment script
   const LINKS = {};

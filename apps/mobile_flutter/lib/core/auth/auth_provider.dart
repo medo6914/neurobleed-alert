@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared/entities/user.dart';
 import 'package:core/core.dart';
+import '../../features/notifications/push_notification_service.dart';
 
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref.read(apiClientProvider), SecureStorageService());
@@ -124,12 +127,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
         user: user,
         isLoading: false,
       );
+      unawaited(_registerPush());
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: 'فشل تسجيل الدخول: ${_extractError(e)}',
       );
     }
+  }
+
+  Future<void> _registerPush() async {
+    try {
+      await PushNotificationService(_api).initialize();
+    } catch (_) {}
   }
 
   Future<void> register({

@@ -1,6 +1,8 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:design_system/design_system.dart';
 import 'package:core/core.dart';
@@ -18,6 +20,7 @@ final mapHospitalsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) as
 
 const _kDefaultLat = 30.0444;
 const _kDefaultLng = 31.2357;
+const _kTileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -27,20 +30,31 @@ class MapScreen extends ConsumerStatefulWidget {
 }
 
 class _MapScreenState extends ConsumerState<MapScreen> {
+  final MapController _mapController = MapController();
+  LatLng _userLocation = const LatLng(_kDefaultLat, _kDefaultLng);
   bool _loading = true;
-  bool _failed = false;
+  bool _locating = false;
   List<Map<String, dynamic>> _hospitals = [];
+  List<LatLng>? _route;
+  String _searchQuery = '';
+  LatLng? _searchResult;
 
   @override
   void initState() {
     super.initState();
     _load();
+    _locateUser();
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
 
   Future<void> _load() async {
     setState(() {
       _loading = true;
-      _failed = false;
     });
     try {
       final api = ref.read(apiClientProvider);
@@ -49,16 +63,128 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       final hospitals = data is Map && data['hospitals'] is List
           ? (data['hospitals'] as List).cast<Map<String, dynamic>>()
           : <Map<String, dynamic>>[];
+      final nearby = await _nearbyHospitals(api);
       setState(() {
-        _hospitals = hospitals;
+        _hospitals = hospitals.isEmpty ? nearby : hospitals;
         _loading = false;
       });
     } catch (_) {
       setState(() {
         _hospitals = [];
         _loading = false;
-        _failed = true;
       });
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _nearbyHospitals(dynamic api) async {
+    try {
+      final response = await api.get('/v1/maps/hospitals/nearby',
+          queryParameters: {
+            'lat': _userLocation.latitude,
+            'lng': _userLocation.longitude,
+            'radius_m': 10000,
+            'limit': 10,
+          });
+      final data = response.data;
+      if (data is List) return data.cast<Map<String, dynamic>>();
+    } catch (_) {}
+    return [];
+  }
+
+  Future<void> _locateUser() async {
+    setState(() => _locating = true);
+    try {
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        final asked = await Geolocator.requestPermission();
+        if (asked == LocationPermission.denied ||
+            asked == LocationPermission.deniedForever) {
+          return;
+        }
+      }
+      final pos = await Geolocator.getCurrentPosition();
+      setState(() {
+        _userLocation = LatLng(pos.latitude, pos.longitude);
+        _mapController.move(_userLocation, 14);
+      });
+    } catch (_) {
+      // Offline/simulator: keep default Cairo location.
+    } finally {
+      if (mounted) setState(() => _locating = false);
+    }
+  }
+
+  Future<void> _search() async {
+    final q = _searchQuery.trim();
+    if (q.isEmpty) return;
+    try {
+      final api = ref.read(apiClientProvider);
+      final response = await api.get('/v1/maps/geocode', queryParameters: {'q': q, 'limit': 1});
+      final data = response.data;
+      if (data is List && data.isNotEmpty) {
+        final place = data.first as Map<String, dynamic>;
+        final result = LatLng(
+          (place['lat'] as num).toDouble(),
+          (place['lng'] as num).toDouble(),
+        );
+        setState(() {
+          _searchResult = result;
+          _mapController.move(result, 15);
+        });
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _routeToNearest() async {
+    final hospital = _nearestHospital();
+    if (hospital == null) return;
+    final lat = (hospital['latitude'] as num?)?.toDouble() ??
+        (hospital['lat'] as num?)?.toDouble();
+    final lng = (hospital['longitude'] as num?)?.toDouble() ??
+        (hospital['lng'] as num?)?.toDouble();
+    if (lat == null || lng == null) return;
+    try {
+      final api = ref.read(apiClientProvider);
+      final response = await api.get('/v1/maps/route', queryParameters: {
+        'from_lat': _userLocation.latitude,
+        'from_lng': _userLocation.longitude,
+        'to_lat': lat,
+        'to_lng': lng,
+      });
+      final data = response.data;
+      if (data is Map && data['geometry'] is Map) {
+        final coords = (data['geometry'] as Map)['coordinates'] as List;
+        final points = coords
+            .map((c) => LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
+            .toList();
+        setState(() => _route = points);
+      }
+    } catch (_) {}
+  }
+
+  Map<String, dynamic>? _nearestHospital() {
+    if (_hospitals.isEmpty) return null;
+    double best = double.infinity;
+    Map<String, dynamic>? nearest;
+    for (final h in _hospitals) {
+      final lat = (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
+      final lng = (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
+      if (lat == null || lng == null) continue;
+      final d = const Distance().distance(_userLocation, LatLng(lat, lng));
+      if (d < best) {
+        best = d;
+        nearest = h;
+      }
+    }
+    return nearest;
+  }
+
+  Future<void> _openOSM() async {
+    final uri = Uri.parse(
+      'https://www.openstreetmap.org/?mlat=${_userLocation.latitude}&mlon=${_userLocation.longitude}#map=15/${_userLocation.latitude}/${_userLocation.longitude}',
+    );
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 
@@ -69,20 +195,144 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         title: const Text('الخريطة - أقرب المستشفيات'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _load,
+            icon: Icon(_locating ? Icons.my_location : Icons.location_searching),
+            tooltip: 'موقعي',
+            onPressed: _locateUser,
           ),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
         ],
       ),
       body: _loading
           ? const Center(child: AppLoading())
           : Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          onChanged: (v) => _searchQuery = v,
+                          onSubmitted: (_) => _search(),
+                          decoration: InputDecoration(
+                            hintText: 'ابحث عن مستشفى أو مكان...',
+                            isDense: true,
+                            prefixIcon: const Icon(Icons.search, size: 20),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.directions, color: Color(0xFF1ACB58)),
+                        tooltip: 'الاتجاه إلى أقرب مستشفى',
+                        onPressed: _routeToNearest,
+                      ),
+                    ],
+                  ),
+                ),
                 Expanded(
-                  child: _MapCanvas(
-                    hospitals: _hospitals,
-                    failed: _failed,
-                    onOpenMaps: () => _openGoogleMaps(),
+                  child: Stack(
+                    children: [
+                      FlutterMap(
+                        mapController: _mapController,
+                        options: MapOptions(
+                          initialCenter: _userLocation,
+                          initialZoom: 13,
+                          onTap: (_, __) => setState(() {
+                            _route = null;
+                            _searchResult = null;
+                          }),
+                        ),
+                        children: [
+                          TileLayer(
+                            urlTemplate: _kTileUrl,
+                            userAgentPackageName: 'com.neurobleed.alert',
+                          ),
+                          if (_route != null)
+                            PolylineLayer(
+                              polylines: [
+                                Polyline(
+                                  points: _route!,
+                                  strokeWidth: 5,
+                                  color: const Color(0xFF1ACB58),
+                                ),
+                              ],
+                            ),
+                          MarkerLayer(
+                            markers: [
+                              for (final h in _hospitals)
+                                if (_hospitalLatLng(h) != null)
+                                  Marker(
+                                    point: _hospitalLatLng(h)!,
+                                    width: 34,
+                                    height: 34,
+                                    child: GestureDetector(
+                                      onTap: () => _showHospitalSheet(h),
+                                      child: const Icon(
+                                        Icons.local_hospital,
+                                        color: Color(0xFF1ACB58),
+                                        size: 32,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.black87,
+                                            blurRadius: 6,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              if (_searchResult != null)
+                                Marker(
+                                  point: _searchResult!,
+                                  width: 30,
+                                  height: 30,
+                                  child: const Icon(
+                                    Icons.place,
+                                    color: Color(0xFF2196F3),
+                                    size: 30,
+                                  ),
+                                ),
+                              Marker(
+                                point: _userLocation,
+                                width: 32,
+                                height: 32,
+                                child: const Icon(
+                                  Icons.navigation,
+                                  color: Color(0xFFE53935),
+                                  size: 32,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      if (_locating)
+                        const Positioned(
+                          top: 12,
+                          left: 12,
+                          child: Card(
+                            child: Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text('جاري تحديد الموقع...', style: TextStyle(fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
                 _buildBottomCards(),
@@ -91,22 +341,104 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
-  Future<void> _openGoogleMaps() async {
-    final uri = Uri.parse(
-      'https://www.google.com/maps/search/?api=1&query=$_kDefaultLat,$_kDefaultLng',
+  LatLng? _hospitalLatLng(Map<String, dynamic> h) {
+    final lat = (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
+    final lng = (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
+    if (lat == null || lng == null) return null;
+    return LatLng(lat, lng);
+  }
+
+  void _showHospitalSheet(Map<String, dynamic> h) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0C1427),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.local_hospital, color: Color(0xFF1ACB58)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    h['name'] as String? ?? 'مستشفى',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (h['address'] != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                h['address'] as String,
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+            ],
+            if (h['phone'] != null) ...[
+              const SizedBox(height: 4),
+              Text(
+                h['phone'] as String,
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
+              ),
+            ],
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => _routeToHospital(h),
+                icon: const Icon(Icons.directions),
+                label: const Text('الاتجاه'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+  }
+
+  Future<void> _routeToHospital(Map<String, dynamic> h) async {
+    final lat = (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
+    final lng = (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
+    if (lat == null || lng == null) return;
+    Navigator.of(context).pop();
+    try {
+      final api = ref.read(apiClientProvider);
+      final response = await api.get('/v1/maps/route', queryParameters: {
+        'from_lat': _userLocation.latitude,
+        'from_lng': _userLocation.longitude,
+        'to_lat': lat,
+        'to_lng': lng,
+      });
+      final data = response.data;
+      if (data is Map && data['geometry'] is Map) {
+        final coords = (data['geometry'] as Map)['coordinates'] as List;
+        setState(() {
+          _route = coords
+              .map((c) => LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
+              .toList();
+          _mapController.move(LatLng(lat, lng), 14);
+        });
+      }
+    } catch (_) {}
   }
 
   Widget _buildBottomCards() {
     final hospitals = _hospitals;
     final display = hospitals.isEmpty
         ? const [
-            {'name': 'مستشفى جامعة القاهرة', 'distance_km': 2.4},
-            {'name': 'مستشفى المنيل التخصصي', 'distance_km': 3.1},
-            {'name': 'مستشفى الدمرداش', 'distance_km': 5.8},
+            {'name': 'مستشفى جامعة القاهرة', 'latitude': 30.0286, 'longitude': 31.2278},
+            {'name': 'مستشفى المنيل التخصصي', 'latitude': 30.0339, 'longitude': 31.2304},
+            {'name': 'مستشفى الدمرداش', 'latitude': 30.0827, 'longitude': 31.2904},
           ]
         : hospitals;
 
@@ -125,7 +457,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'أقرب المستشفيات',
                 style: TextStyle(
                   color: Colors.white,
@@ -135,8 +467,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.map_outlined, color: Colors.white),
-                tooltip: 'فتح خرائط Google',
-                onPressed: _openGoogleMaps,
+                tooltip: 'فتح OpenStreetMap',
+                onPressed: _openOSM,
               ),
             ],
           ),
@@ -155,13 +487,9 @@ class _HospitalRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = hospital['name'] as String? ?? 'مستشفى';
-    final distance = (hospital['distance_km'] as num?)?.toDouble() ??
-        (hospital['patient_count'] != null
-            ? (2.0 + (hospital['patient_count'] as num).toDouble() * 0.3)
-            : 2.0);
-    final beds = (hospital['bed_capacity'] as num?)?.toInt();
-    final occupancy =
-        (hospital['bed_occupancy'] as num?)?.toDouble()?.clamp(0, 100);
+    final lat = (hospital['latitude'] as num?)?.toDouble() ?? (hospital['lat'] as num?)?.toDouble();
+    final lng = (hospital['longitude'] as num?)?.toDouble() ?? (hospital['lng'] as num?)?.toDouble();
+    final distance = (hospital['distance_km'] as num?)?.toDouble() ?? 2.0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -175,295 +503,24 @@ class _HospitalRow extends StatelessWidget {
           const Icon(Icons.local_hospital, color: Color(0xFF1ACB58)),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (beds != null && occupancy != null)
-                  Text(
-                    '$beds سرير • إشغال ${occupancy.toStringAsFixed(0)}%',
-                    style: const TextStyle(fontSize: 12, color: Colors.white54),
-                  ),
-              ],
+            child: Text(
+              name,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${distance.toStringAsFixed(1)} كم',
-                style: const TextStyle(
-                  color: Color(0xFF1ACB58),
-                  fontWeight: FontWeight.bold,
-                ),
+          if (lat != null && lng != null)
+            Text(
+              '${distance.toStringAsFixed(1)} كم',
+              style: const TextStyle(
+                color: Color(0xFF1ACB58),
+                fontWeight: FontWeight.bold,
               ),
-              Text(
-                '${((distance / 0.8).clamp(1, 120)).round()} دقيقة',
-                style: const TextStyle(fontSize: 11, color: Colors.white54),
-              ),
-            ],
-          ),
+            ),
         ],
       ),
     );
   }
 }
-
-class _MapCanvas extends StatelessWidget {
-  final List<Map<String, dynamic>> hospitals;
-  final bool failed;
-  final VoidCallback onOpenMaps;
-
-  const _MapCanvas({
-    required this.hospitals,
-    required this.failed,
-    required this.onOpenMaps,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF0A1B33), Color(0xFF04101F)],
-        ),
-      ),
-      child: CustomPaint(
-        painter: _MapPainter(
-          hospitalCount: hospitals.isEmpty ? 3 : hospitals.length,
-          failed: failed,
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 16,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.my_location, color: Colors.white, size: 14),
-                    const SizedBox(width: 6),
-                    Text(
-                      'موقع المريض $_kDefaultLat, $_kDefaultLng',
-                      style: const TextStyle(color: Colors.white, fontSize: 11),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 16,
-              left: 16,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.55),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.local_taxi, color: Color(0xFFFFB74D)),
-                    const SizedBox(width: 10),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'أقرب سيارة إسعاف',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                          ),
-                          Text(
-                            'متوقعة خلال ~4 دقائق',
-                            style: TextStyle(color: Colors.white70, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.map, color: Colors.white),
-                      tooltip: 'فتح الخريطة',
-                      onPressed: onOpenMaps,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _MapPainter extends CustomPainter {
-  final int hospitalCount;
-  final bool failed;
-
-  _MapPainter({required this.hospitalCount, required this.failed});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final gridPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.05)
-      ..strokeWidth = 1;
-
-    const step = 48.0;
-    for (double x = 0; x < size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
-    }
-    for (double y = 0; y < size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
-    }
-
-    final center = Offset(size.width / 2, size.height / 2);
-
-    final roadPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.08)
-      ..strokeWidth = 10
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(
-      Offset(0, center.dy),
-      Offset(size.width, center.dy),
-      roadPaint,
-    );
-    canvas.drawLine(
-      Offset(center.dx, 0),
-      Offset(center.dx, size.height),
-      roadPaint,
-    );
-
-    final roadThin = Paint()
-      ..color = Colors.white.withValues(alpha: 0.04)
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke;
-    for (int i = 1; i < 4; i++) {
-      final o = Offset(size.width * 0.2 * i, size.height * 0.25 * i);
-      canvas.drawLine(o, Offset(size.width - o.dx, size.height - o.dy), roadThin);
-      canvas.drawLine(
-        Offset(size.width - o.dx, o.dy),
-        Offset(o.dx, size.height - o.dy),
-        roadThin,
-      );
-    }
-
-    final rng = math.Random(7);
-    for (int i = 0; i < hospitalCount; i++) {
-      final angle = (rng.nextDouble() * math.pi * 2);
-      final radius = math.min(size.width, size.height) * (0.2 + rng.nextDouble() * 0.3);
-      final pos = center +
-          Offset(math.cos(angle) * radius, math.sin(angle) * radius);
-      _drawMarker(
-        canvas,
-        pos,
-        color: failed ? const Color(0xFF5B7DB1) : const Color(0xFF1ACB58),
-        kind: MarkerKind.hospital,
-        size: 22,
-      );
-    }
-
-    _drawMarker(
-      canvas,
-      center,
-      color: const Color(0xFFE53935),
-      kind: MarkerKind.patient,
-      size: 30,
-      pulse: true,
-    );
-
-    _drawMarker(
-      canvas,
-      center + const Offset(-60, -70),
-      color: const Color(0xFFFFB74D),
-      kind: MarkerKind.ambulance,
-      size: 24,
-    );
-  }
-
-  void _drawMarker(
-    Canvas canvas,
-    Offset center, {
-    required Color color,
-    required MarkerKind kind,
-    required double size,
-    bool pulse = false,
-  }) {
-    if (pulse) {
-      final pulsePaint = Paint()..color = color.withValues(alpha: 0.15);
-      canvas.drawCircle(center, size * 1.8, pulsePaint);
-      canvas.drawCircle(center, size * 1.2, pulsePaint);
-    }
-    final halo = Paint()
-      ..color = Colors.black.withValues(alpha: 0.35)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
-    canvas.drawCircle(center.translate(0, 2), size / 2 + 1, halo);
-
-    final bg = Paint()..color = color;
-    canvas.drawCircle(center, size / 2, bg);
-
-    final fg = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    final fgFill = Paint()..color = Colors.white;
-
-    switch (kind) {
-      case MarkerKind.hospital:
-        final w = size * 0.35;
-        final rect = Rect.fromCenter(
-          center: center,
-          width: w,
-          height: w,
-        );
-        canvas.drawRect(rect, fgFill);
-        canvas.drawRect(
-          rect,
-          Paint()
-            ..color = color
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1,
-        );
-      case MarkerKind.patient:
-        canvas.drawCircle(center, size * 0.18, fgFill);
-        canvas.drawCircle(center, size * 0.18, fg);
-      case MarkerKind.ambulance:
-        canvas.drawRect(
-          Rect.fromCenter(
-            center: center,
-            width: size * 0.7,
-            height: size * 0.3,
-          ),
-          fgFill,
-        );
-        canvas.drawRect(
-          Rect.fromCenter(
-            center: center,
-            width: size * 0.7,
-            height: size * 0.3,
-          ),
-          fg,
-        );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _MapPainter oldDelegate) =>
-      oldDelegate.hospitalCount != hospitalCount ||
-      oldDelegate.failed != failed;
-}
-
-enum MarkerKind { hospital, patient, ambulance }
