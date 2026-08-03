@@ -81,8 +81,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   height: 16,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFF1ACB58),
-                    border: Border.all(color: Colors.white, width: 2),
+                    color: NeuroColors.success,
+                    border: Border.all(color: NeuroColors.bgCard, width: 2),
                   ),
                 ),
               ),

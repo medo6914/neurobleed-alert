@@ -271,16 +271,16 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     }
     switch (status.toLowerCase()) {
       case 'completed':
-        statusColor = Colors.green;
+        statusColor = NeuroColors.success;
         break;
       case 'generating':
-        statusColor = Colors.orange;
+        statusColor = NeuroColors.high;
         break;
       case 'failed':
-        statusColor = Colors.red;
+        statusColor = NeuroColors.critical;
         break;
       default:
-        statusColor = Colors.grey;
+        statusColor = NeuroColors.textSecondary;
     }
 
     return Card(
@@ -317,7 +317,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                   const SizedBox(width: 8),
                   Text(
                     'Risk: ${((riskScore as num) * 100).toStringAsFixed(0)}%',
-                    style: const TextStyle(fontSize: 12, color: Colors.orange),
+                    style: const TextStyle(fontSize: 12, color: NeuroColors.high),
                   ),
                 ],
               ],
@@ -329,7 +329,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
             if (patientId.isNotEmpty) ...[
               const SizedBox(height: 2),
               const Text('اضغط لفتح ملف المريض',
-                  style: TextStyle(fontSize: 11, color: Colors.blue)),
+                  style: TextStyle(fontSize: 11, color: NeuroColors.info)),
             ],
           ],
         ),

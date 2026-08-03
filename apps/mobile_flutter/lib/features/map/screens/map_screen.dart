@@ -227,7 +227,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        icon: const Icon(Icons.directions, color: Color(0xFF1ACB58)),
+                        icon: const Icon(Icons.directions, color: NeuroColors.success),
                         tooltip: 'الاتجاه إلى أقرب مستشفى',
                         onPressed: _routeToNearest,
                       ),
@@ -258,7 +258,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 Polyline(
                                   points: _route!,
                                   strokeWidth: 5,
-                                  color: const Color(0xFF1ACB58),
+                                  color: NeuroColors.success,
                                 ),
                               ],
                             ),
@@ -274,11 +274,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                       onTap: () => _showHospitalSheet(h),
                                       child: const Icon(
                                         Icons.local_hospital,
-                                        color: Color(0xFF1ACB58),
+                                        color: NeuroColors.success,
                                         size: 32,
                                         shadows: [
                                           Shadow(
-                                            color: Colors.black87,
+                                            color: NeuroColors.bgPrimary,
                                             blurRadius: 6,
                                           ),
                                         ],
@@ -292,7 +292,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   height: 30,
                                   child: const Icon(
                                     Icons.place,
-                                    color: Color(0xFF2196F3),
+                                    color: NeuroColors.info,
                                     size: 30,
                                   ),
                                 ),
@@ -302,7 +302,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                 height: 32,
                                 child: const Icon(
                                   Icons.navigation,
-                                  color: Color(0xFFE53935),
+                                  color: NeuroColors.critical,
                                   size: 32,
                                 ),
                               ),
@@ -351,7 +351,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   void _showHospitalSheet(Map<String, dynamic> h) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0C1427),
+      backgroundColor: NeuroColors.bgSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -363,13 +363,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           children: [
             Row(
               children: [
-                const Icon(Icons.local_hospital, color: Color(0xFF1ACB58)),
+                const Icon(Icons.local_hospital, color: NeuroColors.success),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     h['name'] as String? ?? 'مستشفى',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: NeuroColors.textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -381,14 +381,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               const SizedBox(height: 8),
               Text(
                 h['address'] as String,
-                style: const TextStyle(color: Colors.white70, fontSize: 13),
+                style: const TextStyle(color: NeuroColors.textBody, fontSize: 13),
               ),
             ],
             if (h['phone'] != null) ...[
               const SizedBox(height: 4),
               Text(
                 h['phone'] as String,
-                style: const TextStyle(color: Colors.white54, fontSize: 12),
+                style: const TextStyle(color: NeuroColors.textSecondary, fontSize: 12),
               ),
             ],
             const SizedBox(height: 12),
@@ -447,7 +447,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
-        color: Color(0xFF0C1427),
+        color: NeuroColors.bgSurface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
@@ -460,13 +460,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               const Text(
                 'أقرب المستشفيات',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: NeuroColors.textPrimary,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.map_outlined, color: Colors.white),
+                icon: const Icon(Icons.map_outlined, color: NeuroColors.textPrimary),
                 tooltip: 'فتح OpenStreetMap',
                 onPressed: _openOSM,
               ),
@@ -495,18 +495,18 @@ class _HospitalRow extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF131E3A),
+        color: NeuroColors.bgElevated,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          const Icon(Icons.local_hospital, color: Color(0xFF1ACB58)),
+          const Icon(Icons.local_hospital, color: NeuroColors.success),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               name,
               style: const TextStyle(
-                color: Colors.white,
+                color: NeuroColors.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -515,7 +515,7 @@ class _HospitalRow extends StatelessWidget {
             Text(
               '${distance.toStringAsFixed(1)} كم',
               style: const TextStyle(
-                color: Color(0xFF1ACB58),
+                color: NeuroColors.success,
                 fontWeight: FontWeight.bold,
               ),
             ),

@@ -1,114 +1,99 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:design_system/design_system.dart';
-import 'package:core/core.dart';
-import '../../app/providers/app_providers.dart';
-import '../../core/auth/auth_provider.dart';
-import '../../firebase_options.dart';
 
-class SplashScreen extends ConsumerStatefulWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen>
+class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _pulseController;
-  late final AnimationController _fadeController;
-  late final Animation<double> _pulseAnim;
-  late final Animation<double> _fadeAnim;
-  String? _error;
+  late AnimationController _logoController;
+  late AnimationController _glowController;
+  late AnimationController _textController;
+  
+  late Animation<double> _logoScale;
+  late Animation<double> _logoOpacity;
+  late Animation<double> _glowOpacity;
+  late Animation<double> _textOpacity;
+  late Animation<Offset> _textSlide;
 
   @override
   void initState() {
     super.initState();
-    debugPrint('[SPLASH] initState');
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-    _pulseAnim = CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    );
-    _fadeController = AnimationController(
-      vsync: this,
+    
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarBrightness: Brightness.dark,
+    ));
+
+    _logoController = AnimationController(
       duration: const Duration(milliseconds: 1500),
+      vsync: this,
     );
-    _fadeAnim = CurvedAnimation(parent: _fadeController, curve: Curves.easeIn);
-    _fadeController.forward();
-    _initApp();
+
+    _glowController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+
+    _textController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+
+    _logoScale = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.elasticOut),
+    );
+
+    _logoOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeIn),
+    );
+
+    _glowOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
+    );
+
+    _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _textController, curve: Curves.easeIn),
+    );
+
+    _textSlide = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(parent: _textController, curve: Curves.easeOut),
+    );
+
+    _startAnimations();
   }
 
-  Future<void> _initApp() async {
-    debugPrint('[SPLASH] _initApp started');
-    try {
-      debugPrint('[SPLASH] Initializing Firebase...');
-      try {
-        await Firebase.initializeApp(
-          options: DefaultFirebaseOptions.currentPlatform,
-        ).timeout(const Duration(seconds: 10));
-        debugPrint('[SPLASH] Firebase ready');
-      } on TimeoutException {
-        debugPrint('[SPLASH] Firebase init timed out, continuing without it');
-      } catch (e) {
-        debugPrint('[SPLASH] Firebase init error: $e');
-      }
-
-      await _checkAuth();
-    } catch (e) {
-      debugPrint('[SPLASH] _initApp error: $e');
-      if (!mounted) return;
-      setState(() => _error = 'Failed to initialize');
-      await Future.delayed(const Duration(seconds: 2));
-      if (!mounted) return;
-      context.go('/login');
-    }
-  }
-
-  Future<void> _checkAuth() async {
-    debugPrint('[SPLASH] _checkAuth started');
-    try {
-      final storage = SecureStorageService();
-      final hasToken = await storage
-          .hasToken()
-          .timeout(const Duration(seconds: 5));
-      debugPrint('[SPLASH] hasToken: $hasToken');
-      if (hasToken) {
-        ref.read(authGuardProvider).setAuthenticated(true);
-        debugPrint('[SPLASH] Token found, set authenticated');
-      } else {
-        ref.read(authGuardProvider).setAuthenticated(false);
-        debugPrint('[SPLASH] No token, set unauthenticated');
-      }
-    } catch (e) {
-      debugPrint('[SPLASH] _checkAuth error: $e');
-      ref.read(authGuardProvider).setAuthenticated(false);
-    }
-
-    if (!mounted) return;
+  Future<void> _startAnimations() async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    _logoController.forward();
+    
+    await Future.delayed(const Duration(milliseconds: 500));
+    _glowController.repeat(reverse: true);
+    
     await Future.delayed(const Duration(milliseconds: 800));
-    if (!mounted) return;
+    _textController.forward();
 
-    final isAuth = ref.read(authGuardProvider).isAuthenticated;
-    debugPrint('[SPLASH] Auth status: $isAuth, navigating...');
-    if (isAuth) {
-      context.go('/dashboard');
-    } else {
+    await Future.delayed(const Duration(milliseconds: 2000));
+    if (mounted) {
       context.go('/login');
     }
   }
 
   @override
   void dispose() {
-    _pulseController.dispose();
-    _fadeController.dispose();
+    _logoController.dispose();
+    _glowController.dispose();
+    _textController.dispose();
     super.dispose();
   }
 
@@ -120,110 +105,147 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.center,
-            radius: 0.8,
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF251E44),
-              Color(0xFF10265A),
-              NeuroColors.bgPrimary,
+              Color(0xFF000A1C),
+              Color(0xFF020C23),
+              Color(0xFF000A1C),
             ],
-            stops: [0.0, 0.4, 1.0],
           ),
         ),
-        child: FadeTransition(
-          opacity: _fadeAnim,
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Brain scan glow visualization
               AnimatedBuilder(
-                animation: _pulseAnim,
+                animation: _logoController,
                 builder: (context, child) {
-                  final scale = 1.0 + (_pulseAnim.value * 0.08);
-                  final opacity = 0.6 + (_pulseAnim.value * 0.4);
-                  return SizedBox(
-                    width: 180,
-                    height: 180,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Outer glow
-                        Container(
-                          width: 160,
-                          height: 160,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [
-                                const Color(0xFFAEE4FF).withValues(alpha: opacity * 0.3),
-                                const Color(0xFF251E44).withValues(alpha: opacity * 0.1),
-                                Colors.transparent,
-                              ],
-                              stops: [0.0, 0.5, 1.0],
-                            ),
-                          ),
-                        ),
-                        // Brain logo (extracted from reference splash-brain-scan.jpg)
-                        Transform.scale(
-                          scale: scale,
-                          child: Image.asset(
-                            'assets/images/logo_brain.png',
-                            width: 120,
-                            height: 120,
-                            errorBuilder: (context, error, stack) => Icon(
-                              Icons.psychology_outlined,
-                              size: 64,
-                              color: Color(0xFFAEE4FF),
-                            ),
-                          ),
-                        ),
-                      ],
+                  return Transform.scale(
+                    scale: _logoScale.value,
+                    child: Opacity(
+                      opacity: _logoOpacity.value,
+                      child: child,
                     ),
                   );
                 },
+                child: _buildLogo(),
               ),
-              const SizedBox(height: NeuroSpacing.xl),
-              // App title
-              Text(
-                'NeuroBleed Alert',
-                style: NeuroTypography.displaySmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(height: NeuroSpacing.xxl),
+              AnimatedBuilder(
+                animation: _glowController,
+                builder: (context, child) {
+                  return Opacity(
+                    opacity: _glowOpacity.value,
+                    child: child,
+                  );
+                },
+                child: _buildGlowEffect(),
+              ),
+              const SizedBox(height: NeuroSpacing.xxl),
+              SlideTransition(
+                position: _textSlide,
+                child: FadeTransition(
+                  opacity: _textOpacity,
+                  child: _buildText(),
                 ),
               ),
-              const SizedBox(height: NeuroSpacing.sm),
-              // Tagline
-              Text(
-                'نظام تقييم خطر النزيف الدماغي',
-                style: NeuroTypography.bodyMedium?.copyWith(
-                  color: NeuroColors.textBody,
-                ),
-              ),
-              const SizedBox(height: NeuroSpacing.xxxl),
-              // Loading indicator
-              if (_error == null)
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      NeuroColors.primaryLight.withValues(alpha: 0.8),
-                    ),
-                  ),
-                )
-              else
-                Text(
-                  _error!,
-                  style: NeuroTypography.bodyMedium?.copyWith(
-                    color: NeuroColors.critical,
-                  ),
-                ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return Container(
+      width: 180,
+      height: 180,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFAEE4FF).withValues(alpha: 0.25),
+            blurRadius: 60,
+            spreadRadius: 15,
+          ),
+        ],
+      ),
+      child: ClipOval(
+        child: Image.asset(
+          'assets/images/logo_icon.png',
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stack) => const Icon(
+            Icons.psychology_outlined,
+            size: 80,
+            color: Color(0xFFAEE4FF),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGlowEffect() {
+    return Container(
+      width: 200,
+      height: 200,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [
+            const Color(0xFF10265A).withValues(alpha: 0.3),
+            Colors.transparent,
+          ],
+          stops: const [0.0, 1.0],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildText() {
+    return Column(
+      children: [
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: 'Neuro',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              TextSpan(
+                text: 'Bleed',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: NeuroColors.critical,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: NeuroSpacing.sm),
+        Text(
+          '— ALERT —',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: NeuroColors.critical,
+            letterSpacing: 4,
+          ),
+        ),
+        const SizedBox(height: NeuroSpacing.lg),
+        Text(
+          'نظام تقييم خطر النزيف الدماغي',
+          style: NeuroTypography.body?.copyWith(
+            color: NeuroColors.textSecondary,
+          ),
+        ),
+      ],
     );
   }
 }

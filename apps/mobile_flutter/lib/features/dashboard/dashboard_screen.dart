@@ -181,10 +181,10 @@ class DashboardScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(NeuroSpacing.md),
       decoration: BoxDecoration(
-        color: const Color(0xFF12192A).withValues(alpha: 0.9),
+        color: NeuroColors.bgCard.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(NeuroRadius.lg),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: NeuroColors.textPrimary.withValues(alpha: 0.06),
         ),
       ),
       child: Row(
@@ -227,7 +227,7 @@ class DashboardScreen extends ConsumerWidget {
     return Container(
       width: 1,
       height: 36,
-      color: Colors.white.withValues(alpha: 0.08),
+      color: NeuroColors.textPrimary.withValues(alpha: 0.08),
     );
   }
 
@@ -241,7 +241,7 @@ class DashboardScreen extends ConsumerWidget {
         _QuickAction(
           icon: Icons.sos,
           label: 'SOS',
-          color: const Color(0xFFE53935),
+          color: NeuroColors.critical,
           onTap: () {
             final patients = patientsAsync.valueOrNull ?? [];
             if (patients.isNotEmpty) {
@@ -255,19 +255,19 @@ class DashboardScreen extends ConsumerWidget {
         _QuickAction(
           icon: Icons.map_outlined,
           label: 'الخريطة',
-          color: const Color(0xFF1A73E8),
+          color: NeuroColors.info,
           onTap: () => context.push('/map'),
         ),
         _QuickAction(
           icon: Icons.description_outlined,
           label: 'التقارير',
-          color: const Color(0xFF8E24AA),
+          color: NeuroColors.primary,
           onTap: () => context.push('/reports'),
         ),
         _QuickAction(
           icon: Icons.devices_other,
           label: 'الأجهزة',
-          color: const Color(0xFF00ACC1),
+          color: NeuroColors.info,
           onTap: () => context.push('/devices'),
         ),
       ],
@@ -286,10 +286,10 @@ class DashboardScreen extends ConsumerWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF0E2A47), Color(0xFF0A1B33)],
+          colors: [NeuroColors.cardGradTop, NeuroColors.cardGradBottom],
         ),
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
         boxShadow: const [NeuroShadows.card],
       ),
       child: Column(
@@ -361,7 +361,7 @@ class DashboardScreen extends ConsumerWidget {
                       _DeviceStatusPill(
                         icon: Icons.circle,
                         color: connected != null
-                            ? const Color(0xFF1ACB58)
+                            ? NeuroColors.success
                             : NeuroColors.critical,
                         label: connected != null ? 'متصلة' : 'غير متصلة',
                       ),
@@ -624,7 +624,7 @@ class _DeviceMiniMetric extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.all(NeuroSpacing.sm),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.04),
+        color: NeuroColors.textPrimary.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(NeuroRadius.md),
       ),
       child: Column(
@@ -734,7 +734,7 @@ class _PatientCard extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: isActive
-                            ? const Color(0xFF1ACB58)
+                            ? NeuroColors.success
                             : NeuroColors.critical,
                         border: Border.all(
                           color: NeuroColors.bgCard,
@@ -792,7 +792,7 @@ class _PatientCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: riskScore,
               minHeight: 4,
-              backgroundColor: Colors.white.withValues(alpha: 0.06),
+              backgroundColor: NeuroColors.textPrimary.withValues(alpha: 0.06),
               valueColor: AlwaysStoppedAnimation(_riskColor),
             ),
           ),
