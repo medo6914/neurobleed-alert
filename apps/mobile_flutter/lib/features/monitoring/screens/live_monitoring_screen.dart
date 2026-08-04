@@ -58,14 +58,14 @@ class _LiveMonitoringScreenState extends ConsumerState<LiveMonitoringScreen> {
                 Icon(
                   connection ? Icons.wifi : Icons.wifi_off,
                   size: 18,
-                  color: connection ? Colors.green : NeuroColors.error,
+                  color: connection ? NeuroColors.success : NeuroColors.error,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   connection ? 'Live' : 'Disconnected',
                   style: TextStyle(
                     fontSize: 12,
-                    color: connection ? Colors.green : NeuroColors.error,
+                    color: connection ? NeuroColors.success : NeuroColors.error,
                   ),
                 ),
               ],
@@ -78,19 +78,19 @@ class _LiveMonitoringScreenState extends ConsumerState<LiveMonitoringScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.monitor_heart_outlined, size: 64, color: Colors.grey.shade300),
+                  Icon(Icons.monitor_heart_outlined, size: 64, color: NeuroColors.textSecondary),
                   const SizedBox(height: 16),
                   Text(
                     'No active monitoring sessions',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey,
+                          color: NeuroColors.textSecondary,
                         ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Subscribe to a patient from their detail screen',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey.shade500,
+                          color: NeuroColors.textSecondary,
                         ),
                   ),
                 ],
@@ -131,7 +131,7 @@ class _LiveMonitoringScreenState extends ConsumerState<LiveMonitoringScreen> {
                               const Icon(
                                 Icons.schedule,
                                 size: 12,
-                                color: Colors.grey,
+                                color: NeuroColors.textSecondary,
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -139,7 +139,7 @@ class _LiveMonitoringScreenState extends ConsumerState<LiveMonitoringScreen> {
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall
-                                    ?.copyWith(color: Colors.grey),
+                                    ?.copyWith(color: NeuroColors.textSecondary),
                               ),
                             ],
                           ),

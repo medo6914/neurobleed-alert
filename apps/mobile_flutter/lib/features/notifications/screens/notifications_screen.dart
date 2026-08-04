@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/core.dart';
+import 'package:design_system/design_system.dart';
 
 final notificationSubscriptionsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final api = ref.read(apiClientProvider);
@@ -129,10 +130,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         padding: const EdgeInsets.only(right: 20),
                         margin: const EdgeInsets.only(bottom: 8),
                         decoration: BoxDecoration(
-                          color: Colors.red,
+                          color: NeuroColors.critical,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.delete_outline, color: Colors.white),
+                        child: const Icon(Icons.delete_outline, color: NeuroColors.textPrimary),
                       ),
                       onDismissed: (_) {
                         setState(() => _dismissedIds.add(index));
@@ -142,11 +143,11 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                         child: ListTile(
                           leading: CircleAvatar(
                             backgroundColor: status == 'active'
-                                ? Colors.green.withValues(alpha: 0.2)
-                                : Colors.grey.withValues(alpha: 0.2),
+                                ? NeuroColors.success.withValues(alpha: 0.2)
+                                : NeuroColors.textSecondary.withValues(alpha: 0.2),
                             child: Icon(
                               status == 'active' ? Icons.notifications_active : Icons.notifications_off,
-                              color: status == 'active' ? Colors.green : Colors.grey,
+                              color: status == 'active' ? NeuroColors.success : NeuroColors.textSecondary,
                             ),
                           ),
                           title: Text('$tier Plan', style: const TextStyle(fontWeight: FontWeight.w600)),
@@ -158,10 +159,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: (status == 'active' ? Colors.green : Colors.grey).withValues(alpha: 0.1),
+                                    color: (status == 'active' ? NeuroColors.success : NeuroColors.textSecondary).withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: Text(status, style: TextStyle(fontSize: 12, color: status == 'active' ? Colors.green : Colors.grey)),
+                                  child: Text(status, style: TextStyle(fontSize: 12, color: status == 'active' ? NeuroColors.success : NeuroColors.textSecondary)),
                                 ),
                               ]),
                               if (startDate.isNotEmpty) Text(startDate, style: const TextStyle(fontSize: 11)),
@@ -215,12 +216,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.grey.withValues(alpha: 0.08),
+            color: NeuroColors.textSecondary.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             children: [
-              Icon(Icons.notifications_none, color: Colors.grey, size: 18),
+              Icon(Icons.notifications_none, color: NeuroColors.textSecondary, size: 18),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -260,7 +261,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   if (startDate.isNotEmpty) Text('Started: $startDate', style: theme.textTheme.bodySmall),
                   if (endDate.isNotEmpty) Text('Ends: $endDate', style: theme.textTheme.bodySmall),
                   Row(children: [
-                    Icon(Icons.check_circle, size: 14, color: Colors.green),
+                    Icon(Icons.check_circle, size: 14, color: NeuroColors.success),
                     const SizedBox(width: 4),
                     Text(autoRenew ? 'Auto-renew' : 'Manual renew', style: const TextStyle(fontSize: 11)),
                   ]),
@@ -270,10 +271,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.1),
+                color: NeuroColors.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text('Active', style: TextStyle(color: Colors.green, fontSize: 12)),
+              child: const Text('Active', style: TextStyle(color: NeuroColors.success, fontSize: 12)),
             ),
           ],
         ),
@@ -332,7 +333,7 @@ class _AlertEventTile extends StatelessWidget {
                     ),
                     if (acknowledged)
                       const Text('✓',
-                          style: TextStyle(color: Colors.green, fontSize: 12)),
+                          style: TextStyle(color: NeuroColors.success, fontSize: 12)),
                   ],
                 ),
                 if (message.isNotEmpty)
@@ -341,7 +342,7 @@ class _AlertEventTile extends StatelessWidget {
                 if (createdAt.isNotEmpty)
                   Text(_formatTime(createdAt),
                       style: theme.textTheme.bodySmall
-                          ?.copyWith(color: Colors.grey, fontSize: 11)),
+                          ?.copyWith(color: NeuroColors.textSecondary, fontSize: 11)),
               ],
             ),
           ),
@@ -352,25 +353,25 @@ class _AlertEventTile extends StatelessWidget {
 
   (IconData, Color) _mapType(String severity, String type) {
     if (severity == 'critical' || severity == 'high') {
-      return (Icons.warning_amber_rounded, Colors.red);
+      return (Icons.warning_amber_rounded, NeuroColors.critical);
     }
     switch (type) {
       case 'icp_elevated':
       case 'bleed risk':
-        return (Icons.bloodtype_outlined, Colors.red);
+        return (Icons.bloodtype_outlined, NeuroColors.critical);
       case 'desaturation':
-        return (Icons.air, Colors.orange);
+        return (Icons.air, NeuroColors.high);
       case 'bradycardia':
       case 'tachycardia':
       case 'arrhythmia':
-        return (Icons.monitor_heart_outlined, Colors.purple);
+        return (Icons.monitor_heart_outlined, NeuroColors.temperature);
       case 'hypotension':
       case 'hypertension':
-        return (Icons.speed, Colors.orange);
+        return (Icons.speed, NeuroColors.high);
       case 'system':
-        return (Icons.settings_suggest_outlined, Colors.blueGrey);
+        return (Icons.settings_suggest_outlined, NeuroColors.textSecondary);
       default:
-        return (Icons.notifications_outlined, Colors.blue);
+        return (Icons.notifications_outlined, NeuroColors.info);
     }
   }
 

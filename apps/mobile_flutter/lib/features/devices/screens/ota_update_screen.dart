@@ -249,7 +249,7 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: Colors.red),
+          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
         );
       },
       (_) {

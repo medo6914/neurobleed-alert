@@ -97,7 +97,7 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
                 Text(
                   _formatLastUpdate(vitals, latestVitalsAsync.valueOrNull),
                   style: theme.textTheme.bodySmall
-                      ?.copyWith(color: Colors.grey),
+                      ?.copyWith(color: NeuroColors.textSecondary),
                 ),
               ],
             ),
@@ -288,7 +288,7 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
         Text(label,
             style: const TextStyle(fontSize: 12, color: NeuroColors.textSecondary)),
         if (unit.isNotEmpty)
-          Text(unit, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+          Text(unit, style: const TextStyle(fontSize: 10, color: NeuroColors.textSecondary)),
       ],
     );
   }
@@ -323,7 +323,7 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
                   child: Text(
                     'بانتظار وصول بيانات حية...',
                     style: theme.textTheme.bodySmall
-                        ?.copyWith(color: Colors.grey),
+                        ?.copyWith(color: NeuroColors.textSecondary),
                   ),
                 ),
               )
@@ -338,7 +338,7 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
                       show: true,
                       drawVerticalLine: false,
                       getDrawingHorizontalLine: (v) => FlLine(
-                        color: Colors.white.withValues(alpha: 0.06),
+                        color: NeuroColors.textPrimary.withValues(alpha: 0.06),
                         strokeWidth: 1,
                       ),
                     ),

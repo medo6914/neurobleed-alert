@@ -159,7 +159,7 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
             child: Container(
               width: 40, height: 4,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.15),
+                color: NeuroColors.textPrimary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -241,7 +241,7 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: Colors.red),
+          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
         );
       },
       (_) {

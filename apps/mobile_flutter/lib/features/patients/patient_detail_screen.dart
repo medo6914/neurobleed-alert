@@ -68,7 +68,7 @@ class _PatientDetailContentState extends ConsumerState<_PatientDetailContent>
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0xFF011132), Color(0xFF021B3F)],
+                colors: [NeuroColors.primaryGlass, NeuroColors.primaryGlass],
               ),
             ),
             child: SafeArea(
@@ -149,7 +149,7 @@ class _PatientDetailContentState extends ConsumerState<_PatientDetailContent>
                   ),
                   // Tab bar (reference: bg #011030)
                   Container(
-                    color: const Color(0xFF011030),
+                    color: NeuroColors.primaryGlass,
                     child: TabBar(
                       controller: _tabController,
                       isScrollable: true,
@@ -379,13 +379,13 @@ class _ProfileTab extends StatelessWidget {
               onTap: () { Navigator.pop(context); context.push('/patients/${patient.id}/audit'); },
             ),
             ListTile(
-              leading: const Icon(Icons.warning, color: Colors.red),
-              title: const Text('Emergency SOS', style: TextStyle(color: Colors.red)),
+              leading: const Icon(Icons.warning, color: NeuroColors.critical),
+              title: const Text('Emergency SOS', style: TextStyle(color: NeuroColors.critical)),
               onTap: () { Navigator.pop(context); context.push('/patients/${patient.id}/sos'); },
             ),
             ListTile(
-              leading: Icon(Icons.archive, color: Colors.orange),
-              title: Text('Archive Patient', style: TextStyle(color: Colors.orange)),
+              leading: Icon(Icons.archive, color: NeuroColors.high),
+              title: Text('Archive Patient', style: TextStyle(color: NeuroColors.high)),
               onTap: () { Navigator.pop(context); _confirmArchive(context); },
             ),
           ],
@@ -468,8 +468,8 @@ class _MedicalTab extends StatelessWidget {
                     )]
                   : patient.allergies.map((a) => Chip(
                       label: Text(a),
-                      backgroundColor: Colors.orange.withValues(alpha: 0.1),
-                      avatar: const Icon(Icons.warning_amber, size: 16, color: Colors.orange),
+                      backgroundColor: NeuroColors.high.withValues(alpha: 0.1),
+                      avatar: const Icon(Icons.warning_amber, size: 16, color: NeuroColors.high),
                     )).toList(),
             ),
           ),
@@ -624,8 +624,8 @@ class _DocumentsTab extends ConsumerWidget {
                   trailing: Chip(
                     label: Text(doc.status.name, style: const TextStyle(fontSize: 11)),
                     backgroundColor: doc.status == DocumentStatus.verified
-                        ? Colors.green.withValues(alpha: 0.1)
-                        : Colors.orange.withValues(alpha: 0.1),
+                        ? NeuroColors.success.withValues(alpha: 0.1)
+                        : NeuroColors.high.withValues(alpha: 0.1),
                   ),
                 ),
               ),

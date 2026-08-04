@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/core.dart';
+import 'package:design_system/design_system.dart';
 
 class AlertOverlay extends ConsumerStatefulWidget {
   final Widget child;
@@ -36,17 +37,17 @@ class _AlertOverlayState extends ConsumerState<AlertOverlay> {
 
   void _showAlert(BuildContext context, String message, String severity) {
     final color = switch (severity) {
-      'critical' => Colors.red,
-      'high' => Colors.orange,
-      'medium' => Colors.amber,
-      _ => Colors.blue,
+      'critical' => NeuroColors.critical,
+      'high' => NeuroColors.high,
+      'medium' => NeuroColors.medium,
+      _ => NeuroColors.info,
     };
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.warning_rounded, color: Colors.white, size: 20),
+            Icon(Icons.warning_rounded, color: NeuroColors.textPrimary, size: 20),
             const SizedBox(width: 12),
             Expanded(child: Text(message)),
           ],
@@ -57,7 +58,7 @@ class _AlertOverlayState extends ConsumerState<AlertOverlay> {
         duration: const Duration(seconds: 6),
         action: SnackBarAction(
           label: 'Dismiss',
-          textColor: Colors.white,
+          textColor: NeuroColors.textPrimary,
           onPressed: () {},
         ),
       ),

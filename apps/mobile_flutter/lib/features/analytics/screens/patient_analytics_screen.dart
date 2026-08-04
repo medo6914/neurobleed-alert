@@ -43,7 +43,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
                   child: _StatCard(
                     label: 'الإجمالي',
                     value: '${data['total'] ?? 0}',
-                    color: const Color(0xFF1A73E8),
+                    color: NeuroColors.chartBlue,
                   ),
                 ),
                 SizedBox(width: NeuroSpacing.sm),
@@ -51,7 +51,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
                   child: _StatCard(
                     label: 'النشطون',
                     value: '${data['active'] ?? 0}',
-                    color: const Color(0xFF34A853),
+                    color: NeuroColors.low,
                   ),
                 ),
               ]),
@@ -61,7 +61,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
                   child: _StatCard(
                     label: 'قبول اليوم',
                     value: '${data['admitted_today'] ?? 0}',
-                    color: const Color(0xFFFBBC04),
+                    color: NeuroColors.medium,
                   ),
                 ),
                 SizedBox(width: NeuroSpacing.sm),
@@ -69,7 +69,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
                   child: _StatCard(
                     label: 'خروج اليوم',
                     value: '${data['discharged_today'] ?? 0}',
-                    color: const Color(0xFFEA4335),
+                    color: NeuroColors.critical,
                   ),
                 ),
               ]),
@@ -84,7 +84,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
                     icon: Icons.male,
                     label: 'ذكور',
                     value: '${data['male'] ?? 0}',
-                    color: const Color(0xFF1A73E8),
+                    color: NeuroColors.chartBlue,
                   ),
                 ),
                 SizedBox(width: NeuroSpacing.sm),
@@ -93,7 +93,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
                     icon: Icons.female,
                     label: 'إناث',
                     value: '${data['female'] ?? 0}',
-                    color: const Color(0xFFE91E63),
+                    color: NeuroColors.icp,
                   ),
                 ),
               ]),
@@ -104,7 +104,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
                     icon: Icons.cake,
                     label: 'متوسط العمر',
                     value: '${_asDouble(data['average_age']).toStringAsFixed(1)}',
-                    color: const Color(0xFF8E24AA),
+                    color: NeuroColors.temperature,
                   ),
                 ),
                 SizedBox(width: NeuroSpacing.sm),
@@ -114,7 +114,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
                     label: 'متوسط الإقامة',
                     value:
                         '${_asDouble(data['average_length_of_stay_days']).toStringAsFixed(1)} يوم',
-                    color: const Color(0xFF00ACC1),
+                    color: NeuroColors.info,
                   ),
                 ),
               ]),
@@ -257,7 +257,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
             child: _StatCard(
               label: 'متوسط',
               value: avg.toStringAsFixed(1),
-              color: const Color(0xFF1A73E8),
+              color: NeuroColors.chartBlue,
             ),
           ),
           SizedBox(width: NeuroSpacing.sm),
@@ -265,7 +265,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
             child: _StatCard(
               label: 'أعلى قسم',
               value: high.toStringAsFixed(0),
-              color: const Color(0xFFEA4335),
+              color: NeuroColors.critical,
             ),
           ),
         ]),
@@ -275,7 +275,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
             child: _StatCard(
               label: 'أقل قسم',
               value: low.toStringAsFixed(0),
-              color: const Color(0xFF34A853),
+              color: NeuroColors.low,
             ),
           ),
           SizedBox(width: NeuroSpacing.sm),
@@ -283,7 +283,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
             child: _StatCard(
               label: 'عدد الأقسام',
               value: '${departments.length}',
-              color: const Color(0xFFFBBC04),
+              color: NeuroColors.medium,
             ),
           ),
         ]),
@@ -347,8 +347,8 @@ class PatientAnalyticsScreen extends ConsumerWidget {
                       ? Icons.trending_up
                       : Icons.trending_down,
                   color: change >= 0
-                      ? const Color(0xFFEA4335)
-                      : const Color(0xFF34A853),
+                      ? NeuroColors.critical
+                      : NeuroColors.low,
                   size: 32,
                 ),
                 const SizedBox(width: NeuroSpacing.md),

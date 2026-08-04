@@ -27,7 +27,7 @@ class _AlertsScreenState extends ConsumerState<AlertsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('الإنذارات'),
-        backgroundColor: const Color(0xFF0A101E),
+        backgroundColor: NeuroColors.navBg,
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),

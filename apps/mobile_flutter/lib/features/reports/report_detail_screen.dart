@@ -34,6 +34,8 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
                     const SizedBox(height: NeuroSpacing.xl),
                     _buildDailyRecommendations(),
                     const SizedBox(height: NeuroSpacing.xl),
+                    _buildTimeline(),
+                    const SizedBox(height: NeuroSpacing.xl),
                     _buildShareButton(),
                   ],
                 ),
@@ -88,7 +90,7 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.chip),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -204,7 +206,7 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,7 +256,7 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,12 +290,145 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
               ),
             ),
             child: isCompleted
-                ? const Icon(Icons.check, color: Colors.white, size: 16)
+                ? const Icon(Icons.check, color: NeuroColors.textPrimary, size: 16)
                 : null,
           ),
           const SizedBox(width: NeuroSpacing.md),
           Expanded(
             child: Text(text, style: NeuroTypography.bodyMedium),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimeline() {
+    return Container(
+      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      decoration: BoxDecoration(
+        color: NeuroColors.bgCard,
+        borderRadius: BorderRadius.circular(NeuroRadius.card),
+        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.timeline, color: NeuroColors.primary, size: 24),
+              const SizedBox(width: NeuroSpacing.sm),
+              Text(
+                'الخط الزمني الطبي',
+                style: NeuroTypography.h3,
+              ),
+            ],
+          ),
+          const SizedBox(height: NeuroSpacing.lg),
+          _buildTimelineItem(
+            icon: Icons.monitor_heart_outlined,
+            title: 'قراءة القياسات الحيوية',
+            subtitle: 'معدل ضغط الدم: 120/80 - معدل النبض: 72',
+            time: '08:00 صباحاً',
+            color: NeuroColors.low,
+            isLast: false,
+          ),
+          _buildTimelineItem(
+            icon: Icons.psychology_outlined,
+            title: 'تحليل الذكاء الاصطناعي',
+            subtitle: 'اكتمل تقييم خطر النزيف - احتمال 18%',
+            time: '08:05 صباحاً',
+            color: NeuroColors.info,
+            isLast: false,
+          ),
+          _buildTimelineItem(
+            icon: Icons.health_and_safety_outlined,
+            title: 'مراجعة الطبيب',
+            subtitle: 'مراجعة يومية مجدولة - الحالة مستقرة',
+            time: '09:30 صباحاً',
+            color: NeuroColors.primary,
+            isLast: false,
+          ),
+          _buildTimelineItem(
+            icon: Icons.description_outlined,
+            title: 'إصدار التقرير',
+            subtitle: 'تم إنشاء التقرير اليومي ورقمه NB-2026-0718',
+            time: '10:00 صباحاً',
+            color: NeuroColors.critical,
+            isLast: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineItem({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String time,
+    required Color color,
+    required bool isLast,
+  }) {
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Column(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: color.withValues(alpha: 0.4)),
+                ),
+                child: Icon(icon, color: color, size: 18),
+              ),
+              if (!isLast)
+                Expanded(
+                  child: Container(
+                    width: 2,
+                    color: NeuroColors.chartGrid,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(width: NeuroSpacing.md),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: isLast ? 0 : NeuroSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: NeuroTypography.h3?.copyWith(
+                            color: NeuroColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        time,
+                        style: NeuroTypography.caption?.copyWith(
+                          color: NeuroColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: NeuroSpacing.xs),
+                  Text(
+                    subtitle,
+                    style: NeuroTypography.caption?.copyWith(
+                      color: NeuroColors.textBody,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

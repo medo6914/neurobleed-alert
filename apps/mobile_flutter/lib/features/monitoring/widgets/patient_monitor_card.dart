@@ -107,10 +107,10 @@ class PatientMonitorCard extends StatelessWidget {
   Widget _buildRiskBadge(String? riskLevel) {
     final color = switch (riskLevel) {
       'critical' => NeuroColors.error,
-      'high' => Colors.orange,
-      'medium' => Colors.amber,
-      'low' => Colors.green,
-      _ => Colors.grey,
+      'high' => NeuroColors.high,
+      'medium' => NeuroColors.medium,
+      'low' => NeuroColors.success,
+      _ => NeuroColors.textSecondary,
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -133,8 +133,8 @@ class PatientMonitorCard extends StatelessWidget {
     };
     final color = switch (trend) {
       'worsening' => NeuroColors.error,
-      'improving' => Colors.green,
-      _ => Colors.grey,
+      'improving' => NeuroColors.success,
+      _ => NeuroColors.textSecondary,
     };
     return Row(
       mainAxisSize: MainAxisSize.min,

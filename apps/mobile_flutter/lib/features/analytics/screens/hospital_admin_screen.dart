@@ -38,19 +38,19 @@ class HospitalAdminScreen extends ConsumerWidget {
               error: (e, _) => AppErrorState(title: 'Error', message: e.toString(), onRetry: () => ref.invalidate(systemHealthProvider)),
               data: (health) => Column(
                 children: [
-                  _HealthRow(icon: Icons.speed, label: 'Avg Response', value: '${health.avgResponseTimeMs.toStringAsFixed(0)} ms', color: health.avgResponseTimeMs > 500 ? const Color(0xFFEA4335) : const Color(0xFF34A853)),
+                  _HealthRow(icon: Icons.speed, label: 'Avg Response', value: '${health.avgResponseTimeMs.toStringAsFixed(0)} ms', color: health.avgResponseTimeMs > 500 ? NeuroColors.critical : NeuroColors.low),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.error_outline, label: 'Error Rate (24h)', value: '${(health.errorRate24h * 100).toStringAsFixed(1)}%', color: health.errorRate24h > 0.05 ? const Color(0xFFEA4335) : const Color(0xFF34A853)),
+                  _HealthRow(icon: Icons.error_outline, label: 'Error Rate (24h)', value: '${(health.errorRate24h * 100).toStringAsFixed(1)}%', color: health.errorRate24h > 0.05 ? NeuroColors.critical : NeuroColors.low),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.cloud_download, label: 'Requests (24h)', value: '${_formatNumber(health.totalRequests24h)}', color: const Color(0xFF1A73E8)),
+                  _HealthRow(icon: Icons.cloud_download, label: 'Requests (24h)', value: '${_formatNumber(health.totalRequests24h)}', color: NeuroColors.chartBlue),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.wifi, label: 'WebSockets', value: '${health.activeWebSockets}', color: const Color(0xFF8E24AA)),
+                  _HealthRow(icon: Icons.wifi, label: 'WebSockets', value: '${health.activeWebSockets}', color: NeuroColors.temperature),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.storage, label: 'DB Connections', value: '${health.databaseConnections}', color: const Color(0xFF00ACC1)),
+                  _HealthRow(icon: Icons.storage, label: 'DB Connections', value: '${health.databaseConnections}', color: NeuroColors.info),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.cached, label: 'Cache Hit Rate', value: '${(health.cacheHitRate * 100).toStringAsFixed(0)}%', color: health.cacheHitRate > 0.8 ? const Color(0xFF34A853) : const Color(0xFFFBBC04)),
+                  _HealthRow(icon: Icons.cached, label: 'Cache Hit Rate', value: '${(health.cacheHitRate * 100).toStringAsFixed(0)}%', color: health.cacheHitRate > 0.8 ? NeuroColors.low : NeuroColors.medium),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.timer, label: 'Uptime', value: '${health.uptimeHours.toStringAsFixed(0)}h', color: const Color(0xFF34A853)),
+                  _HealthRow(icon: Icons.timer, label: 'Uptime', value: '${health.uptimeHours.toStringAsFixed(0)}h', color: NeuroColors.low),
                   if (health.recentErrors.isNotEmpty) ...[
                     SizedBox(height: NeuroSpacing.lg),
                     Text('Recent Errors', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
@@ -83,18 +83,18 @@ class HospitalAdminScreen extends ConsumerWidget {
               data: (overview) => Column(
                 children: [
                   Row(children: [
-                    Expanded(child: _HospitalMetricCard(label: 'Total', value: '${overview.totalHospitals}', icon: Icons.business, color: const Color(0xFF1A73E8))),
+                    Expanded(child: _HospitalMetricCard(label: 'Total', value: '${overview.totalHospitals}', icon: Icons.business, color: NeuroColors.chartBlue)),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _HospitalMetricCard(label: 'Total Beds', value: '${overview.totalBeds}', icon: Icons.hotel, color: const Color(0xFF34A853))),
+                    Expanded(child: _HospitalMetricCard(label: 'Total Beds', value: '${overview.totalBeds}', icon: Icons.hotel, color: NeuroColors.low)),
                   ]),
                   SizedBox(height: NeuroSpacing.sm),
                   Row(children: [
-                    Expanded(child: _HospitalMetricCard(label: 'Occupied', value: '${overview.occupiedBeds}', icon: Icons.person, color: const Color(0xFFFBBC04))),
+                    Expanded(child: _HospitalMetricCard(label: 'Occupied', value: '${overview.occupiedBeds}', icon: Icons.person, color: NeuroColors.medium)),
                     SizedBox(width: NeuroSpacing.sm),
                     Expanded(child: _HospitalMetricCard(
                       label: 'Occupancy Rate',
                       value: overview.totalBeds > 0 ? '${((overview.occupiedBeds / overview.totalBeds) * 100).toStringAsFixed(0)}%' : '0%',
-                      icon: Icons.analytics, color: const Color(0xFF8E24AA),
+                      icon: Icons.analytics, color: NeuroColors.temperature,
                     )),
                   ]),
                   SizedBox(height: NeuroSpacing.lg),

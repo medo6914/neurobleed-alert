@@ -254,9 +254,9 @@ class _ProvisionDeviceScreenState extends ConsumerState<ProvisionDeviceScreen> {
                 height: 100,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.green.withValues(alpha: 0.1),
+                  color: NeuroColors.success.withValues(alpha: 0.1),
                 ),
-                child: const Icon(Icons.check_circle, size: 60, color: Colors.green),
+                child: const Icon(Icons.check_circle, size: 60, color: NeuroColors.success),
               ),
               SizedBox(height: NeuroSpacing.xl),
               Text(

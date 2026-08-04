@@ -128,7 +128,7 @@ class _TimelineEntryWidget extends StatelessWidget {
       case TimelineEventType.diagnosis: return NeuroColors.info;
       case TimelineEventType.medicationChange: return NeuroColors.primary;
       case TimelineEventType.vitalsAbnormal: return NeuroColors.critical;
-      default: return Colors.grey;
+      default: return NeuroColors.textSecondary;
     }
   }
 

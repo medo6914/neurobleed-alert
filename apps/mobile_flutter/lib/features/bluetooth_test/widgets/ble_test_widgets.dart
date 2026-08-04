@@ -190,10 +190,10 @@ class ServiceExplorer extends ConsumerWidget {
                               spacing: 4,
                               runSpacing: 2,
                               children: [
-                                if (ch.isReadable) _PropertyChip(label: 'Read', color: const Color(0xFF1A73E8)),
-                                if (ch.isWritable) _PropertyChip(label: 'Write', color: const Color(0xFF34A853)),
-                                if (ch.isNotifiable) _PropertyChip(label: 'Notify', color: const Color(0xFFFBBC04)),
-                                if (ch.isIndicatable) _PropertyChip(label: 'Indicate', color: const Color(0xFF8E24AA)),
+                                if (ch.isReadable) _PropertyChip(label: 'Read', color: NeuroColors.chartBlue),
+                                if (ch.isWritable) _PropertyChip(label: 'Write', color: NeuroColors.low),
+                                if (ch.isNotifiable) _PropertyChip(label: 'Notify', color: NeuroColors.medium),
+                                if (ch.isIndicatable) _PropertyChip(label: 'Indicate', color: NeuroColors.temperature),
                               ],
                             ),
                             if (ch.value != null && ch.value!.isNotEmpty) ...[
@@ -281,9 +281,9 @@ class BleTestLogViewer extends ConsumerWidget {
                 '${entry.timestamp.minute.toString().padLeft(2, '0')}:'
                 '${entry.timestamp.second.toString().padLeft(2, '0')}';
             final color = switch (entry.level) {
-              LogLevel.error => const Color(0xFFEA4335),
-              LogLevel.warning => const Color(0xFFFBBC04),
-              LogLevel.success => const Color(0xFF34A853),
+              LogLevel.error => NeuroColors.critical,
+              LogLevel.warning => NeuroColors.medium,
+              LogLevel.success => NeuroColors.low,
               LogLevel.info => theme.colorScheme.onSurfaceVariant,
             };
 
@@ -335,10 +335,10 @@ class ConnectionPanel extends ConsumerWidget {
     final theme = Theme.of(context);
 
     final stateColor = switch (info.state) {
-      BleTestConnectionState.disconnected => const Color(0xFF9E9E9E),
-      BleTestConnectionState.connecting => const Color(0xFFFBBC04),
-      BleTestConnectionState.connected => const Color(0xFF34A853),
-      BleTestConnectionState.disconnecting => const Color(0xFFFF6D00),
+      BleTestConnectionState.disconnected => NeuroColors.textSecondary,
+      BleTestConnectionState.connecting => NeuroColors.medium,
+      BleTestConnectionState.connected => NeuroColors.low,
+      BleTestConnectionState.disconnecting => NeuroColors.high,
     };
 
     final stateLabel = switch (info.state) {

@@ -16,9 +16,8 @@ class NeuroBleedWebApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'NeuroBleed Alert - Web Dashboard',
       debugShowCheckedModeBanner: false,
-      theme: _buildLightTheme(),
-      darkTheme: _buildDarkTheme(),
-      themeMode: ThemeMode.system,
+      theme: _buildDarkTheme(),
+      themeMode: ThemeMode.dark,
       locale: const Locale('en', 'US'),
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [
@@ -28,16 +27,6 @@ class NeuroBleedWebApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       routerConfig: AppRouter(AuthGuard()).router,
-    );
-  }
-
-  ThemeData _buildLightTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      colorSchemeSeed: NeuroColors.primary,
-      brightness: Brightness.light,
-      textTheme: NeuroTypography.textTheme,
-      scaffoldBackgroundColor: NeuroColors.background,
     );
   }
 

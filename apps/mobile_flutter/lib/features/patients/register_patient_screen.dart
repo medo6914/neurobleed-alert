@@ -601,7 +601,7 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: Colors.red),
+          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
         );
       },
       (createdPatient) {

@@ -78,7 +78,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
       context.pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pairing failed'), backgroundColor: Colors.red),
+        const SnackBar(content: Text('Pairing failed'), backgroundColor: NeuroColors.critical),
       );
     }
   }

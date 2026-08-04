@@ -372,7 +372,7 @@ class _AssignmentTab extends ConsumerWidget {
           result.fold(
             (failure) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(failure.message), backgroundColor: Colors.red),
+                SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
               );
             },
             (_) {
@@ -443,7 +443,7 @@ class _DiagnosticsTab extends ConsumerWidget {
                               label: 'Battery Level',
                               value: '${diag.batteryLevel!.toStringAsFixed(0)}%',
                               valueColor: diag.batteryLevel! < 20
-                                  ? const Color(0xFFE53935)
+                                  ? NeuroColors.critical
                                   : null,
                             ),
                           if (diag.signalStrength != null)
@@ -641,20 +641,20 @@ class _HistoryTile extends StatelessWidget {
     switch (type) {
       case 'heartbeat':
         icon = Icons.favorite;
-        iconColor = const Color(0xFF4CAF50);
+        iconColor = NeuroColors.success;
       case 'status_change':
         icon = Icons.swap_horiz;
-        iconColor = const Color(0xFF2196F3);
+        iconColor = NeuroColors.info;
       case 'fw_update':
       case 'firmware_update':
         icon = Icons.system_update;
-        iconColor = const Color(0xFFF57C00);
+        iconColor = NeuroColors.high;
       case 'assignment':
         icon = Icons.link;
-        iconColor = const Color(0xFF9C27B0);
+        iconColor = NeuroColors.temperature;
       case 'error':
         icon = Icons.error;
-        iconColor = const Color(0xFFE53935);
+        iconColor = NeuroColors.critical;
       default:
         icon = Icons.circle;
         iconColor = theme.colorScheme.onSurfaceVariant;

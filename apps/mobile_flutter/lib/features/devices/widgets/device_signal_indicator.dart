@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:design_system/design_system.dart';
 
 class DeviceSignalIndicator extends StatelessWidget {
   final double signalStrength;
@@ -17,9 +18,9 @@ class DeviceSignalIndicator extends StatelessWidget {
   }
 
   Color _signalColor() {
-    if (signalStrength >= -70) return const Color(0xFF4CAF50);
-    if (signalStrength >= -85) return const Color(0xFFF57C00);
-    return const Color(0xFFE53935);
+    if (signalStrength >= -70) return NeuroColors.success;
+    if (signalStrength >= -85) return NeuroColors.high;
+    return NeuroColors.critical;
   }
 
   @override
@@ -35,14 +36,18 @@ class DeviceSignalIndicator extends StatelessWidget {
           width: 20,
           height: 14,
           child: CustomPaint(
-            painter: _SignalBarsPainter(bars: bars, color: color),
+            painter: _SignalBarsPainter(
+              bars: bars,
+              color: color,
+              inactiveColor: NeuroColors.textSecondary.withValues(alpha: 0.3),
+            ),
           ),
         ),
         SizedBox(width: 4),
         Text(
           '${signalStrength.toInt()} dBm',
           style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+            color: NeuroColors.textSecondary,
           ),
         ),
       ],
@@ -53,8 +58,13 @@ class DeviceSignalIndicator extends StatelessWidget {
 class _SignalBarsPainter extends CustomPainter {
   final int bars;
   final Color color;
+  final Color inactiveColor;
 
-  _SignalBarsPainter({required this.bars, required this.color});
+  _SignalBarsPainter({
+    required this.bars,
+    required this.color,
+    required this.inactiveColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -69,7 +79,7 @@ class _SignalBarsPainter extends CustomPainter {
       final x = i * (barWidth + gap) + gap;
       final y = size.height - barHeight;
 
-      paint.color = i < bars ? color : Colors.grey.withValues(alpha: 0.3);
+      paint.color = i < bars ? color : inactiveColor;
 
       canvas.drawRRect(
         RRect.fromRectAndCorners(
@@ -84,6 +94,8 @@ class _SignalBarsPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _SignalBarsPainter oldDelegate) {
-    return oldDelegate.bars != bars || oldDelegate.color != color;
+    return oldDelegate.bars != bars ||
+        oldDelegate.color != color ||
+        oldDelegate.inactiveColor != inactiveColor;
   }
 }

@@ -137,7 +137,7 @@ class _KnowledgeCenterScreenState extends ConsumerState<KnowledgeCenterScreen> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               'Found ${state.total} result(s) in ${state.queryTimeMs.toStringAsFixed(0)}ms',
-              style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
+              style: theme.textTheme.bodySmall?.copyWith(color: NeuroColors.textSecondary),
             ),
           ),
         if (state.semanticResults.isNotEmpty) ...[
@@ -216,7 +216,7 @@ class _KnowledgeCard extends StatelessWidget {
       child: ExpansionTile(
         leading: Icon(
           isSemantic ? Icons.psychology : Icons.article,
-          color: isSemantic ? theme.colorScheme.primary : Colors.grey.shade600,
+          color: isSemantic ? theme.colorScheme.primary : NeuroColors.textSecondary,
           size: 20,
         ),
         title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
@@ -227,7 +227,7 @@ class _KnowledgeCard extends StatelessWidget {
               const SizedBox(width: 4),
               _SmallBadge(
                 label: '${(score * 100).round()}%',
-                color: score > 0.7 ? Colors.green : score > 0.4 ? Colors.orange : Colors.grey,
+                color: score > 0.7 ? NeuroColors.success : score > 0.4 ? NeuroColors.high : NeuroColors.textSecondary,
               ),
             ],
           ],
@@ -247,7 +247,7 @@ class _KnowledgeCard extends StatelessWidget {
                 if (source.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text('Source: $source',
-                      style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey)),
+                      style: theme.textTheme.labelSmall?.copyWith(color: NeuroColors.textSecondary)),
                 ],
               ],
             ),
@@ -269,12 +269,12 @@ class _SmallBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: (color ?? Colors.grey).withValues(alpha: 0.15),
+        color: (color ?? NeuroColors.textSecondary).withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         label,
-        style: TextStyle(fontSize: 10, color: color ?? Colors.grey.shade700),
+        style: TextStyle(fontSize: 10, color: color ?? NeuroColors.textSecondary),
       ),
     );
   }

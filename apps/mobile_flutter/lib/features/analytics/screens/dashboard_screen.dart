@@ -122,7 +122,7 @@ class _SummaryGrid extends StatelessWidget {
             SizedBox(width: NeuroSpacing.sm),
             Expanded(child: _MetricCard(
               icon: Icons.person, label: 'Users', value: '${overview.totalUsers}',
-              color: const Color(0xFF00ACC1),
+              color: NeuroColors.info,
             )),
           ],
         ),
@@ -131,7 +131,7 @@ class _SummaryGrid extends StatelessWidget {
           children: [
             Expanded(child: _MetricCard(
               icon: Icons.description, label: 'Reports', value: '${overview.reportsGenerated}',
-              color: const Color(0xFF6D4C41),
+              color: NeuroColors.textSecondary,
             )),
             const Expanded(child: SizedBox()),
           ],
@@ -280,7 +280,7 @@ class _ActivityFeed extends StatelessWidget {
                   width: 8, height: 8,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: item.eventType.contains('error') ? const Color(0xFFEA4335) : const Color(0xFF34A853),
+                    color: item.eventType.contains('error') ? NeuroColors.critical : NeuroColors.low,
                   ),
                 ),
                 SizedBox(width: NeuroSpacing.sm),

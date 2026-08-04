@@ -31,14 +31,14 @@ class AuditHistoryScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final record = records[index];
               final actionColor = record.action == 'create'
-                  ? Colors.green
+                  ? NeuroColors.success
                   : record.action == 'update'
                       ? NeuroColors.primary
                       : record.action == 'delete'
                           ? NeuroColors.critical
                           : record.action == 'view_sensitive'
                               ? NeuroColors.warning
-                              : Colors.grey;
+                              : NeuroColors.textSecondary;
 
               return Padding(
                 padding: EdgeInsets.only(bottom: NeuroSpacing.sm),

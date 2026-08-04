@@ -80,12 +80,12 @@ class _AlertsHistoryScreenState extends ConsumerState<AlertsHistoryScreen> {
                               child: Text(alert.title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
                             ),
                             Chip(
-                              label: Text(alert.status.name, style: const TextStyle(fontSize: 10, color: Colors.white)),
+                              label: Text(alert.status.name, style: const TextStyle(fontSize: 10, color: NeuroColors.textPrimary)),
                               backgroundColor: alert.status == AlertStatus.active
                                   ? NeuroColors.critical
                                   : alert.status == AlertStatus.acknowledged
                                       ? NeuroColors.warning
-                                      : Colors.green,
+                                      : NeuroColors.success,
                               visualDensity: VisualDensity.compact,
                             ),
                           ],

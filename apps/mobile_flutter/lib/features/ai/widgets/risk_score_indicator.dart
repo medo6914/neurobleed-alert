@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:design_system/design_system.dart';
 
 class RiskScoreIndicator extends StatelessWidget {
   final double score;
@@ -16,10 +17,10 @@ class RiskScoreIndicator extends StatelessWidget {
   });
 
   Color get _color {
-    if (score >= 0.8) return Colors.red;
-    if (score >= 0.6) return Colors.orange;
-    if (score >= 0.3) return Colors.amber;
-    return Colors.green;
+    if (score >= 0.8) return NeuroColors.critical;
+    if (score >= 0.6) return NeuroColors.high;
+    if (score >= 0.3) return NeuroColors.medium;
+    return NeuroColors.success;
   }
 
   String get _label {
@@ -96,7 +97,7 @@ class RiskScoreIndicator extends StatelessWidget {
             child: Text(
               'Confidence: ${(confidence * 100).round()}%',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey,
+                    color: NeuroColors.textSecondary,
                   ),
             ),
           ),
@@ -117,7 +118,7 @@ class _GaugePainter extends CustomPainter {
     final radius = size.width / 2 - 8;
 
     final bgPaint = Paint()
-      ..color = Colors.grey.withValues(alpha: 0.15)
+      ..color = NeuroColors.textSecondary.withValues(alpha: 0.15)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 10;
 

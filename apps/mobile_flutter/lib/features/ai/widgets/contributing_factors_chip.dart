@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:design_system/design_system.dart';
 
 final _factorLabels = <String, String>{
   'abnormal_heart_rate': 'Abnormal HR',
@@ -33,14 +34,14 @@ class ContributingFactorsChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Chip(
-      avatar: Icon(_icon, size: 16, color: Colors.red.shade400),
+      avatar: Icon(_icon, size: 16, color: NeuroColors.critical),
       label: Text(
         _factorLabels[factor] ?? factor,
         style: const TextStyle(fontSize: 11),
       ),
       visualDensity: VisualDensity.compact,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      backgroundColor: Colors.red.withValues(alpha: 0.05),
+      backgroundColor: NeuroColors.critical.withValues(alpha: 0.05),
       side: BorderSide.none,
     );
   }

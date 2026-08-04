@@ -190,7 +190,7 @@ class _EmergencyContactScreenState extends ConsumerState<EmergencyContactScreen>
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(backgroundColor: NeuroColors.critical),
             onPressed: () async {
               try {
                 final apiClient = ref.read(apiClientProvider);
@@ -201,7 +201,7 @@ class _EmergencyContactScreenState extends ConsumerState<EmergencyContactScreen>
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: const Text('Delete', style: TextStyle(color: NeuroColors.textPrimary)),
           ),
         ],
       ),

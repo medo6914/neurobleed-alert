@@ -39,10 +39,10 @@ class MedicalDocumentsScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final doc = docs[index];
               final statusColor = doc.status == DocumentStatus.verified
-                  ? Colors.green
+                  ? NeuroColors.success
                   : doc.status == DocumentStatus.rejected
-                      ? Colors.red
-                      : Colors.orange;
+                      ? NeuroColors.critical
+                      : NeuroColors.high;
 
               return Padding(
                 padding: EdgeInsets.only(bottom: NeuroSpacing.sm),
@@ -59,7 +59,7 @@ class MedicalDocumentsScreen extends ConsumerWidget {
                       ],
                     ),
                     trailing: Chip(
-                      label: Text(doc.status.name, style: const TextStyle(fontSize: 10, color: Colors.white)),
+                      label: Text(doc.status.name, style: const TextStyle(fontSize: 10, color: NeuroColors.textPrimary)),
                       backgroundColor: statusColor,
                       visualDensity: VisualDensity.compact,
                     ),

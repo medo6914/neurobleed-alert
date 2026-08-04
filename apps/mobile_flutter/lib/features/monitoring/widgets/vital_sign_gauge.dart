@@ -30,11 +30,11 @@ class VitalSignGauge extends StatelessWidget {
 
     Color statusColor;
     if (value == null) {
-      statusColor = Colors.grey;
+      statusColor = NeuroColors.textSecondary;
     } else if (value! < normalRange.min || value! > normalRange.max) {
       statusColor = NeuroColors.error;
     } else {
-      statusColor = Colors.green;
+      statusColor = NeuroColors.success;
     }
 
     return Column(

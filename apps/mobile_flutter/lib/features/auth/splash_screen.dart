@@ -109,9 +109,9 @@ class _SplashScreenState extends State<SplashScreen>
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF000A1C),
-              Color(0xFF020C23),
-              Color(0xFF000A1C),
+              NeuroColors.bgPrimary,
+              NeuroColors.headerGradTop,
+              NeuroColors.bgPrimary,
             ],
           ),
         ),
@@ -214,7 +214,7 @@ class _SplashScreenState extends State<SplashScreen>
                 style: TextStyle(
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: NeuroColors.textPrimary,
                 ),
               ),
               TextSpan(

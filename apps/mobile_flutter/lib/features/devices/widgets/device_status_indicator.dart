@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:design_system/design_system.dart';
 import 'package:shared/shared.dart';
 
 class DeviceStatusIndicator extends StatelessWidget {
@@ -14,34 +15,34 @@ class DeviceStatusIndicator extends StatelessWidget {
   Color _statusColor() {
     switch (status) {
       case DeviceStatus.online:
-        return const Color(0xFF4CAF50);
+        return NeuroColors.success;
       case DeviceStatus.offline:
-        return Colors.grey;
+        return NeuroColors.textSecondary;
       case DeviceStatus.pairing:
-        return const Color(0xFF2196F3);
+        return NeuroColors.info;
       case DeviceStatus.error:
-        return const Color(0xFFE53935);
+        return NeuroColors.critical;
       case DeviceStatus.lowBattery:
-        return const Color(0xFFF57C00);
+        return NeuroColors.high;
       case DeviceStatus.maintenance:
-        return const Color(0xFFFFC107);
+        return NeuroColors.medium;
     }
   }
 
   String _statusLabel() {
     switch (status) {
       case DeviceStatus.online:
-        return 'Online';
+        return 'متصل';
       case DeviceStatus.offline:
-        return 'Offline';
+        return 'غير متصل';
       case DeviceStatus.pairing:
-        return 'Pairing';
+        return 'اقتران';
       case DeviceStatus.error:
-        return 'Error';
+        return 'خطأ';
       case DeviceStatus.lowBattery:
-        return 'Low Battery';
+        return 'بطارية منخفضة';
       case DeviceStatus.maintenance:
-        return 'Maintenance';
+        return 'صيانة';
     }
   }
 

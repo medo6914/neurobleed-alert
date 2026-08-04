@@ -194,7 +194,7 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: isError ? const Color(0xFFEA4335) : null,
+        backgroundColor: isError ? NeuroColors.critical : null,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -764,21 +764,21 @@ class _StatusRow extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: NeuroSpacing.md, vertical: NeuroSpacing.sm),
           child: Row(
             children: [
-              Icon(icon, size: 18, color: value ? const Color(0xFF34A853) : const Color(0xFFEA4335)),
+              Icon(icon, size: 18, color: value ? NeuroColors.low : NeuroColors.critical),
               SizedBox(width: NeuroSpacing.sm),
               Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: value
-                      ? const Color(0xFF34A853).withValues(alpha: 0.15)
-                      : const Color(0xFFEA4335).withValues(alpha: 0.15),
+                      ? NeuroColors.low.withValues(alpha: 0.15)
+                      : NeuroColors.critical.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   value ? 'ON' : 'OFF',
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: value ? const Color(0xFF34A853) : const Color(0xFFEA4335),
+                    color: value ? NeuroColors.low : NeuroColors.critical,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

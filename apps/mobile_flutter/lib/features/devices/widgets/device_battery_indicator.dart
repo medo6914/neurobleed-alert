@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:design_system/design_system.dart';
 
 class DeviceBatteryIndicator extends StatelessWidget {
   final double batteryLevel;
@@ -11,9 +12,9 @@ class DeviceBatteryIndicator extends StatelessWidget {
   });
 
   Color _batteryColor() {
-    if (batteryLevel < 20) return const Color(0xFFE53935);
-    if (batteryLevel < 50) return const Color(0xFFF57C00);
-    return const Color(0xFF4CAF50);
+    if (batteryLevel < 20) return NeuroColors.critical;
+    if (batteryLevel < 50) return NeuroColors.high;
+    return NeuroColors.success;
   }
 
   IconData _batteryIcon() {

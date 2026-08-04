@@ -33,19 +33,19 @@ class DeviceFleetScreen extends ConsumerWidget {
               Text('Status Distribution', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
               SizedBox(height: NeuroSpacing.sm),
               Row(children: [
-                Expanded(child: _StatusBadge(label: 'Online', value: data.online, color: const Color(0xFF34A853))),
+                Expanded(child: _StatusBadge(label: 'Online', value: data.online, color: NeuroColors.low)),
                 SizedBox(width: 4),
-                Expanded(child: _StatusBadge(label: 'Offline', value: data.offline, color: const Color(0xFF9E9E9E))),
+                Expanded(child: _StatusBadge(label: 'Offline', value: data.offline, color: NeuroColors.textSecondary)),
                 SizedBox(width: 4),
-                Expanded(child: _StatusBadge(label: 'Error', value: data.error, color: const Color(0xFFEA4335))),
+                Expanded(child: _StatusBadge(label: 'Error', value: data.error, color: NeuroColors.critical)),
               ]),
               SizedBox(height: NeuroSpacing.sm),
               Row(children: [
-                Expanded(child: _StatusBadge(label: 'Maintenance', value: data.maintenance, color: const Color(0xFFFBBC04))),
+                Expanded(child: _StatusBadge(label: 'Maintenance', value: data.maintenance, color: NeuroColors.medium)),
                 SizedBox(width: 4),
-                Expanded(child: _StatusBadge(label: 'Sleeping', value: data.sleeping, color: const Color(0xFF1A73E8))),
+                Expanded(child: _StatusBadge(label: 'Sleeping', value: data.sleeping, color: NeuroColors.chartBlue)),
                 SizedBox(width: 4),
-                Expanded(child: _StatusBadge(label: 'Updating', value: data.updating, color: const Color(0xFF8E24AA))),
+                Expanded(child: _StatusBadge(label: 'Updating', value: data.updating, color: NeuroColors.temperature)),
               ]),
               SizedBox(height: NeuroSpacing.lg),
               Text('Battery', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
@@ -55,7 +55,7 @@ class DeviceFleetScreen extends ConsumerWidget {
                   padding: EdgeInsets.all(NeuroSpacing.md),
                   child: Row(
                     children: [
-                      Icon(Icons.battery_charging_full, color: data.averageBattery > 50 ? const Color(0xFF34A853) : const Color(0xFFEA4335)),
+                      Icon(Icons.battery_charging_full, color: data.averageBattery > 50 ? NeuroColors.low : NeuroColors.critical),
                       SizedBox(width: NeuroSpacing.sm),
                       Expanded(
                         child: Column(

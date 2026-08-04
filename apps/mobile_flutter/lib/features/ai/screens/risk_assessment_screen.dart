@@ -67,7 +67,7 @@ class _RiskAssessmentScreenState extends ConsumerState<RiskAssessmentScreen> {
                 end: Alignment.bottomCenter,
                 colors: [
                   NeuroColors.headerGradTop,
-                  Color(0xFF2F3C55),
+                  NeuroColors.headerGradBottom,
                 ],
               ),
             ),
@@ -188,7 +188,7 @@ class _RiskAssessmentScreenState extends ConsumerState<RiskAssessmentScreen> {
                     Container(
                       padding: const EdgeInsets.all(NeuroSpacing.lg),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF16233B),
+                        color: NeuroColors.bgElevated,
                         borderRadius: BorderRadius.circular(NeuroRadius.card),
                         boxShadow: const [NeuroShadows.card],
                       ),
@@ -434,7 +434,7 @@ class _GaugePainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 16
       ..strokeCap = StrokeCap.round
-      ..color = const Color(0xFF1A2A4A);
+      ..color = NeuroColors.chartGrid;
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       startAngle,

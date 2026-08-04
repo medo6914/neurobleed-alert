@@ -40,9 +40,9 @@ class RiskHistoryScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final risk = risks[index];
               final scoreColor = risk.score < 0.3
-                  ? Colors.green
+                  ? NeuroColors.success
                   : risk.score < 0.6
-                      ? Colors.orange
+                      ? NeuroColors.high
                       : risk.score < 0.8
                           ? NeuroColors.warning
                           : NeuroColors.critical;
@@ -85,9 +85,9 @@ class RiskHistoryScreen extends ConsumerWidget {
   Color _levelColor(String level) {
     switch (level) {
       case 'critical': return NeuroColors.critical;
-      case 'high': return Colors.red;
+      case 'high': return NeuroColors.critical;
       case 'moderate': return NeuroColors.warning;
-      default: return Colors.green;
+      default: return NeuroColors.success;
     }
   }
 }

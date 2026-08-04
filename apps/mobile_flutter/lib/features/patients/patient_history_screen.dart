@@ -41,7 +41,7 @@ class PatientHistoryScreen extends ConsumerWidget {
               title: '${a.admissionType ?? "N/A"} - ${a.admissionDate.toLocal().toString().substring(0, 10)}',
               subtitle: '${a.ward ?? "N/A"} / Bed ${a.bedNumber ?? "N/A"}',
               trailing: a.status.name,
-              statusColor: a.status == AdmissionStatus.active ? NeuroColors.stable : Colors.grey,
+              statusColor: a.status == AdmissionStatus.active ? NeuroColors.stable : NeuroColors.textSecondary,
             )),
             SizedBox(height: NeuroSpacing.lg),
 

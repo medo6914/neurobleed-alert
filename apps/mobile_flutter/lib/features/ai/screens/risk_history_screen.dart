@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/ai_providers.dart';
+import 'package:design_system/design_system.dart';
 
 class RiskHistoryScreen extends ConsumerStatefulWidget {
   final String patientId;
@@ -22,10 +23,10 @@ class _RiskHistoryScreenState extends ConsumerState<RiskHistoryScreen> {
   }
 
   Color _scoreColor(double score) {
-    if (score >= 0.8) return Colors.red;
-    if (score >= 0.6) return Colors.orange;
-    if (score >= 0.3) return Colors.amber;
-    return Colors.green;
+    if (score >= 0.8) return NeuroColors.critical;
+    if (score >= 0.6) return NeuroColors.high;
+    if (score >= 0.3) return NeuroColors.medium;
+    return NeuroColors.success;
   }
 
   @override
@@ -84,8 +85,8 @@ class _RiskHistoryScreenState extends ConsumerState<RiskHistoryScreen> {
                                             : Icons.trending_flat,
                                     size: 14,
                                     color: item.trend == 'worsening'
-                                        ? Colors.red
-                                        : Colors.grey,
+                                        ? NeuroColors.critical
+                                        : NeuroColors.textSecondary,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
@@ -103,11 +104,11 @@ class _RiskHistoryScreenState extends ConsumerState<RiskHistoryScreen> {
                             if (item.rulesTriggered.isNotEmpty)
                               Text(
                                 '${item.rulesTriggered.length} rules',
-                                style: const TextStyle(fontSize: 10, color: Colors.orange),
+                                style: const TextStyle(fontSize: 10, color: NeuroColors.high),
                               ),
                             Text(
                               '${item.confidence.toStringAsFixed(2)}',
-                              style: const TextStyle(fontSize: 10, color: Colors.grey),
+                              style: const TextStyle(fontSize: 10, color: NeuroColors.textSecondary),
                             ),
                           ],
                         ),

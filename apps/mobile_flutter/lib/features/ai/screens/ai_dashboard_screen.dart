@@ -131,12 +131,12 @@ class _StatsGrid extends StatelessWidget {
           mainAxisSpacing: 8,
           childAspectRatio: 1.3,
           children: [
-            _StatTile(label: 'Assessments', value: '${stats.totalAssessments}', icon: Icons.assessment, color: Colors.blue),
-            _StatTile(label: 'Alerts', value: '${stats.totalAlerts}', icon: Icons.warning, color: Colors.red),
-            _StatTile(label: 'Active Patients', value: '${stats.activePatients}', icon: Icons.people, color: Colors.green),
-            _StatTile(label: 'Active Devices', value: '${stats.activeDevices}', icon: Icons.devices, color: Colors.teal),
-            _StatTile(label: 'Avg Risk', value: '${(stats.avgRiskScore * 100).round()}%', icon: Icons.speed, color: Colors.orange),
-            _StatTile(label: 'Docs Indexed', value: '${stats.ragDocumentCount}', icon: Icons.menu_book, color: Colors.purple),
+            _StatTile(label: 'Assessments', value: '${stats.totalAssessments}', icon: Icons.assessment, color: NeuroColors.info),
+            _StatTile(label: 'Alerts', value: '${stats.totalAlerts}', icon: Icons.warning, color: NeuroColors.critical),
+            _StatTile(label: 'Active Patients', value: '${stats.activePatients}', icon: Icons.people, color: NeuroColors.success),
+            _StatTile(label: 'Active Devices', value: '${stats.activeDevices}', icon: Icons.devices, color: NeuroColors.low),
+            _StatTile(label: 'Avg Risk', value: '${(stats.avgRiskScore * 100).round()}%', icon: Icons.speed, color: NeuroColors.high),
+            _StatTile(label: 'Docs Indexed', value: '${stats.ragDocumentCount}', icon: Icons.menu_book, color: NeuroColors.temperature),
           ],
         );
       },
@@ -165,7 +165,7 @@ class _StatTile extends StatelessWidget {
             Text(value,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
             Text(label,
-                style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 10, color: NeuroColors.textSecondary),
                 textAlign: TextAlign.center),
           ],
         ),
@@ -185,16 +185,16 @@ class _RiskDistributionChart extends StatelessWidget {
     if (total == 0) return const Text('No data yet');
 
     const colors = {
-      'low': Colors.green,
-      'medium': Colors.amber,
-      'high': Colors.orange,
-      'critical': Colors.red,
+      'low': NeuroColors.success,
+      'medium': NeuroColors.medium,
+      'high': NeuroColors.high,
+      'critical': NeuroColors.critical,
     };
 
     return Column(
       children: distribution.entries.map((entry) {
         final ratio = entry.value / total;
-        final color = colors[entry.key] ?? Colors.grey;
+        final color = colors[entry.key] ?? NeuroColors.textSecondary;
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: Column(
@@ -237,17 +237,17 @@ class _AlertSeverityChart extends StatelessWidget {
     if (alertsBySeverity.isEmpty) return const Text('No alerts yet');
 
     const colors = {
-      'low': Colors.green,
-      'medium': Colors.amber,
-      'high': Colors.orange,
-      'critical': Colors.red,
+      'low': NeuroColors.success,
+      'medium': NeuroColors.medium,
+      'high': NeuroColors.high,
+      'critical': NeuroColors.critical,
     };
 
     return Wrap(
       spacing: 12,
       runSpacing: 12,
       children: alertsBySeverity.entries.map((entry) {
-        final color = colors[entry.key] ?? Colors.grey;
+        final color = colors[entry.key] ?? NeuroColors.textSecondary;
         return Chip(
           avatar: Icon(Icons.warning, color: color, size: 16),
           label: Text('${entry.key}: ${entry.value}'),
@@ -268,14 +268,14 @@ class _ModelStatusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Card(
-      color: Colors.green.withValues(alpha: stats.modelTrained ? 0.05 : 0.02),
+      color: NeuroColors.success.withValues(alpha: stats.modelTrained ? 0.05 : 0.02),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             Icon(
               stats.modelTrained ? Icons.check_circle : Icons.info_outline,
-              color: stats.modelTrained ? Colors.green : Colors.orange,
+              color: stats.modelTrained ? NeuroColors.success : NeuroColors.high,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -286,7 +286,7 @@ class _ModelStatusCard extends StatelessWidget {
                       style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
                   Text(
                     'Model: ${stats.modelVersion}  |  ${stats.ragIndexLoaded ? "RAG loaded" : "RAG not loaded"}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 12, color: NeuroColors.textSecondary),
                   ),
                 ],
               ),
@@ -294,12 +294,12 @@ class _ModelStatusCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: stats.modelTrained ? Colors.green : Colors.orange,
+                color: stats.modelTrained ? NeuroColors.success : NeuroColors.high,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 stats.modelTrained ? 'Online' : 'Training',
-                style: const TextStyle(color: Colors.white, fontSize: 11),
+                style: const TextStyle(color: NeuroColors.textPrimary, fontSize: 11),
               ),
             ),
           ],
@@ -318,7 +318,7 @@ class _ActivityItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final score = (activity['risk_score'] as num?)?.toDouble() ?? 0.0;
     final level = activity['risk_level'] as String? ?? 'unknown';
-    final color = score >= 0.8 ? Colors.red : score >= 0.6 ? Colors.orange : score >= 0.3 ? Colors.amber : Colors.green;
+    final color = score >= 0.8 ? NeuroColors.critical : score >= 0.6 ? NeuroColors.high : score >= 0.3 ? NeuroColors.medium : NeuroColors.success;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 4),
@@ -352,7 +352,7 @@ class _ActionCards extends StatelessWidget {
         const SizedBox(height: 8),
         Card(
           child: ListTile(
-            leading: const Icon(Icons.assessment, color: Colors.blue),
+            leading: const Icon(Icons.assessment, color: NeuroColors.info),
             title: const Text('Risk Assessment'),
             subtitle: const Text('Real-time risk scoring from vitals'),
             trailing: const Icon(Icons.chevron_right),
@@ -361,7 +361,7 @@ class _ActionCards extends StatelessWidget {
         ),
         Card(
           child: ListTile(
-            leading: const Icon(Icons.history, color: Colors.teal),
+            leading: const Icon(Icons.history, color: NeuroColors.low),
             title: const Text('Risk History'),
             subtitle: const Text('View past risk assessments'),
             trailing: const Icon(Icons.chevron_right),
@@ -370,7 +370,7 @@ class _ActionCards extends StatelessWidget {
         ),
         Card(
           child: ListTile(
-            leading: const Icon(Icons.menu_book, color: Colors.purple),
+            leading: const Icon(Icons.menu_book, color: NeuroColors.temperature),
             title: const Text('Knowledge Base'),
             subtitle: const Text('Search medical knowledge'),
             trailing: const Icon(Icons.chevron_right),

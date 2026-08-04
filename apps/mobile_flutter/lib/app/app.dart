@@ -19,7 +19,7 @@ class NeuroBleedApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'NeuroBleed Alert',
       debugShowCheckedModeBanner: false,
-      theme: NeuroThemeData.light(fontFamily: NeuroTypography.fontFamily),
+      theme: NeuroThemeData.dark(fontFamily: NeuroTypography.fontFamily),
       darkTheme: NeuroThemeData.dark(fontFamily: NeuroTypography.fontFamily),
       themeMode: themeMode,
       locale: locale,

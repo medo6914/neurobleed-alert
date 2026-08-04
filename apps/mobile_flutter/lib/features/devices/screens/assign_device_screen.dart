@@ -142,12 +142,12 @@ class _AssignDeviceScreenState extends ConsumerState<AssignDeviceScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.check_circle, size: 16, color: Colors.green),
+                              Icon(Icons.check_circle, size: 16, color: NeuroColors.success),
                               SizedBox(width: 4),
                               Text(
                                 'Selected: $_selectedPatientName',
                                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: Colors.green,
+                                  color: NeuroColors.success,
                                 ),
                               ),
                             ],
@@ -163,7 +163,7 @@ class _AssignDeviceScreenState extends ConsumerState<AssignDeviceScreen> {
                           subtitle: Text('MRN: ${r['mrn'] ?? ''}'),
                           selected: _selectedPatientId == r['id'],
                           trailing: _selectedPatientId == r['id']
-                              ? Icon(Icons.check_circle, color: Colors.green, size: 20)
+                              ? Icon(Icons.check_circle, color: NeuroColors.success, size: 20)
                               : null,
                           onTap: () {
                             setState(() {
@@ -251,7 +251,7 @@ class _AssignDeviceScreenState extends ConsumerState<AssignDeviceScreen> {
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: Colors.red),
+          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
         );
       },
       (_) {

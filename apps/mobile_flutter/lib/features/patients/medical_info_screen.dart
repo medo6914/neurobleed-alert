@@ -44,7 +44,7 @@ class MedicalInfoScreen extends ConsumerWidget {
                 SizedBox(height: NeuroSpacing.md),
               ],
               _section(context, 'Diagnoses', Icons.check_circle, NeuroColors.stable, patient.diagnoses),
-              _section(context, 'Allergies', Icons.warning_amber, Colors.orange, patient.allergies),
+              _section(context, 'Allergies', Icons.warning_amber, NeuroColors.high, patient.allergies),
               _section(context, 'Medications', Icons.medication, NeuroColors.primary, patient.medications),
               _section(context, 'Comorbidities', Icons.heart_broken, NeuroColors.warning, patient.comorbidities),
             ],

@@ -113,12 +113,6 @@
   .qr-box h3 { margin-bottom: 6px; }
   .qr-box p { color: var(--muted); font-size: 14px; }
 
-  .team { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:18px; }
-  .member { padding: 24px; text-align:center; }
-  .member .ava { width:64px; height:64px; border-radius:50%; margin:0 auto 14px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:22px; }
-  .member h4 { margin-bottom:4px; }
-  .member p { color: var(--muted); font-size:13px; }
-
   .tech { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
   .tech span { padding: 10px 18px; border-radius: 12px; font-size: 13.5px; font-weight:600; border:1px solid var(--border); background: rgba(255,255,255,.05); }
 
@@ -157,11 +151,12 @@
     </div>
     <nav>
       <a href="#features">المميزات</a>
+      <a href="#ai">الذكاء الاصطناعي</a>
+      <a href="#device">الجهاز الطبي</a>
+      <a href="#workflow">مسار الطوارئ</a>
       <a href="#arch">البنية</a>
       <a href="#demo">التجربة</a>
-      <a href="#qr">QR</a>
       <a href="#map-sec">الخريطة</a>
-      <a href="#team">الفريق</a>
       <a href="#tech">التقنيات</a>
     </nav>
   </header>
@@ -195,6 +190,65 @@
       <div class="feat glass reveal"><div class="ico">🩺</div><h3>Doctor Dashboard</h3><p>لوحة أطباء: مرضى، أجهزة، قراءات حية، وتنبيهات خطورة.</p></div>
       <div class="feat glass reveal"><div class="ico">🛡</div><h3>Admin Dashboard</h3><p>إدارة المستخدمين والمستشفيات والأدوار والأنظمة في لوحة ويب كاملة.</p></div>
       <div class="feat glass reveal"><div class="ico">☁️</div><h3>Cloud Backend</h3><p>FastAPI + PostgreSQL مع Firebase للرسائل والإشعارات.</p></div>
+    </div>
+  </section>
+
+  <section id="ai">
+    <h2 class="sec-title reveal">محرك الذكاء الاصطناعي</h2>
+    <p class="sec-sub reveal">تقييم لحظي لاحتمالية النزيف الدماغي مع تفسير كامل لكل قرار</p>
+    <div class="features">
+      <div class="feat glass reveal"><div class="ico">🧠</div><h3>نموذج XGBoost</h3><p>نموذج تنبؤي مُدرَّب على بيانات طبية حقيقية يقيّم خطر النزيف من القراءات الحيوية لحظياً.</p></div>
+      <div class="feat glass reveal"><div class="ico">📊</div><h3>15+ مؤشر حيوي</h3><p>ضغط الدم، النبض، الأكسجين، درجة الحرارة، ضغط الجمجمة (ICP) والمزيد يُحلَّل معاً في ثوانٍ.</p></div>
+      <div class="feat glass reveal"><div class="ico">🔍</div><h3>تفسير SHAP</h3><p>كل تقييم يصحبه تحليل شلال يوضح المؤشرات الأكثر تأثيراً — شفافية كاملة للطبيب.</p></div>
+      <div class="feat glass reveal"><div class="ico">⚡</div><h3>استجابة فورية</h3><p>مع كل قراءة جديدة يُعاد التقييم تلقائياً ويُرسل إنذار فوري عند ارتفاع الخطر عن الحد.</p></div>
+      <div class="feat glass reveal"><div class="ico">🗂️</div><h3>قاعدة معرفية RAG</h3><p>مساعد ذكي يرجع إلى الأدبيات الطبية للرد على أسئلة الأطباء مع الاستشهاد بالمصادر.</p></div>
+      <div class="feat glass reveal"><div class="ico">📈</div><h3>تتبع التطور</h3><p>مخططات تاريخية لاحتمالية الخطر تظهر تحسن الحالة أو تدهورها عبر الأيام.</p></div>
+    </div>
+  </section>
+
+  <section id="device">
+    <h2 class="sec-title reveal">الجهاز الطبي الذكي</h2>
+    <p class="sec-sub reveal">عصابة رأس طبية BLE تراقب المؤشرات العصبية الحيوية</p>
+    <div class="demo-cards">
+      <div class="demo glass reveal" style="align-items:center; text-align:center">
+        <img src="logo_brain.png" alt="NeuroBleed medical device" style="width:150px; height:150px; border-radius:22px; box-shadow:0 0 30px rgba(79,140,255,.4)" />
+        <h3>NeuroBleed Headband</h3>
+        <div class="meta">عصابة رأس طبية متصلة عبر Bluetooth Low Energy تقيس المؤشرات الحيوية وترسلها للتطبيق كل ثانية.</div>
+      </div>
+      <div class="demo glass reveal">
+        <h3>🩺 المؤشرات الحيوية</h3>
+        <div class="meta">
+          <div style="display:flex; justify-content:space-between; padding:4px 0"><span>معدل النبض</span><code>72 نبضة/دقيقة</code></div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0"><span>ضغط الدم</span><code>120/80 مم زئبق</code></div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0"><span>الأكسجين</span><code>98%</code></div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0"><span>ضغط الجمجمة ICP</span><code>12 مم زئبق</code></div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0"><span>درجة الحرارة</span><code>36.8°</code></div>
+        </div>
+      </div>
+      <div class="demo glass reveal">
+        <h3>⚙️ مواصفات الاتصال</h3>
+        <div class="meta">
+          <div style="display:flex; justify-content:space-between; padding:4px 0"><span>الاتصال</span><code>BLE 5.0</code></div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0"><span>الاقتران</span><code>نقرتان مع تحقق</code></div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0"><span>البطارية</span><code>حتى 48 ساعة</code></div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0"><span>البرنامج الثابت</span><code>تحديث OTA</code></div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0"><span>قوة الإشارة</span><code>عرض dBm مباشر</code></div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0"><span>التشخيص</span><code>فحص ذاتي كامل</code></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="workflow">
+    <h2 class="sec-title reveal">مسار الطوارئ</h2>
+    <p class="sec-sub reveal">من ضغطة زر SOS حتى وصول الإسعاف — بالكامل تلقائياً</p>
+    <div class="arch reveal">
+      <div class="node glass">🚨 ضغطة زر SOS</div><span class="arrow">↓</span>
+      <div class="node glass">⏱️ عد تنازلي 10 ثوانٍ</div><span class="arrow">↓</span>
+      <div class="node glass">📍 إرسال الموقع + البيانات الحيوية</div><span class="arrow">↓</span>
+      <div class="node glass">🛰️ إشعار فوري للمستشفى القريب</div><span class="arrow">↓</span>
+      <div class="node glass">🗺️ توجيه عبر أقصر طريق</div><span class="arrow">↓</span>
+      <div class="node glass">🏥 استقبال الطوارئ</div>
     </div>
   </section>
 
@@ -257,17 +311,6 @@
     <p class="sec-sub reveal">OpenStreetMap — لقطات حية للمستشفيات في القاهرة مع البحث والاتجاهات</p>
     <div id="map" class="reveal"></div>
     <p class="sec-sub reveal" style="margin-top:16px; font-size:13px">خرائط مفتوحة المصدر بالكامل: OpenStreetMap + Nominatim (بحث) + Overpass (مستشفيات) + OSRM (اتجاهات) — بدون رسوم وبدون بطاقة ائتمان</p>
-  </section>
-
-  <section id="team">
-    <h2 class="sec-title reveal">فريق المشروع</h2>
-    <p class="sec-sub reveal">Graduation Project — تخرج 2026</p>
-    <div class="team">
-      <div class="member glass reveal"><div class="ava">م</div><h4>المشرف</h4><p>د. اسم المشرف</p></div>
-      <div class="member glass reveal"><div class="ava">ط</div><h4>الطالب ١</h4><p>اسم الطالب — الجامعة</p></div>
-      <div class="member glass reveal"><div class="ava">ط</div><h4>الطالب ٢</h4><p>اسم الطالب — الجامعة</p></div>
-      <div class="member glass reveal"><div class="ava">ط</div><h4>الطالب ٣</h4><p>اسم الطالب — الجامعة</p></div>
-    </div>
   </section>
 
   <section id="tech">

@@ -103,13 +103,13 @@ class VitalsHistoryScreen extends ConsumerWidget {
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: (v.riskScore! >= 0.7 ? Colors.red : v.riskScore! >= 0.4 ? Colors.orange : Colors.green).withValues(alpha: 0.1),
+                              color: (v.riskScore! >= 0.7 ? NeuroColors.critical : v.riskScore! >= 0.4 ? NeuroColors.high : NeuroColors.success).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(NeuroRadius.sm),
                             ),
                             child: Text('${(v.riskScore! * 100).toInt()}%', style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: v.riskScore! >= 0.7 ? Colors.red : v.riskScore! >= 0.4 ? Colors.orange : Colors.green,
+                              color: v.riskScore! >= 0.7 ? NeuroColors.critical : v.riskScore! >= 0.4 ? NeuroColors.high : NeuroColors.success,
                             )),
                           ),
                       ],
@@ -268,7 +268,7 @@ class VitalsHistoryScreen extends ConsumerWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.symmetric(vertical: NeuroSpacing.sm),
         decoration: BoxDecoration(
-          color: const Color(0xFF071736),
+          color: NeuroColors.bgInput,
           borderRadius: BorderRadius.circular(NeuroRadius.md),
         ),
         child: Column(

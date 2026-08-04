@@ -33,17 +33,17 @@ class AlertAnalyticsScreen extends ConsumerWidget {
               Text('Severity Breakdown', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
               SizedBox(height: NeuroSpacing.sm),
               Row(children: [
-                Expanded(child: _AlertSeverityCard(label: 'Critical', value: data.critical, color: const Color(0xFFEA4335))),
+                Expanded(child: _AlertSeverityCard(label: 'Critical', value: data.critical, color: NeuroColors.critical)),
                 SizedBox(width: 4),
-                Expanded(child: _AlertSeverityCard(label: 'High', value: data.high, color: const Color(0xFFFF6D00))),
+                Expanded(child: _AlertSeverityCard(label: 'High', value: data.high, color: NeuroColors.high)),
                 SizedBox(width: 4),
-                Expanded(child: _AlertSeverityCard(label: 'Medium', value: data.medium, color: const Color(0xFFFBBC04))),
+                Expanded(child: _AlertSeverityCard(label: 'Medium', value: data.medium, color: NeuroColors.medium)),
               ]),
               SizedBox(height: NeuroSpacing.sm),
               Row(children: [
-                Expanded(child: _AlertSeverityCard(label: 'Low', value: data.low, color: const Color(0xFF34A853))),
+                Expanded(child: _AlertSeverityCard(label: 'Low', value: data.low, color: NeuroColors.low)),
                 SizedBox(width: NeuroSpacing.sm),
-                Expanded(child: _AlertSeverityCard(label: 'Unacknowledged', value: data.unacknowledged, color: const Color(0xFF1A73E8))),
+                Expanded(child: _AlertSeverityCard(label: 'Unacknowledged', value: data.unacknowledged, color: NeuroColors.chartBlue)),
               ]),
               SizedBox(height: NeuroSpacing.lg),
               Text('Response Time', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
@@ -53,7 +53,7 @@ class AlertAnalyticsScreen extends ConsumerWidget {
                   padding: EdgeInsets.all(NeuroSpacing.md),
                   child: Row(
                     children: [
-                      Icon(Icons.timer, color: data.averageResponseTimeMinutes > 10 ? const Color(0xFFEA4335) : const Color(0xFF34A853)),
+                      Icon(Icons.timer, color: data.averageResponseTimeMinutes > 10 ? NeuroColors.critical : NeuroColors.low),
                       SizedBox(width: NeuroSpacing.sm),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

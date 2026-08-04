@@ -269,27 +269,4 @@ class NeuroThemeData {
       hintClr: NeuroColors.textSecondary,
     );
   }
-
-  static ThemeData light({required String fontFamily}) {
-    return _baseTheme(
-      brightness: Brightness.light,
-      scaffoldBg: const Color(0xFFF0F2F5),
-      surfaceColor: Colors.white,
-      appBarBg: Colors.white,
-      appBarFg: const Color(0xFF1A1A2E),
-      navBg: Colors.white,
-      navActive: NeuroColors.primary,
-      navInactive: const Color(0xFF9E9E9E),
-      primaryClr: NeuroColors.primary,
-      primaryContainerClr: const Color(0xFFD6E4FF),
-      onPrimaryClr: Colors.white,
-      secondaryClr: NeuroColors.info,
-      errorClr: NeuroColors.critical,
-      onSurfaceClr: const Color(0xFF1A1A2E),
-      inputFill: const Color(0xFFF5F5F5),
-      cardBg: Colors.white,
-      dividerClr: const Color(0xFFE0E0E0),
-      hintClr: const Color(0xFF9E9E9E),
-    );
-  }
 }

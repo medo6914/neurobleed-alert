@@ -147,8 +147,12 @@ class _AppShimmerLoadingState extends State<AppShimmerLoading>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark ? Colors.grey.shade800 : Colors.grey.shade300;
-    final highlightColor = isDark ? Colors.grey.shade700 : Colors.grey.shade100;
+    final baseColor = isDark
+        ? NeuroColors.bgElevated
+        : NeuroColors.chartGrid;
+    final highlightColor = isDark
+        ? NeuroColors.primaryGlass
+        : NeuroColors.chartFill;
 
     return AnimatedBuilder(
       animation: _animation,

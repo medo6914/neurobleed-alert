@@ -64,9 +64,9 @@ class DeviceDiagnosticsScreen extends ConsumerWidget {
                   label: 'Status',
                   value: diag.status!,
                   valueColor: diag.status == 'online'
-                      ? const Color(0xFF4CAF50)
+                      ? NeuroColors.success
                       : diag.status == 'error'
-                          ? const Color(0xFFE53935)
+                          ? NeuroColors.critical
                           : null,
                 ),
               if (diag.lastSeen != null)
@@ -92,16 +92,16 @@ class DeviceDiagnosticsScreen extends ConsumerWidget {
                   label: 'Battery Level',
                   value: '${diag.batteryLevel!.toStringAsFixed(0)}%',
                   valueColor: diag.batteryLevel! < 20
-                      ? const Color(0xFFE53935)
+                      ? NeuroColors.critical
                       : diag.batteryLevel! < 50
-                          ? const Color(0xFFF57C00)
-                          : const Color(0xFF4CAF50),
+                          ? NeuroColors.high
+                          : NeuroColors.success,
                 ),
               if (diag.chargingStatus != null)
                 _DiagRow(
                   label: 'Charging',
                   value: diag.chargingStatus! ? 'Yes' : 'No',
-                  valueColor: diag.chargingStatus! ? const Color(0xFF4CAF50) : null,
+                  valueColor: diag.chargingStatus! ? NeuroColors.success : null,
                 ),
             ],
           ),
@@ -126,16 +126,16 @@ class DeviceDiagnosticsScreen extends ConsumerWidget {
                   label: 'BLE Status',
                   value: diag.bleStatus!,
                   valueColor: diag.bleStatus == 'connected'
-                      ? const Color(0xFF4CAF50)
-                      : const Color(0xFFE53935),
+                      ? NeuroColors.success
+                      : NeuroColors.critical,
                 ),
               if (diag.simStatus != null)
                 _DiagRow(
                   label: 'SIM Status',
                   value: diag.simStatus!,
                   valueColor: diag.simStatus == 'active'
-                      ? const Color(0xFF4CAF50)
-                      : const Color(0xFFE53935),
+                      ? NeuroColors.success
+                      : NeuroColors.critical,
                 ),
             ],
           ),
@@ -150,9 +150,9 @@ class DeviceDiagnosticsScreen extends ConsumerWidget {
                   label: 'Temperature',
                   value: '${diag.temperature!.toStringAsFixed(1)}°C',
                   valueColor: diag.temperature! > 50
-                      ? const Color(0xFFE53935)
+                      ? NeuroColors.critical
                       : diag.temperature! > 40
-                          ? const Color(0xFFF57C00)
+                          ? NeuroColors.high
                           : null,
                 ),
               if (diag.firmwareVersion != null)

@@ -77,7 +77,7 @@ class _PatientSearchScreenState extends ConsumerState<PatientSearchScreen> {
               NeuroSpacing.lg,
               NeuroSpacing.md,
             ),
-            color: const Color(0xFF051229),
+            color: NeuroColors.bgInput,
             child: TextField(
               controller: _searchController,
               onChanged: (_) => setState(() {}),
@@ -241,7 +241,7 @@ class _FilterChip extends StatelessWidget {
                 : NeuroColors.bgCard,
             borderRadius: BorderRadius.circular(NeuroRadius.chip),
             border: Border.all(
-              color: selected ? color : Colors.white.withValues(alpha: 0.08),
+              color: selected ? color : NeuroColors.textPrimary.withValues(alpha: 0.08),
             ),
           ),
           child: Text(
@@ -410,7 +410,7 @@ class _PatientListCard extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: riskScore,
                   minHeight: 4,
-                  backgroundColor: Colors.white.withValues(alpha: 0.06),
+                  backgroundColor: NeuroColors.textPrimary.withValues(alpha: 0.06),
                   valueColor: AlwaysStoppedAnimation(_riskColor),
                 ),
               ),

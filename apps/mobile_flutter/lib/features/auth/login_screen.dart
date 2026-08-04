@@ -49,8 +49,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF020C23),
-              Color(0xFF051B38),
+              NeuroColors.headerGradTop,
+              NeuroColors.primaryGlass,
               NeuroColors.bgPrimary,
             ],
             stops: [0.0, 0.45, 1.0],
@@ -118,7 +118,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: NeuroColors.textPrimary,
                 ),
               ),
               TextSpan(
@@ -216,10 +216,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ],
             const SizedBox(height: NeuroSpacing.lg),
-            AppButton(
-              label: 'تسجيل الدخول',
-              onPressed: _onLogin,
+            _AnimatedSignInButton(
               isLoading: authState.isLoading,
+              onPressed: _onLogin,
             ),
             const SizedBox(height: NeuroSpacing.lg),
             Row(
@@ -256,7 +255,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           decoration: BoxDecoration(
             color: NeuroColors.bgInput,
             borderRadius: BorderRadius.circular(NeuroRadius.md),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.1)),
           ),
           child: Icon(icon, color: NeuroColors.textSecondary, size: 30),
         ),
@@ -276,6 +275,96 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: const Text('إنشاء حساب'),
         ),
       ],
+    );
+  }
+}
+
+class _AnimatedSignInButton extends StatefulWidget {
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  const _AnimatedSignInButton({
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  @override
+  State<_AnimatedSignInButton> createState() => _AnimatedSignInButtonState();
+}
+
+class _AnimatedSignInButtonState extends State<_AnimatedSignInButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _pulse;
+  bool _pressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+    _pulse = Tween<double>(begin: 1.0, end: 1.03).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    if (widget.isLoading) {
+      _controller.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _AnimatedSignInButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isLoading && !oldWidget.isLoading) {
+      _controller.repeat(reverse: true);
+    } else if (!widget.isLoading && oldWidget.isLoading) {
+      _controller.stop();
+      _controller.value = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTap: widget.isLoading ? null : widget.onPressed,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _pressed ? 0.98 : _pulse.value,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(NeuroRadius.md),
+                boxShadow: [
+                  BoxShadow(
+                    color: NeuroColors.primary.withValues(
+                      alpha: 0.2 + 0.18 * _controller.value,
+                    ),
+                    blurRadius: 8 + 14 * _controller.value,
+                    spreadRadius: 3 * _controller.value,
+                  ),
+                ],
+              ),
+              child: child,
+            ),
+          );
+        },
+        child: AppButton(
+          label: 'تسجيل الدخول',
+          onPressed: widget.onPressed,
+          isLoading: widget.isLoading,
+        ),
+      ),
     );
   }
 }

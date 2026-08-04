@@ -57,8 +57,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF020C23),
-              Color(0xFF051B38),
+              NeuroColors.headerGradTop,
+              NeuroColors.primaryGlass,
               NeuroColors.bgPrimary,
             ],
             stops: [0.0, 0.45, 1.0],

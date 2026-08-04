@@ -88,16 +88,16 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: device.status == DeviceStatus.online
-                        ? Colors.green.withValues(alpha: 0.1)
+                        ? NeuroColors.success.withValues(alpha: 0.1)
                         : device.status == DeviceStatus.error
-                            ? Colors.red.withValues(alpha: 0.1)
-                            : Colors.grey.withValues(alpha: 0.1),
+                            ? NeuroColors.critical.withValues(alpha: 0.1)
+                            : NeuroColors.textSecondary.withValues(alpha: 0.1),
                     border: Border.all(
                       color: device.status == DeviceStatus.online
-                          ? Colors.green
+                          ? NeuroColors.success
                           : device.status == DeviceStatus.error
-                              ? Colors.red
-                              : Colors.grey,
+                              ? NeuroColors.critical
+                              : NeuroColors.textSecondary,
                       width: 3,
                     ),
                   ),
@@ -113,10 +113,10 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
                                   : Icons.circle,
                           size: 36,
                           color: device.status == DeviceStatus.online
-                              ? Colors.green
+                              ? NeuroColors.success
                               : device.status == DeviceStatus.error
-                                  ? Colors.red
-                                  : Colors.grey,
+                                  ? NeuroColors.critical
+                                  : NeuroColors.textSecondary,
                         ),
                         SizedBox(height: 4),
                         Text(
@@ -124,10 +124,10 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
                           style: theme.textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: device.status == DeviceStatus.online
-                                ? Colors.green
+                                ? NeuroColors.success
                                 : device.status == DeviceStatus.error
-                                    ? Colors.red
-                                    : Colors.grey,
+                                    ? NeuroColors.critical
+                                    : NeuroColors.textSecondary,
                           ),
                         ),
                       ],
@@ -159,10 +159,10 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
                   label: 'Battery',
                   value: '${device.batteryLevel.toStringAsFixed(0)}%',
                   color: device.batteryLevel < 20
-                      ? const Color(0xFFE53935)
+                      ? NeuroColors.critical
                       : device.batteryLevel < 50
-                          ? const Color(0xFFF57C00)
-                          : const Color(0xFF4CAF50),
+                          ? NeuroColors.high
+                          : NeuroColors.success,
                   subtitle: diag?.chargingStatus == true ? 'Charging' : null,
                 ),
               ),
@@ -173,10 +173,10 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
                   label: 'Signal',
                   value: '${device.signalStrength} dBm',
                   color: device.signalStrength >= -70
-                      ? const Color(0xFF4CAF50)
+                      ? NeuroColors.success
                       : device.signalStrength >= -85
-                          ? const Color(0xFFF57C00)
-                          : const Color(0xFFE53935),
+                          ? NeuroColors.high
+                          : NeuroColors.critical,
                 ),
               ),
             ],
@@ -191,8 +191,8 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
                     label: 'Temperature',
                     value: '${diag!.temperature!.toStringAsFixed(1)}°C',
                     color: diag.temperature! > 45
-                        ? const Color(0xFFE53935)
-                        : const Color(0xFF4CAF50),
+                        ? NeuroColors.critical
+                        : NeuroColors.success,
                   ),
                 ),
               if (diag?.uptime != null)
@@ -218,7 +218,7 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
                     label: 'Last Heartbeat',
                     value: _relativeTime(device.lastHeartbeat),
                     valueColor: DateTime.now().difference(device.lastHeartbeat).inMinutes > 5
-                        ? const Color(0xFFE53935)
+                        ? NeuroColors.critical
                         : null,
                   ),
                   if (device.lastReadingAt != null)

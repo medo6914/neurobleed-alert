@@ -36,6 +36,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   bool _locating = false;
   List<Map<String, dynamic>> _hospitals = [];
   List<LatLng>? _route;
+  double? _routeDistanceM;
+  int? _routeDurationS;
   String _searchQuery = '';
   LatLng? _searchResult;
 
@@ -157,7 +159,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         final points = coords
             .map((c) => LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
             .toList();
-        setState(() => _route = points);
+        setState(() {
+          _route = points;
+          _routeDistanceM = (data['distance_m'] as num?)?.toDouble();
+          _routeDurationS = (data['duration_s'] as num?)?.toInt();
+        });
       }
     } catch (_) {}
   }
@@ -244,6 +250,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           initialZoom: 13,
                           onTap: (_, __) => setState(() {
                             _route = null;
+                            _routeDistanceM = null;
+                            _routeDurationS = null;
                             _searchResult = null;
                           }),
                         ),
@@ -332,12 +340,79 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             ),
                           ),
                         ),
+                      if (_route != null)
+                        Positioned(
+                          left: 12,
+                          right: 12,
+                          bottom: 12,
+                          child: _buildEtaBanner(),
+                        ),
                     ],
                   ),
                 ),
                 _buildBottomCards(),
               ],
             ),
+    );
+  }
+
+  Widget _buildEtaBanner() {
+    final durationS = _routeDurationS;
+    final distanceM = _routeDistanceM;
+    final minutes = durationS != null
+        ? (durationS / 60).ceil()
+        : null;
+    final distanceKm = distanceM != null
+        ? distanceM >= 1000
+            ? '${(distanceM / 1000).toStringAsFixed(1)} كم'
+            : '${distanceM.round()} م'
+        : null;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: NeuroColors.bgElevated,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: NeuroColors.success.withValues(alpha: 0.4)),
+        boxShadow: const [NeuroShadows.elevated],
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.emergency, color: NeuroColors.critical, size: 22),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'الوصول المتوقع للمستشفى',
+                  style: NeuroTypography.caption?.copyWith(
+                    color: NeuroColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  minutes != null
+                      ? 'خلال ${minutes == 1 ? 'دقيقة واحدة' : '$minutes دقائق'}'
+                      : 'جاري حساب وقت الوصول...',
+                  style: NeuroTypography.h3?.copyWith(
+                    color: NeuroColors.success,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (distanceKm != null)
+            Text(
+              distanceKm,
+              style: NeuroTypography.caption?.copyWith(
+                color: NeuroColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -426,6 +501,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           _route = coords
               .map((c) => LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
               .toList();
+          _routeDistanceM = (data['distance_m'] as num?)?.toDouble();
+          _routeDurationS = (data['duration_s'] as num?)?.toInt();
           _mapController.move(LatLng(lat, lng), 14);
         });
       }
