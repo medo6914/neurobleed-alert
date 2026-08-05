@@ -106,6 +106,22 @@ docs/
 - Design reference: `docs/ui_reference/README.md`
 - Run guide: `RUN_PROJECT_GUIDE.md`
 - Presentation package: `docs/presentation/presentation_links.md`
+- Final production report: `FINAL_PRODUCTION_REPORT.md`
+
+## Design Specification Compliance
+
+The UI is implemented strictly from the pixel-verified Vision Design Specification (`docs/ui_reference/DESIGN_SYSTEM.md`).
+
+- **Design tokens only** — every hardcoded color replaced with `NeuroColors` tokens (backgrounds, semantic risk colors, text, gradients, charts). The only remaining literals are spec-verified accent colors (`#AEE4FF`, `#10265A`, `#1ACB58`) and transparency.
+- **Dark theme only** — the app is always the spec dark design; the light theme with Material default colors was removed.
+- **No default icons** — Android (legacy + adaptive), iOS, web favicon/manifest, splash, login, and admin use the extracted NeuroBleed logo everywhere.
+- **Splash** — real logo, elastic scale/fade animation, no white flash (native launch background = dark `#020C23`).
+- **Login** — logo, email/password, remember me, forgot password, biometric placeholders, and an animated sign-in button (pulse glow while loading + press feedback).
+- **Admin dashboard (8 sections)** — Users, Hospitals, Alerts, Analytics, Devices, Audit Logs, AI Logs, System Health — all wired to real backend endpoints.
+- **SOS** — live GPS location status (acquiring / granted + accuracy / disabled), 10s countdown, cancel, emergency call + nearest-hospital shortcut.
+- **Map** — OpenStreetMap only; live ETA banner (minutes + distance) from the OSRM route.
+- **Reports** — risk gauge, AI analysis, daily recommendations, and a medical timeline.
+- **Landing page** — real logo, Hero / Features / AI / Device / Emergency Workflow / Architecture / Demo / QR / Hospitals map / Tech sections; placeholder team members removed.
 
 ---
 
