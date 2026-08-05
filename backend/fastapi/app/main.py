@@ -7,12 +7,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
-from app.database import init_db
+from app.database import init_db, check_database
 from app.core.security import validate_production_config
 from app.core.firebase import init_firebase
 from app.core.rate_limiter import add_rate_limiting
 from app.core.audit import log_action, generate_correlation_id
 from app.core.redis import init_redis, close_redis
+from app.core.migrations import run_migrations
 from app.services.monitoring_service import register_handlers
 from app.services.maps_service import maps_service
 from app.services.weather_service import weather_service
@@ -25,6 +26,7 @@ from app.ai.llm_gateway import llm_gateway
 from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.middleware.tenant_isolation import apply_tenant_isolation
 from app.api.v1 import router as v1_router
+from app.seed_data import seed as seed_demo_data
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +53,9 @@ def init_sentry():
 async def lifespan(app: FastAPI):
     validate_production_config()
     init_sentry()
+    run_migrations()
     await init_db()
+    await seed_demo_data()
     init_firebase()
     await init_redis()
     register_handlers()
@@ -120,9 +124,14 @@ app.add_middleware(
 
 @app.get("/health")
 async def health_check():
-    return {
-        "status": "ok",
+    db_ok = await check_database()
+    body = {
+        "status": "ok" if db_ok else "degraded",
         "version": "0.1.0",
+        "database": "ok" if db_ok else "error",
+        "database_backend": "postgresql"
+        if settings.DATABASE_URL.startswith("postgresql")
+        else "sqlite",
         "maps": "nominatim/osrm/overpass",
         "llm_providers": llm_gateway.providers_available(),
         "firebase": bool(settings.FIREBASE_CREDENTIALS_PATH),
@@ -131,6 +140,11 @@ async def health_check():
         "payments": payment_service.providers(),
         "files": file_service.cloudinary_configured(),
     }
+    if not db_ok:
+        from starlette.responses import JSONResponse
+
+        return JSONResponse(status_code=503, content=body)
+    return body
 
 
 @app.middleware("http")
