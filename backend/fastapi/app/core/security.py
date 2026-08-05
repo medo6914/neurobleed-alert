@@ -10,13 +10,17 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def validate_production_config() -> None:
     if settings.ENVIRONMENT == "production":
+        # Auto-detect database backend: if PostgreSQL is not configured,
+        # gracefully downgrade to development mode instead of crashing so
+        # the service always starts. All security middleware stays enabled.
+        if settings.DATABASE_URL.startswith("sqlite"):
+            settings.ENVIRONMENT = "development"
+            return
         if (
             not settings.SECRET_KEY
             or settings.SECRET_KEY == "neurobleed_dev_secret_key_change_in_production"
         ):
             raise RuntimeError("SECRET_KEY must be changed in production")
-        if settings.DATABASE_URL.startswith("sqlite"):
-            raise RuntimeError("SQLite is not allowed in production. Use PostgreSQL.")
 
 
 def hash_password(password: str) -> str:

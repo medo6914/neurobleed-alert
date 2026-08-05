@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 
 from app.core.security import hash_password
-from app.database import async_session
+from app.database import async_session, init_db
 from app.models.enums import UserRole, HospitalType
 from app.models.hospital import Hospital
 from app.models.role import Role
@@ -197,6 +197,7 @@ async def seed() -> int:
 
 def main() -> None:
     try:
+        asyncio.run(init_db())
         created = asyncio.run(seed())
         print(f"[seed] done. created={created}")
     except Exception as exc:  # noqa: BLE001

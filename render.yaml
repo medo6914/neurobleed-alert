@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: neurobleed-alert-api
+    runtime: docker
+    repo: https://github.com/medo6914/neurobleed-alert
+    rootDir: backend/fastapi
+    plan: free
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./neurobleed.db
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHONUNBUFFERED
+        value: 1
+    healthCheckPath: /health
+    autoDeploy: true

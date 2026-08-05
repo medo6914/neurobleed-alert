@@ -1,4 +1,5 @@
 import logging
+import json
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
@@ -68,13 +69,14 @@ class AnalyticsService:
         occupied = 0
         if hospital_id:
             h_result = await self.db.execute(
-                select(Hospital.bed_count).where(Hospital.id == hospital_id)
+                select(func.count(Hospital.id)).where(
+                    Hospital.id == hospital_id, Hospital.is_deleted == False
+                )
             )
             bed_count = h_result.scalar() or 0
             occupied = min(active_patients, bed_count) if bed_count else 0
         else:
-            h_result = await self.db.execute(select(func.sum(Hospital.bed_count)))
-            bed_count = h_result.scalar() or 0
+            bed_count = total_hospitals
             occupied = active_patients if bed_count else 0
 
         occupancy = (occupied / bed_count * 100) if bed_count > 0 else 0.0
@@ -479,19 +481,25 @@ class AnalyticsService:
         )
 
     async def get_activity_feed(self, limit: int = 50) -> list[ActivityFeedItem]:
-        logs = await self.db.execute(
-            select(AuditLog).order_by(AuditLog.created_at.desc()).limit(limit)
+        result = await self.db.execute(
+            select(AuditLog, User)
+            .outerjoin(User, User.id == AuditLog.user_id)
+            .order_by(AuditLog.created_at.desc())
+            .limit(limit)
         )
         items = []
-        for log in logs.scalars().all():
+        for log, user in result.all():
+            details = log.details
+            if isinstance(details, dict):
+                details = json.dumps(details, ensure_ascii=False)
             items.append(
                 ActivityFeedItem(
                     id=log.id,
                     event_type=log.action,
-                    description=log.details or log.action,
-                    entity_type=log.resource_type or "unknown",
+                    description=details or log.action,
+                    entity_type=log.resource or "unknown",
                     entity_id=log.resource_id,
-                    user_name=log.actor_name,
+                    user_name=user.full_name if user else None,
                     timestamp=log.created_at,
                     metadata={"ip": log.ip_address} if log.ip_address else None,
                 )

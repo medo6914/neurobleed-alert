@@ -109,6 +109,8 @@ app.add_middleware(
         "https://neurobleed.com",
         "https://*.neurobleed.com",
         "https://app.neurobleed.com",
+        "https://medo6914.github.io",
+        "https://*.github.io",
     ],
     allow_credentials=True,
     allow_methods=["*"],

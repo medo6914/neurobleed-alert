@@ -28,6 +28,7 @@ from app.core.session_store import (
     invalidate_user_sessions,
     get_active_sessions,
 )
+from app.core.audit import log_action
 from app.models.user import User
 from app.models.refresh_token import RefreshToken
 from app.schemas.user import (
@@ -136,6 +137,14 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
     token_id = decode_access_token(resp.access_token).get("jti")
     if token_id:
         await store_session(user.id, token_id)
+
+    await log_action(
+        user_id=user.id,
+        action="register",
+        resource="user",
+        resource_id=str(user.id),
+        details={"email": data.email, "full_name": data.full_name, "role": user.role},
+    )
     return resp
 
 

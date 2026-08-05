@@ -6,7 +6,7 @@ class AppConfig {
     );
   }
 
-  static String get apiUrl => '$baseUrl/api/v1';
+  static String get apiUrl => '$baseUrl/v1';
   static String get wsUrl => baseUrl.replaceFirst('http', 'ws');
 
   static bool get isProduction {
