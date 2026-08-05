@@ -20,7 +20,9 @@ class DeleteDevice {
       return Left(ValidationFailure(
         message: 'Device ID is required',
         code: 'VALIDATION_ERROR',
-        errors: {'id': ['Device ID is required']},
+        errors: {
+          'id': ['Device ID is required']
+        },
       ));
     }
 

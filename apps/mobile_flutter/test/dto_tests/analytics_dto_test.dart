@@ -31,11 +31,16 @@ void main() {
 
     test('fromJson handles zero values', () {
       final json = {
-        'total_patients': 0, 'active_patients': 0,
-        'total_devices': 0, 'online_devices': 0,
-        'total_alerts': 0, 'critical_alerts': 0,
-        'total_hospitals': 0, 'total_users': 0,
-        'reports_generated': 0, 'bed_occupancy_rate': 0.0,
+        'total_patients': 0,
+        'active_patients': 0,
+        'total_devices': 0,
+        'online_devices': 0,
+        'total_alerts': 0,
+        'critical_alerts': 0,
+        'total_hospitals': 0,
+        'total_users': 0,
+        'reports_generated': 0,
+        'bed_occupancy_rate': 0.0,
       };
       final dto = AnalyticsOverview.fromJson(json);
       expect(dto.totalPatients, 0);
@@ -46,12 +51,23 @@ void main() {
   group('PatientAnalytics', () {
     test('fromJson creates correct instance', () {
       final json = {
-        'total': 100, 'active': 75, 'admitted_today': 5, 'discharged_today': 3,
-        'male': 55, 'female': 45, 'average_age': 52.5,
+        'total': 100,
+        'active': 75,
+        'admitted_today': 5,
+        'discharged_today': 3,
+        'male': 55,
+        'female': 45,
+        'average_age': 52.5,
         'average_length_of_stay_days': 4.2,
-        'admissions_by_month': [{'month': '2026-01', 'count': 20}],
-        'discharges_by_month': [{'month': '2026-01', 'count': 18}],
-        'by_department': [{'name': 'ICU', 'count': 30}],
+        'admissions_by_month': [
+          {'month': '2026-01', 'count': 20}
+        ],
+        'discharges_by_month': [
+          {'month': '2026-01', 'count': 18}
+        ],
+        'by_department': [
+          {'name': 'ICU', 'count': 30}
+        ],
       };
       final dto = PatientAnalytics.fromJson(json);
       expect(dto.total, 100);
@@ -71,11 +87,21 @@ void main() {
   group('DeviceAnalytics', () {
     test('fromJson creates correct instance', () {
       final json = {
-        'total': 50, 'online': 40, 'offline': 5, 'error': 2,
-        'maintenance': 1, 'sleeping': 1, 'updating': 1,
-        'average_battery': 72.5, 'low_battery_count': 3,
-        'by_type': [{'type': 'nb_01', 'count': 30}],
-        'by_status': [{'status': 'online', 'count': 40}],
+        'total': 50,
+        'online': 40,
+        'offline': 5,
+        'error': 2,
+        'maintenance': 1,
+        'sleeping': 1,
+        'updating': 1,
+        'average_battery': 72.5,
+        'low_battery_count': 3,
+        'by_type': [
+          {'type': 'nb_01', 'count': 30}
+        ],
+        'by_status': [
+          {'status': 'online', 'count': 40}
+        ],
       };
       final dto = DeviceAnalytics.fromJson(json);
       expect(dto.total, 50);
@@ -95,11 +121,22 @@ void main() {
   group('AlertAnalytics', () {
     test('fromJson creates correct instance', () {
       final json = {
-        'total': 25, 'critical': 3, 'high': 7, 'medium': 10, 'low': 5,
-        'unacknowledged': 4, 'average_response_time_minutes': 8.5,
-        'by_type': [{'type': 'icp_elevated', 'count': 10}],
-        'by_severity': [{'severity': 'high', 'count': 7}],
-        'by_day': [{'date': '2026-07-20', 'count': 5}],
+        'total': 25,
+        'critical': 3,
+        'high': 7,
+        'medium': 10,
+        'low': 5,
+        'unacknowledged': 4,
+        'average_response_time_minutes': 8.5,
+        'by_type': [
+          {'type': 'icp_elevated', 'count': 10}
+        ],
+        'by_severity': [
+          {'severity': 'high', 'count': 7}
+        ],
+        'by_day': [
+          {'date': '2026-07-20', 'count': 5}
+        ],
       };
       final dto = AlertAnalytics.fromJson(json);
       expect(dto.total, 25);
@@ -118,12 +155,19 @@ void main() {
   group('HospitalOverview', () {
     test('fromJson creates correct instance', () {
       final json = {
-        'total_hospitals': 5, 'total_beds': 500, 'occupied_beds': 390,
+        'total_hospitals': 5,
+        'total_beds': 500,
+        'occupied_beds': 390,
         'hospitals': [
           {
-            'id': 'hosp-1', 'name': 'General Hospital',
-            'patient_count': 78, 'device_count': 20, 'active_alerts': 5,
-            'bed_capacity': 100, 'bed_occupancy': 0.78, 'alert_trend': [],
+            'id': 'hosp-1',
+            'name': 'General Hospital',
+            'patient_count': 78,
+            'device_count': 20,
+            'active_alerts': 5,
+            'bed_capacity': 100,
+            'bed_occupancy': 0.78,
+            'alert_trend': [],
           },
         ],
       };
@@ -147,8 +191,12 @@ void main() {
         'database_connections': 10,
         'cache_hit_rate': 0.85,
         'uptime_hours': 720.0,
-        'recent_errors': [{'message': 'Timeout', 'timestamp': '2026-07-24T12:00:00Z'}],
-        'service_status': [{'service': 'api', 'status': 'healthy'}],
+        'recent_errors': [
+          {'message': 'Timeout', 'timestamp': '2026-07-24T12:00:00Z'}
+        ],
+        'service_status': [
+          {'service': 'api', 'status': 'healthy'}
+        ],
       };
       final dto = SystemHealth.fromJson(json);
       expect(dto.totalRequests24h, 15000);
@@ -186,10 +234,14 @@ void main() {
 
     test('fromJson handles null fields', () {
       final json = {
-        'id': 'feed-2', 'event_type': 'device_registered',
-        'description': 'Device registered', 'entity_type': 'device',
-        'entity_id': null, 'user_name': null,
-        'timestamp': '2026-07-24T11:00:00Z', 'metadata': null,
+        'id': 'feed-2',
+        'event_type': 'device_registered',
+        'description': 'Device registered',
+        'entity_type': 'device',
+        'entity_id': null,
+        'user_name': null,
+        'timestamp': '2026-07-24T11:00:00Z',
+        'metadata': null,
       };
       final dto = ActivityFeedItem.fromJson(json);
       expect(dto.id, 'feed-2');

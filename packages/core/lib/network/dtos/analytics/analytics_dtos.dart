@@ -23,18 +23,19 @@ class AnalyticsOverview {
     required this.bedOccupancyRate,
   });
 
-  factory AnalyticsOverview.fromJson(Map<String, dynamic> json) => AnalyticsOverview(
-    totalPatients: (json['total_patients'] as num).toInt(),
-    activePatients: (json['active_patients'] as num).toInt(),
-    totalDevices: (json['total_devices'] as num).toInt(),
-    onlineDevices: (json['online_devices'] as num).toInt(),
-    totalAlerts: (json['total_alerts'] as num).toInt(),
-    criticalAlerts: (json['critical_alerts'] as num).toInt(),
-    totalHospitals: (json['total_hospitals'] as num).toInt(),
-    totalUsers: (json['total_users'] as num).toInt(),
-    reportsGenerated: (json['reports_generated'] as num).toInt(),
-    bedOccupancyRate: (json['bed_occupancy_rate'] as num).toDouble(),
-  );
+  factory AnalyticsOverview.fromJson(Map<String, dynamic> json) =>
+      AnalyticsOverview(
+        totalPatients: (json['total_patients'] as num).toInt(),
+        activePatients: (json['active_patients'] as num).toInt(),
+        totalDevices: (json['total_devices'] as num).toInt(),
+        onlineDevices: (json['online_devices'] as num).toInt(),
+        totalAlerts: (json['total_alerts'] as num).toInt(),
+        criticalAlerts: (json['critical_alerts'] as num).toInt(),
+        totalHospitals: (json['total_hospitals'] as num).toInt(),
+        totalUsers: (json['total_users'] as num).toInt(),
+        reportsGenerated: (json['reports_generated'] as num).toInt(),
+        bedOccupancyRate: (json['bed_occupancy_rate'] as num).toDouble(),
+      );
 }
 
 class PatientAnalytics {
@@ -64,19 +65,24 @@ class PatientAnalytics {
     required this.byDepartment,
   });
 
-  factory PatientAnalytics.fromJson(Map<String, dynamic> json) => PatientAnalytics(
-    total: (json['total'] as num).toInt(),
-    active: (json['active'] as num).toInt(),
-    admittedToday: (json['admitted_today'] as num).toInt(),
-    dischargedToday: (json['discharged_today'] as num).toInt(),
-    male: (json['male'] as num).toInt(),
-    female: (json['female'] as num).toInt(),
-    averageAge: (json['average_age'] as num).toDouble(),
-    averageLengthOfStayDays: (json['average_length_of_stay_days'] as num).toDouble(),
-    admissionsByMonth: (json['admissions_by_month'] as List).cast<Map<String, dynamic>>(),
-    dischargesByMonth: (json['discharges_by_month'] as List).cast<Map<String, dynamic>>(),
-    byDepartment: (json['by_department'] as List).cast<Map<String, dynamic>>(),
-  );
+  factory PatientAnalytics.fromJson(Map<String, dynamic> json) =>
+      PatientAnalytics(
+        total: (json['total'] as num).toInt(),
+        active: (json['active'] as num).toInt(),
+        admittedToday: (json['admitted_today'] as num).toInt(),
+        dischargedToday: (json['discharged_today'] as num).toInt(),
+        male: (json['male'] as num).toInt(),
+        female: (json['female'] as num).toInt(),
+        averageAge: (json['average_age'] as num).toDouble(),
+        averageLengthOfStayDays:
+            (json['average_length_of_stay_days'] as num).toDouble(),
+        admissionsByMonth:
+            (json['admissions_by_month'] as List).cast<Map<String, dynamic>>(),
+        dischargesByMonth:
+            (json['discharges_by_month'] as List).cast<Map<String, dynamic>>(),
+        byDepartment:
+            (json['by_department'] as List).cast<Map<String, dynamic>>(),
+      );
 }
 
 class DeviceAnalytics {
@@ -106,19 +112,20 @@ class DeviceAnalytics {
     required this.byStatus,
   });
 
-  factory DeviceAnalytics.fromJson(Map<String, dynamic> json) => DeviceAnalytics(
-    total: (json['total'] as num).toInt(),
-    online: (json['online'] as num).toInt(),
-    offline: (json['offline'] as num).toInt(),
-    error: (json['error'] as num).toInt(),
-    maintenance: (json['maintenance'] as num).toInt(),
-    sleeping: (json['sleeping'] as num).toInt(),
-    updating: (json['updating'] as num).toInt(),
-    averageBattery: (json['average_battery'] as num).toDouble(),
-    lowBatteryCount: (json['low_battery_count'] as num).toInt(),
-    byType: (json['by_type'] as List).cast<Map<String, dynamic>>(),
-    byStatus: (json['by_status'] as List).cast<Map<String, dynamic>>(),
-  );
+  factory DeviceAnalytics.fromJson(Map<String, dynamic> json) =>
+      DeviceAnalytics(
+        total: (json['total'] as num).toInt(),
+        online: (json['online'] as num).toInt(),
+        offline: (json['offline'] as num).toInt(),
+        error: (json['error'] as num).toInt(),
+        maintenance: (json['maintenance'] as num).toInt(),
+        sleeping: (json['sleeping'] as num).toInt(),
+        updating: (json['updating'] as num).toInt(),
+        averageBattery: (json['average_battery'] as num).toDouble(),
+        lowBatteryCount: (json['low_battery_count'] as num).toInt(),
+        byType: (json['by_type'] as List).cast<Map<String, dynamic>>(),
+        byStatus: (json['by_status'] as List).cast<Map<String, dynamic>>(),
+      );
 }
 
 class AlertAnalytics {
@@ -147,17 +154,18 @@ class AlertAnalytics {
   });
 
   factory AlertAnalytics.fromJson(Map<String, dynamic> json) => AlertAnalytics(
-    total: (json['total'] as num).toInt(),
-    critical: (json['critical'] as num).toInt(),
-    high: (json['high'] as num).toInt(),
-    medium: (json['medium'] as num).toInt(),
-    low: (json['low'] as num).toInt(),
-    unacknowledged: (json['unacknowledged'] as num).toInt(),
-    averageResponseTimeMinutes: (json['average_response_time_minutes'] as num).toDouble(),
-    byType: (json['by_type'] as List).cast<Map<String, dynamic>>(),
-    bySeverity: (json['by_severity'] as List).cast<Map<String, dynamic>>(),
-    byDay: (json['by_day'] as List).cast<Map<String, dynamic>>(),
-  );
+        total: (json['total'] as num).toInt(),
+        critical: (json['critical'] as num).toInt(),
+        high: (json['high'] as num).toInt(),
+        medium: (json['medium'] as num).toInt(),
+        low: (json['low'] as num).toInt(),
+        unacknowledged: (json['unacknowledged'] as num).toInt(),
+        averageResponseTimeMinutes:
+            (json['average_response_time_minutes'] as num).toDouble(),
+        byType: (json['by_type'] as List).cast<Map<String, dynamic>>(),
+        bySeverity: (json['by_severity'] as List).cast<Map<String, dynamic>>(),
+        byDay: (json['by_day'] as List).cast<Map<String, dynamic>>(),
+      );
 }
 
 class HospitalOverview {
@@ -173,14 +181,15 @@ class HospitalOverview {
     required this.hospitals,
   });
 
-  factory HospitalOverview.fromJson(Map<String, dynamic> json) => HospitalOverview(
-    totalHospitals: (json['total_hospitals'] as num).toInt(),
-    totalBeds: (json['total_beds'] as num).toInt(),
-    occupiedBeds: (json['occupied_beds'] as num).toInt(),
-    hospitals: (json['hospitals'] as List)
-        .map((e) => HospitalMetrics.fromJson(e as Map<String, dynamic>))
-        .toList(),
-  );
+  factory HospitalOverview.fromJson(Map<String, dynamic> json) =>
+      HospitalOverview(
+        totalHospitals: (json['total_hospitals'] as num).toInt(),
+        totalBeds: (json['total_beds'] as num).toInt(),
+        occupiedBeds: (json['occupied_beds'] as num).toInt(),
+        hospitals: (json['hospitals'] as List)
+            .map((e) => HospitalMetrics.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
 }
 
 class HospitalMetrics {
@@ -204,16 +213,18 @@ class HospitalMetrics {
     required this.alertTrend,
   });
 
-  factory HospitalMetrics.fromJson(Map<String, dynamic> json) => HospitalMetrics(
-    id: json['id'] as String,
-    name: json['name'] as String,
-    patientCount: (json['patient_count'] as num).toInt(),
-    deviceCount: (json['device_count'] as num).toInt(),
-    activeAlerts: (json['active_alerts'] as num).toInt(),
-    bedCapacity: (json['bed_capacity'] as num).toInt(),
-    bedOccupancy: (json['bed_occupancy'] as num).toDouble(),
-    alertTrend: (json['alert_trend'] as List?)?.cast<Map<String, dynamic>>() ?? [],
-  );
+  factory HospitalMetrics.fromJson(Map<String, dynamic> json) =>
+      HospitalMetrics(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        patientCount: (json['patient_count'] as num).toInt(),
+        deviceCount: (json['device_count'] as num).toInt(),
+        activeAlerts: (json['active_alerts'] as num).toInt(),
+        bedCapacity: (json['bed_capacity'] as num).toInt(),
+        bedOccupancy: (json['bed_occupancy'] as num).toDouble(),
+        alertTrend:
+            (json['alert_trend'] as List?)?.cast<Map<String, dynamic>>() ?? [],
+      );
 }
 
 class SystemHealth {
@@ -240,16 +251,18 @@ class SystemHealth {
   });
 
   factory SystemHealth.fromJson(Map<String, dynamic> json) => SystemHealth(
-    totalRequests24h: (json['total_requests_24h'] as num).toInt(),
-    activeWebSockets: (json['active_web_sockets'] as num).toInt(),
-    avgResponseTimeMs: (json['avg_response_time_ms'] as num).toDouble(),
-    errorRate24h: (json['error_rate_24h'] as num).toDouble(),
-    databaseConnections: (json['database_connections'] as num).toInt(),
-    cacheHitRate: (json['cache_hit_rate'] as num).toDouble(),
-    uptimeHours: (json['uptime_hours'] as num).toDouble(),
-    recentErrors: (json['recent_errors'] as List).cast<Map<String, dynamic>>(),
-    serviceStatus: (json['service_status'] as List).cast<Map<String, dynamic>>(),
-  );
+        totalRequests24h: (json['total_requests_24h'] as num).toInt(),
+        activeWebSockets: (json['active_web_sockets'] as num).toInt(),
+        avgResponseTimeMs: (json['avg_response_time_ms'] as num).toDouble(),
+        errorRate24h: (json['error_rate_24h'] as num).toDouble(),
+        databaseConnections: (json['database_connections'] as num).toInt(),
+        cacheHitRate: (json['cache_hit_rate'] as num).toDouble(),
+        uptimeHours: (json['uptime_hours'] as num).toDouble(),
+        recentErrors:
+            (json['recent_errors'] as List).cast<Map<String, dynamic>>(),
+        serviceStatus:
+            (json['service_status'] as List).cast<Map<String, dynamic>>(),
+      );
 }
 
 class ActivityFeedItem {
@@ -273,14 +286,15 @@ class ActivityFeedItem {
     this.metadata,
   });
 
-  factory ActivityFeedItem.fromJson(Map<String, dynamic> json) => ActivityFeedItem(
-    id: json['id'] as String,
-    eventType: json['event_type'] as String,
-    description: json['description'] as String,
-    entityType: json['entity_type'] as String,
-    entityId: json['entity_id'] as String?,
-    userName: json['user_name'] as String?,
-    timestamp: json['timestamp'] as String,
-    metadata: json['metadata'] as Map<String, dynamic>?,
-  );
+  factory ActivityFeedItem.fromJson(Map<String, dynamic> json) =>
+      ActivityFeedItem(
+        id: json['id'] as String,
+        eventType: json['event_type'] as String,
+        description: json['description'] as String,
+        entityType: json['entity_type'] as String,
+        entityId: json['entity_id'] as String?,
+        userName: json['user_name'] as String?,
+        timestamp: json['timestamp'] as String,
+        metadata: json['metadata'] as Map<String, dynamic>?,
+      );
 }

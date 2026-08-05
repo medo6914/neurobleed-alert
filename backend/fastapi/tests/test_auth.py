@@ -33,10 +33,13 @@ async def test_register_duplicate_email(client):
 @pytest.mark.anyio
 async def test_login_success(client):
     await client.post("/v1/auth/register", json=REGISTER_PAYLOAD)
-    response = await client.post("/v1/auth/login", json={
-        "email": REGISTER_PAYLOAD["email"],
-        "password": REGISTER_PAYLOAD["password"],
-    })
+    response = await client.post(
+        "/v1/auth/login",
+        json={
+            "email": REGISTER_PAYLOAD["email"],
+            "password": REGISTER_PAYLOAD["password"],
+        },
+    )
     assert response.status_code == 200
     data = response.json()
     assert "access_token" in data
@@ -47,23 +50,34 @@ async def test_login_success(client):
 @pytest.mark.anyio
 async def test_login_wrong_password(client):
     await client.post("/v1/auth/register", json=REGISTER_PAYLOAD)
-    response = await client.post("/v1/auth/login", json={
-        "email": REGISTER_PAYLOAD["email"],
-        "password": "wrongpassword",
-    })
+    response = await client.post(
+        "/v1/auth/login",
+        json={
+            "email": REGISTER_PAYLOAD["email"],
+            "password": "wrongpassword",
+        },
+    )
     assert response.status_code == 401
 
 
 @pytest.mark.anyio
 async def test_refresh_token(client):
     await client.post("/v1/auth/register", json=REGISTER_PAYLOAD)
-    login = (await client.post("/v1/auth/login", json={
-        "email": REGISTER_PAYLOAD["email"],
-        "password": REGISTER_PAYLOAD["password"],
-    })).json()
-    response = await client.post("/v1/auth/refresh", json={
-        "refresh_token": login["refresh_token"],
-    })
+    login = (
+        await client.post(
+            "/v1/auth/login",
+            json={
+                "email": REGISTER_PAYLOAD["email"],
+                "password": REGISTER_PAYLOAD["password"],
+            },
+        )
+    ).json()
+    response = await client.post(
+        "/v1/auth/refresh",
+        json={
+            "refresh_token": login["refresh_token"],
+        },
+    )
     assert response.status_code == 200
     assert "access_token" in response.json()
 
@@ -71,9 +85,12 @@ async def test_refresh_token(client):
 @pytest.mark.anyio
 async def test_forgot_password(client):
     await client.post("/v1/auth/register", json=REGISTER_PAYLOAD)
-    response = await client.post("/v1/auth/forgot-password", json={
-        "email": REGISTER_PAYLOAD["email"],
-    })
+    response = await client.post(
+        "/v1/auth/forgot-password",
+        json={
+            "email": REGISTER_PAYLOAD["email"],
+        },
+    )
     assert response.status_code == 200
     assert "code_length" in response.json()
 
@@ -81,14 +98,22 @@ async def test_forgot_password(client):
 @pytest.mark.anyio
 async def test_get_me(client):
     await client.post("/v1/auth/register", json=REGISTER_PAYLOAD)
-    login = (await client.post("/v1/auth/login", json={
-        "email": REGISTER_PAYLOAD["email"],
-        "password": REGISTER_PAYLOAD["password"],
-    })).json()
+    login = (
+        await client.post(
+            "/v1/auth/login",
+            json={
+                "email": REGISTER_PAYLOAD["email"],
+                "password": REGISTER_PAYLOAD["password"],
+            },
+        )
+    ).json()
     token = login["access_token"]
-    response = await client.get("/v1/auth/me", headers={
-        "Authorization": f"Bearer {token}",
-    })
+    response = await client.get(
+        "/v1/auth/me",
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["email"] == REGISTER_PAYLOAD["email"]
@@ -97,16 +122,25 @@ async def test_get_me(client):
 @pytest.mark.anyio
 async def test_update_me(client):
     await client.post("/v1/auth/register", json=REGISTER_PAYLOAD)
-    login = (await client.post("/v1/auth/login", json={
-        "email": REGISTER_PAYLOAD["email"],
-        "password": REGISTER_PAYLOAD["password"],
-    })).json()
+    login = (
+        await client.post(
+            "/v1/auth/login",
+            json={
+                "email": REGISTER_PAYLOAD["email"],
+                "password": REGISTER_PAYLOAD["password"],
+            },
+        )
+    ).json()
     token = login["access_token"]
-    response = await client.put("/v1/auth/me", json={
-        "full_name": "Dr. Updated",
-    }, headers={
-        "Authorization": f"Bearer {token}",
-    })
+    response = await client.put(
+        "/v1/auth/me",
+        json={
+            "full_name": "Dr. Updated",
+        },
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
+    )
     assert response.status_code == 200
     assert response.json()["full_name"] == "Dr. Updated"
 
@@ -114,13 +148,21 @@ async def test_update_me(client):
 @pytest.mark.anyio
 async def test_logout(client):
     await client.post("/v1/auth/register", json=REGISTER_PAYLOAD)
-    login = (await client.post("/v1/auth/login", json={
-        "email": REGISTER_PAYLOAD["email"],
-        "password": REGISTER_PAYLOAD["password"],
-    })).json()
+    login = (
+        await client.post(
+            "/v1/auth/login",
+            json={
+                "email": REGISTER_PAYLOAD["email"],
+                "password": REGISTER_PAYLOAD["password"],
+            },
+        )
+    ).json()
     token = login["access_token"]
-    response = await client.post("/v1/auth/logout", headers={
-        "Authorization": f"Bearer {token}",
-    })
+    response = await client.post(
+        "/v1/auth/logout",
+        headers={
+            "Authorization": f"Bearer {token}",
+        },
+    )
     assert response.status_code == 200
     assert response.json()["message"] == "Logged out successfully"

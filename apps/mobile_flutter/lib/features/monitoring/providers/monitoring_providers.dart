@@ -2,11 +2,13 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/core.dart';
 
-final liveVitalsStateProvider = StateNotifierProvider<LiveVitalsNotifier, Map<String, Map<String, dynamic>>>((ref) {
+final liveVitalsStateProvider = StateNotifierProvider<LiveVitalsNotifier,
+    Map<String, Map<String, dynamic>>>((ref) {
   return LiveVitalsNotifier(ref);
 });
 
-class LiveVitalsNotifier extends StateNotifier<Map<String, Map<String, dynamic>>> {
+class LiveVitalsNotifier
+    extends StateNotifier<Map<String, Map<String, dynamic>>> {
   final Ref _ref;
   StreamSubscription<Map<String, dynamic>>? _subscription;
 
@@ -38,7 +40,8 @@ class LiveVitalsNotifier extends StateNotifier<Map<String, Map<String, dynamic>>
   }
 }
 
-final patientLiveVitalsProvider = Provider.family<Map<String, dynamic>?, String>((ref, patientId) {
+final patientLiveVitalsProvider =
+    Provider.family<Map<String, dynamic>?, String>((ref, patientId) {
   final vitalsMap = ref.watch(liveVitalsStateProvider);
   return vitalsMap[patientId];
 });

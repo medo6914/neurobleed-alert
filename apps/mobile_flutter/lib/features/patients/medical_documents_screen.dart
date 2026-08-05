@@ -29,7 +29,8 @@ class MedicalDocumentsScreen extends ConsumerWidget {
               title: 'No Documents',
               message: 'No medical documents uploaded yet',
               actionLabel: 'Upload Document',
-              onAction: () => context.push('/patients/$patientId/documents/add'),
+              onAction: () =>
+                  context.push('/patients/$patientId/documents/add'),
             );
           }
 
@@ -48,18 +49,29 @@ class MedicalDocumentsScreen extends ConsumerWidget {
                 padding: EdgeInsets.only(bottom: NeuroSpacing.sm),
                 child: AppCard(
                   child: ListTile(
-                    leading: Icon(_documentIcon(doc.type), color: NeuroColors.primary, size: 32),
-                    title: Text(doc.title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    leading: Icon(_documentIcon(doc.type),
+                        color: NeuroColors.primary, size: 32),
+                    title: Text(doc.title,
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(doc.fileName),
-                        Text('${_formatSize(doc.fileSize)} • ${doc.createdAt.toLocal().toString().substring(0, 10)}',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                        Text(
+                            '${_formatSize(doc.fileSize)} • ${doc.createdAt.toLocal().toString().substring(0, 10)}',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant)),
                       ],
                     ),
                     trailing: Chip(
-                      label: Text(doc.status.name, style: const TextStyle(fontSize: 10, color: NeuroColors.textPrimary)),
+                      label: Text(doc.status.name,
+                          style: const TextStyle(
+                              fontSize: 10, color: NeuroColors.textPrimary)),
                       backgroundColor: statusColor,
                       visualDensity: VisualDensity.compact,
                     ),
@@ -76,14 +88,22 @@ class MedicalDocumentsScreen extends ConsumerWidget {
 
   IconData _documentIcon(DocumentType type) {
     switch (type) {
-      case DocumentType.labReport: return Icons.science;
-      case DocumentType.imaging: return Icons.image;
-      case DocumentType.prescription: return Icons.medication;
-      case DocumentType.consentForm: return Icons.description;
-      case DocumentType.medicalReport: return Icons.article;
-      case DocumentType.dischargeSummary: return Icons.summarize;
-      case DocumentType.referral: return Icons.send;
-      default: return Icons.insert_drive_file;
+      case DocumentType.labReport:
+        return Icons.science;
+      case DocumentType.imaging:
+        return Icons.image;
+      case DocumentType.prescription:
+        return Icons.medication;
+      case DocumentType.consentForm:
+        return Icons.description;
+      case DocumentType.medicalReport:
+        return Icons.article;
+      case DocumentType.dischargeSummary:
+        return Icons.summarize;
+      case DocumentType.referral:
+        return Icons.send;
+      default:
+        return Icons.insert_drive_file;
     }
   }
 

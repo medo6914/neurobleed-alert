@@ -12,14 +12,20 @@ class PaginationParams(BaseModel):
     page: int = Field(default=1, ge=1, description="Page number (1-indexed)")
     per_page: int = Field(default=50, ge=1, le=1000, description="Items per page")
     sort_by: str | None = Field(default=None, description="Column to sort by")
-    sort_order: Literal["asc", "desc"] = Field(default="desc", description="Sort direction")
+    sort_order: Literal["asc", "desc"] = Field(
+        default="desc", description="Sort direction"
+    )
 
 
 class CursorPaginationParams(BaseModel):
-    cursor: str | None = Field(default=None, description="Base64-encoded cursor for pagination")
+    cursor: str | None = Field(
+        default=None, description="Base64-encoded cursor for pagination"
+    )
     limit: int = Field(default=50, ge=1, le=1000, description="Items per page")
     sort_by: str | None = Field(default=None, description="Column to sort by")
-    sort_order: Literal["asc", "desc"] = Field(default="desc", description="Sort direction")
+    sort_order: Literal["asc", "desc"] = Field(
+        default="desc", description="Sort direction"
+    )
 
 
 class PaginatedResponse(BaseModel, Generic[T]):

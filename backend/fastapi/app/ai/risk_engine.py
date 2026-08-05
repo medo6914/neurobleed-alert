@@ -4,17 +4,30 @@ import xgboost as xgb
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from app.ai.schemas import RiskAssessmentRequest, RiskAssessmentResponse, ShapExplanation
+from app.ai.schemas import (
+    RiskAssessmentRequest,
+    RiskAssessmentResponse,
+    ShapExplanation,
+)
 from app.ai.medical_rules_engine import MedicalRulesEngine
 
 
 class RiskEngine:
     MODEL_VERSION = "NB-RISK-XGB-2.0.0"
     FEATURE_NAMES = [
-        "heart_rate", "spo2", "rso2", "ir_value", "red_value",
-        "systolic_bp", "diastolic_bp", "gcs",
-        "signal_quality", "motion_artifact",
-        "hr_spo2_ratio", "rso2_drop", "shock_index",
+        "heart_rate",
+        "spo2",
+        "rso2",
+        "ir_value",
+        "red_value",
+        "systolic_bp",
+        "diastolic_bp",
+        "gcs",
+        "signal_quality",
+        "motion_artifact",
+        "hr_spo2_ratio",
+        "rso2_drop",
+        "shock_index",
     ]
 
     def __init__(self, rules_engine: MedicalRulesEngine | None = None):
@@ -24,20 +37,25 @@ class RiskEngine:
         self._feature_importance = None
 
     def _build_pipeline(self) -> Pipeline:
-        return Pipeline([
-            ("scaler", StandardScaler()),
-            ("model", xgb.XGBRegressor(
-                n_estimators=200,
-                max_depth=6,
-                min_child_weight=3,
-                learning_rate=0.05,
-                subsample=0.8,
-                colsample_bytree=0.8,
-                random_state=42,
-                n_jobs=-1,
-                verbosity=0,
-            )),
-        ])
+        return Pipeline(
+            [
+                ("scaler", StandardScaler()),
+                (
+                    "model",
+                    xgb.XGBRegressor(
+                        n_estimators=200,
+                        max_depth=6,
+                        min_child_weight=3,
+                        learning_rate=0.05,
+                        subsample=0.8,
+                        colsample_bytree=0.8,
+                        random_state=42,
+                        n_jobs=-1,
+                        verbosity=0,
+                    ),
+                ),
+            ]
+        )
 
     def _extract_features(self, data: RiskAssessmentRequest) -> list[float]:
         hr = data.heart_rate or 75.0
@@ -120,7 +138,11 @@ class RiskEngine:
         if not data.readings_window or len(data.readings_window) < 2:
             return None
         try:
-            scores = [r.get("risk_score", 0.5) for r in data.readings_window if isinstance(r, dict)]
+            scores = [
+                r.get("risk_score", 0.5)
+                for r in data.readings_window
+                if isinstance(r, dict)
+            ]
             if len(scores) >= 2:
                 trend = scores[-1] - scores[0]
                 if trend > 0.1:
@@ -131,7 +153,9 @@ class RiskEngine:
         except Exception:
             return None
 
-    def _compute_explanation(self, features: list[float], raw_score: float) -> ShapExplanation:
+    def _compute_explanation(
+        self, features: list[float], raw_score: float
+    ) -> ShapExplanation:
         if not self._trained:
             base_contributions = {name: 0.0 for name in self.FEATURE_NAMES}
             return ShapExplanation(
@@ -203,7 +227,9 @@ class RiskEngine:
         }
 
         override_score, override_level, rules_triggered = (
-            self.rules_engine.override_risk_if_needed(vitals, ensemble_score, risk_level)
+            self.rules_engine.override_risk_if_needed(
+                vitals, ensemble_score, risk_level
+            )
         )
 
         trend = self._compute_trend(data)
@@ -232,7 +258,9 @@ class RiskEngine:
             model_version=self.MODEL_VERSION,
             inference_time_ms=round(elapsed, 2),
             explanation=explanation,
-            shap_values=list(explanation.shap_values.values()) if explanation.shap_values else [],
+            shap_values=list(explanation.shap_values.values())
+            if explanation.shap_values
+            else [],
             feature_names=self.FEATURE_NAMES,
         )
 
@@ -240,10 +268,9 @@ class RiskEngine:
         self.pipeline.fit(X, y)
         self._trained = True
         xgb_model = self.pipeline.named_steps["model"]
-        self._feature_importance = dict(zip(
-            self.FEATURE_NAMES,
-            xgb_model.feature_importances_.tolist()
-        ))
+        self._feature_importance = dict(
+            zip(self.FEATURE_NAMES, xgb_model.feature_importances_.tolist())
+        )
 
     def is_trained(self) -> bool:
         return self._trained

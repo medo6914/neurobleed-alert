@@ -22,12 +22,13 @@ class TriggerOtaUpdate {
       return Left(ValidationFailure(
         message: 'Device ID is required',
         code: 'VALIDATION_ERROR',
-        errors: {'deviceId': ['Device ID is required']},
+        errors: {
+          'deviceId': ['Device ID is required']
+        },
       ));
     }
 
-    final fwResult =
-        DeviceValidator.validateFirmwareVersion(firmwareVersion);
+    final fwResult = DeviceValidator.validateFirmwareVersion(firmwareVersion);
     if (fwResult.isLeft()) {
       return fwResult as Left<Failure, dynamic>;
     }

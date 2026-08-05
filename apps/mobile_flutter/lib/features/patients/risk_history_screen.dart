@@ -4,7 +4,8 @@ import 'package:design_system/design_system.dart';
 import 'package:shared/shared.dart';
 import 'package:core/core.dart';
 
-final _patientRisksProvider = FutureProvider.family<List<RiskRecord>, String>((ref, patientId) async {
+final _patientRisksProvider =
+    FutureProvider.family<List<RiskRecord>, String>((ref, patientId) async {
   final apiClient = ref.watch(apiClientProvider);
   final response = await apiClient.get('/v1/patients/$patientId/risks');
   return (response.data['data'] as List)
@@ -53,14 +54,26 @@ class RiskHistoryScreen extends ConsumerWidget {
                   child: ListTile(
                     leading: CircleAvatar(
                       backgroundColor: scoreColor.withValues(alpha: 0.2),
-                      child: Text('${(risk.score * 100).toInt()}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: scoreColor)),
+                      child: Text('${(risk.score * 100).toInt()}%',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: scoreColor)),
                     ),
-                    title: Text(risk.riskType.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w600)),
+                    title: Text(risk.riskType.toUpperCase(),
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Level: ${risk.level}'),
-                        Text(risk.timestamp.toLocal().toString().substring(0, 16), style: TextStyle(fontSize: 12, color: NeuroColors.textSecondary)),
+                        Text(
+                            risk.timestamp
+                                .toLocal()
+                                .toString()
+                                .substring(0, 16),
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: NeuroColors.textSecondary)),
                       ],
                     ),
                     trailing: Container(
@@ -69,7 +82,11 @@ class RiskHistoryScreen extends ConsumerWidget {
                         color: _levelColor(risk.level).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(NeuroRadius.sm),
                       ),
-                      child: Text(risk.level.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: _levelColor(risk.level))),
+                      child: Text(risk.level.toUpperCase(),
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: _levelColor(risk.level))),
                     ),
                     isThreeLine: true,
                   ),
@@ -84,10 +101,14 @@ class RiskHistoryScreen extends ConsumerWidget {
 
   Color _levelColor(String level) {
     switch (level) {
-      case 'critical': return NeuroColors.critical;
-      case 'high': return NeuroColors.critical;
-      case 'moderate': return NeuroColors.warning;
-      default: return NeuroColors.success;
+      case 'critical':
+        return NeuroColors.critical;
+      case 'high':
+        return NeuroColors.critical;
+      case 'moderate':
+        return NeuroColors.warning;
+      default:
+        return NeuroColors.success;
     }
   }
 }

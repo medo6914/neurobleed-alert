@@ -15,12 +15,14 @@ final bleTestInitProvider = FutureProvider<bool>((ref) async {
 
 final bleTestScanStateProvider = StateProvider<bool>((ref) => false);
 
-final bleTestScannedDevicesProvider = StreamProvider<List<BleTestDevice>>((ref) {
+final bleTestScannedDevicesProvider =
+    StreamProvider<List<BleTestDevice>>((ref) {
   final service = ref.watch(bleTestServiceProvider);
   return service.devicesStream;
 });
 
-final bleTestConnectionStateProvider = StreamProvider<BleTestConnectionState>((ref) {
+final bleTestConnectionStateProvider =
+    StreamProvider<BleTestConnectionState>((ref) {
   final service = ref.watch(bleTestServiceProvider);
   return service.connectionStream;
 });
@@ -40,12 +42,13 @@ final bleTestNotificationProvider = StreamProvider<NotificationData>((ref) {
   return service.notificationStream;
 });
 
-final bleTestConnectedDeviceInfoProvider = Provider<({
-  String? id,
-  String? name,
-  int? rssi,
-  BleTestConnectionState state,
-})>((ref) {
+final bleTestConnectedDeviceInfoProvider = Provider<
+    ({
+      String? id,
+      String? name,
+      int? rssi,
+      BleTestConnectionState state,
+    })>((ref) {
   final service = ref.watch(bleTestServiceProvider);
   return (
     id: service.connectedDeviceId,
@@ -55,13 +58,14 @@ final bleTestConnectedDeviceInfoProvider = Provider<({
   );
 });
 
-final bleTestStatusProvider = Provider<({
-  bool initialized,
-  bool bleEnabled,
-  bool locationPermission,
-  bool nearbyPermission,
-  bool scanning,
-})>((ref) {
+final bleTestStatusProvider = Provider<
+    ({
+      bool initialized,
+      bool bleEnabled,
+      bool locationPermission,
+      bool nearbyPermission,
+      bool scanning,
+    })>((ref) {
   final service = ref.watch(bleTestServiceProvider);
   return (
     initialized: service.isInitialized,

@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _logoController;
   late AnimationController _glowController;
   late AnimationController _textController;
-  
+
   late Animation<double> _logoScale;
   late Animation<double> _logoOpacity;
   late Animation<double> _glowOpacity;
@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    
+
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarBrightness: Brightness.dark,
@@ -76,10 +76,10 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _startAnimations() async {
     await Future.delayed(const Duration(milliseconds: 300));
     _logoController.forward();
-    
+
     await Future.delayed(const Duration(milliseconds: 500));
     _glowController.repeat(reverse: true);
-    
+
     await Future.delayed(const Duration(milliseconds: 800));
     _textController.forward();
 

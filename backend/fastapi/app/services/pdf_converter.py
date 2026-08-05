@@ -6,6 +6,7 @@ logger = logging.getLogger(__name__)
 def html_to_pdf(html_content: str) -> bytes | None:
     try:
         from weasyprint import HTML
+
         pdf_bytes = HTML(string=html_content).write_pdf()
         return pdf_bytes
     except ImportError:

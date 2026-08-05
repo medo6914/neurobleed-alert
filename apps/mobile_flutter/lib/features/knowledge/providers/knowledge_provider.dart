@@ -68,7 +68,8 @@ class KnowledgeNotifier extends StateNotifier<KnowledgeSearchState> {
   Future<void> search(String query, {String? category}) async {
     if (query.trim().length < 2) return;
 
-    state = state.copyWith(isLoading: true, error: null, query: query, category: category);
+    state = state.copyWith(
+        isLoading: true, error: null, query: query, category: category);
 
     try {
       final response = await _apiClient.post('/v1/ai/knowledge/search', data: {
@@ -101,7 +102,8 @@ class KnowledgeNotifier extends StateNotifier<KnowledgeSearchState> {
   }
 }
 
-final knowledgeProvider = StateNotifierProvider<KnowledgeNotifier, KnowledgeSearchState>((ref) {
+final knowledgeProvider =
+    StateNotifierProvider<KnowledgeNotifier, KnowledgeSearchState>((ref) {
   final apiClient = ref.watch(apiClientProvider);
   return KnowledgeNotifier(apiClient);
 });

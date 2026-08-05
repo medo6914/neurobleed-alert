@@ -14,10 +14,18 @@ PATIENT_PAYLOAD = {
 
 @pytest.mark.anyio
 async def test_create_patient(client):
-    await client.post("/v1/auth/register", json={
-        "email": "doc@test.com", "password": "pass123", "full_name": "Dr. X", "role": "doctor",
-    })
-    login = await client.post("/v1/auth/login", json={"email": "doc@test.com", "password": "pass123"})
+    await client.post(
+        "/v1/auth/register",
+        json={
+            "email": "doc@test.com",
+            "password": "pass123",
+            "full_name": "Dr. X",
+            "role": "doctor",
+        },
+    )
+    login = await client.post(
+        "/v1/auth/login", json={"email": "doc@test.com", "password": "pass123"}
+    )
     token = login.json()["access_token"]
 
     response = await client.post(
@@ -34,14 +42,23 @@ async def test_create_patient(client):
 
 @pytest.mark.anyio
 async def test_list_patients(client):
-    await client.post("/v1/auth/register", json={
-        "email": "doc2@test.com", "password": "pass123", "full_name": "Dr. Y", "role": "doctor",
-    })
-    login = await client.post("/v1/auth/login", json={"email": "doc2@test.com", "password": "pass123"})
+    await client.post(
+        "/v1/auth/register",
+        json={
+            "email": "doc2@test.com",
+            "password": "pass123",
+            "full_name": "Dr. Y",
+            "role": "doctor",
+        },
+    )
+    login = await client.post(
+        "/v1/auth/login", json={"email": "doc2@test.com", "password": "pass123"}
+    )
     token = login.json()["access_token"]
 
     await client.post(
-        "/v1/patients/", json=PATIENT_PAYLOAD,
+        "/v1/patients/",
+        json=PATIENT_PAYLOAD,
         headers={"Authorization": f"Bearer {token}"},
     )
 

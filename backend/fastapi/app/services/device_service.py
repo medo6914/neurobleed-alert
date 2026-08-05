@@ -11,8 +11,12 @@ from app.models.device import Device
 from app.models.device_event_log import DeviceEventLog
 from app.models.enums import DeviceStatus, DeviceEventType
 from app.schemas.device import (
-    DeviceCreate, DeviceUpdate, DeviceStatusUpdate, DeviceAssignRequest,
-    DeviceHeartbeatRequest, BulkDeviceOperation,
+    DeviceCreate,
+    DeviceUpdate,
+    DeviceStatusUpdate,
+    DeviceAssignRequest,
+    DeviceHeartbeatRequest,
+    BulkDeviceOperation,
 )
 
 logger = logging.getLogger(__name__)
@@ -24,7 +28,9 @@ class DeviceService:
         self.redis = redis_client
 
     async def _log_event(
-        self, device_id: UUID, event_type: DeviceEventType,
+        self,
+        device_id: UUID,
+        event_type: DeviceEventType,
         description: str | None = None,
         prev_value: str | None = None,
         new_value: str | None = None,
@@ -68,7 +74,10 @@ class DeviceService:
                 "device:registered", json.dumps({"id": str(device.id)})
             )
 
-        logger.info("Device registered", extra={"device_id": str(device.id), "serial": device.serial_number})
+        logger.info(
+            "Device registered",
+            extra={"device_id": str(device.id), "serial": device.serial_number},
+        )
         return device
 
     async def get_device(self, device_id: UUID) -> Device:
@@ -112,7 +121,11 @@ class DeviceService:
         total_result = await self.db.execute(count_query)
         total = total_result.scalar() or 0
 
-        sort_column = getattr(Device, sort_by, Device.created_at) if sort_by else Device.created_at
+        sort_column = (
+            getattr(Device, sort_by, Device.created_at)
+            if sort_by
+            else Device.created_at
+        )
         if sort_order == "asc":
             query = query.order_by(sort_column.asc())
         else:
@@ -167,12 +180,14 @@ class DeviceService:
         if self.redis:
             await self.redis.publish(
                 "device:status",
-                json.dumps({
-                    "id": str(device.id),
-                    "status": device.status.value,
-                    "battery": device.battery_level,
-                    "signal": device.signal_strength,
-                }),
+                json.dumps(
+                    {
+                        "id": str(device.id),
+                        "status": device.status.value,
+                        "battery": device.battery_level,
+                        "signal": device.signal_strength,
+                    }
+                ),
             )
 
         return device
@@ -195,22 +210,33 @@ class DeviceService:
         device.department = data.department
         await self.db.flush()
 
-        event_type = DeviceEventType.UNASSIGNED if data.patient_id is None else DeviceEventType.ASSIGNED
+        event_type = (
+            DeviceEventType.UNASSIGNED
+            if data.patient_id is None
+            else DeviceEventType.ASSIGNED
+        )
         await self._log_event(
             device_id=device.id,
             event_type=event_type,
             description=f"Device {'unassigned from' if data.patient_id is None else 'assigned to patient'} {data.patient_id or old_patient_id}",
             prev_value=str(old_patient_id) if old_patient_id else None,
             new_value=str(data.patient_id) if data.patient_id else None,
-            metadata={"hospital_id": str(data.hospital_id) if data.hospital_id else None} if data.hospital_id else None,
+            metadata={
+                "hospital_id": str(data.hospital_id) if data.hospital_id else None
+            }
+            if data.hospital_id
+            else None,
         )
 
         await self.db.commit()
         await self.db.refresh(device)
-        logger.info("Device assigned", extra={
-            "device_id": str(device.id),
-            "patient_id": str(data.patient_id) if data.patient_id else None,
-        })
+        logger.info(
+            "Device assigned",
+            extra={
+                "device_id": str(device.id),
+                "patient_id": str(data.patient_id) if data.patient_id else None,
+            },
+        )
         return device
 
     async def heartbeat(self, device_id: UUID, data: DeviceHeartbeatRequest) -> Device:

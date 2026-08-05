@@ -51,7 +51,13 @@ class HL7Message:
 
         gender = pid.get_field(8)
         if gender:
-            data["gender"] = "male" if gender.upper() == "M" else "female" if gender.upper() == "F" else "other"
+            data["gender"] = (
+                "male"
+                if gender.upper() == "M"
+                else "female"
+                if gender.upper() == "F"
+                else "other"
+            )
 
         mrn = pid.get_field(3)
         if mrn:
@@ -101,7 +107,19 @@ class HL7Message:
             formats = ["%Y%m%d", "%Y%m%d%H%M", "%Y%m%d%H%M%S"]
             for fmt in formats:
                 try:
-                    return datetime.strptime(date_str[:len(fmt.replace("%Y", "2025").replace("%m", "01").replace("%d", "01").replace("%H", "00").replace("%M", "00").replace("%S", "00"))], fmt).strftime("%Y-%m-%d")
+                    return datetime.strptime(
+                        date_str[
+                            : len(
+                                fmt.replace("%Y", "2025")
+                                .replace("%m", "01")
+                                .replace("%d", "01")
+                                .replace("%H", "00")
+                                .replace("%M", "00")
+                                .replace("%S", "00")
+                            )
+                        ],
+                        fmt,
+                    ).strftime("%Y-%m-%d")
                 except ValueError:
                     continue
         except Exception:
@@ -195,14 +213,20 @@ class HL7v2Parser:
             patient_data = HL7Parser.extract_patient(msg)
             return {
                 "resourceType": "Patient",
-                "identifier": [{"system": "urn:hl7:temp", "value": patient_data.get("mrn", "")}],
-                "name": [{
-                    "family": patient_data.get("last_name", ""),
-                    "given": [patient_data.get("first_name", "")],
-                }],
+                "identifier": [
+                    {"system": "urn:hl7:temp", "value": patient_data.get("mrn", "")}
+                ],
+                "name": [
+                    {
+                        "family": patient_data.get("last_name", ""),
+                        "given": [patient_data.get("first_name", "")],
+                    }
+                ],
                 "gender": patient_data.get("gender", "unknown"),
                 "birthDate": patient_data.get("date_of_birth", ""),
-                "telecom": [{"system": "phone", "value": patient_data.get("phone", "")}] if patient_data.get("phone") else [],
+                "telecom": [{"system": "phone", "value": patient_data.get("phone", "")}]
+                if patient_data.get("phone")
+                else [],
             }
 
         if msg_type.startswith("ORU"):
@@ -216,11 +240,20 @@ class HL7v2Parser:
                             "resourceType": "Observation",
                             "status": "final",
                             "code": {
-                                "coding": [{"code": obs.get("code", ""), "display": obs.get("display_name", "")}]
+                                "coding": [
+                                    {
+                                        "code": obs.get("code", ""),
+                                        "display": obs.get("display_name", ""),
+                                    }
+                                ]
                             },
                             "valueString": obs.get("value", ""),
-                            "referenceRange": [{"text": obs.get("reference_range", "")}] if obs.get("reference_range") else [],
-                            "interpretation": [{"text": obs.get("abnormal_flags", "")}] if obs.get("abnormal_flags") else [],
+                            "referenceRange": [{"text": obs.get("reference_range", "")}]
+                            if obs.get("reference_range")
+                            else [],
+                            "interpretation": [{"text": obs.get("abnormal_flags", "")}]
+                            if obs.get("abnormal_flags")
+                            else [],
                         }
                     }
                     for obs in observations

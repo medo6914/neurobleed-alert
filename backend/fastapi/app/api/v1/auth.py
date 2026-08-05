@@ -80,12 +80,14 @@ def _hash_token(token: str) -> str:
 
 def _issue_tokens(user: User) -> TokenResponse:
     token_id = str(uuid.uuid4())
-    access_token = create_access_token({
-        "sub": str(user.id),
-        "role": user.role,
-        "firebase_uid": user.firebase_uid,
-        "jti": token_id,
-    })
+    access_token = create_access_token(
+        {
+            "sub": str(user.id),
+            "role": user.role,
+            "firebase_uid": user.firebase_uid,
+            "jti": token_id,
+        }
+    )
     refresh_token = create_refresh_token({"sub": str(user.id)})
     return TokenResponse(
         access_token=access_token,
@@ -97,16 +99,22 @@ def _issue_tokens(user: User) -> TokenResponse:
     )
 
 
-@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED
+)
 async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
     validate_password(data.password)
     result = await db.execute(select(User).where(User.email == data.email))
     if result.scalar_one_or_none():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
+        )
 
     firebase_uid = None
     try:
-        firebase_user = await create_firebase_user(data.email, data.password, data.full_name)
+        firebase_user = await create_firebase_user(
+            data.email, data.password, data.full_name
+        )
         firebase_uid = firebase_user.get("uid") if firebase_user else None
     except Exception:
         pass
@@ -137,9 +145,13 @@ async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
     user = result.scalar_one_or_none()
 
     if not user or not verify_password(data.password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
+        )
     if not user.is_active:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is inactive")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Account is inactive"
+        )
 
     resp = _issue_tokens(user)
     token_id = decode_access_token(resp.access_token).get("jti")
@@ -152,7 +164,9 @@ async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
 async def google_login(data: GoogleLoginRequest, db: AsyncSession = Depends(get_db)):
     decoded = await verify_firebase_token(data.id_token)
     if not decoded:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Google token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Google token"
+        )
 
     email = decoded.get("email")
     firebase_uid = decoded.get("uid")
@@ -187,11 +201,15 @@ async def google_login(data: GoogleLoginRequest, db: AsyncSession = Depends(get_
 async def refresh_token(data: RefreshRequest, db: AsyncSession = Depends(get_db)):
     payload = decode_refresh_token(data.refresh_token)
     if payload is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
+        )
 
     user_id = payload.get("sub")
     if user_id is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token"
+        )
 
     user_uuid = uuid.UUID(user_id)
     token_hash = _hash_token(data.refresh_token)
@@ -214,25 +232,32 @@ async def refresh_token(data: RefreshRequest, db: AsyncSession = Depends(get_db)
     result = await db.execute(select(User).where(User.id == user_uuid))
     user = result.scalar_one_or_none()
     if user is None or not user.is_active:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found or inactive")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found or inactive",
+        )
 
     new_refresh = create_refresh_token({"sub": str(user.id)})
     new_hash = _hash_token(new_refresh)
-    db.add(RefreshToken(
-        user_id=user.id,
-        token_hash=new_hash,
-        ip_address=None,
-        expires_at=datetime.now(timezone.utc),
-    ))
+    db.add(
+        RefreshToken(
+            user_id=user.id,
+            token_hash=new_hash,
+            ip_address=None,
+            expires_at=datetime.now(timezone.utc),
+        )
+    )
     await db.commit()
 
     token_id = str(uuid.uuid4())
-    access_token = create_access_token({
-        "sub": str(user.id),
-        "role": user.role,
-        "firebase_uid": user.firebase_uid,
-        "jti": token_id,
-    })
+    access_token = create_access_token(
+        {
+            "sub": str(user.id),
+            "role": user.role,
+            "firebase_uid": user.firebase_uid,
+            "jti": token_id,
+        }
+    )
     await store_session(user.id, token_id)
 
     return TokenResponse(
@@ -276,13 +301,22 @@ async def forgot_password(data: ForgotPasswordRequest):
 
 
 @router.post("/reset-password")
-async def reset_password(data: ResetPasswordRequest, db: AsyncSession = Depends(get_db)):
+async def reset_password(
+    data: ResetPasswordRequest, db: AsyncSession = Depends(get_db)
+):
     stored = _reset_store.get(data.email)
     if not stored:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Reset code not found or expired")
-    if (datetime.now(timezone.utc) - stored["created_at"]).total_seconds() > CODE_EXPIRY_SECONDS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Reset code not found or expired",
+        )
+    if (
+        datetime.now(timezone.utc) - stored["created_at"]
+    ).total_seconds() > CODE_EXPIRY_SECONDS:
         del _reset_store[data.email]
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Reset code expired")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Reset code expired"
+        )
 
     stored["attempts"] += 1
     if stored["attempts"] > 3:
@@ -290,13 +324,17 @@ async def reset_password(data: ResetPasswordRequest, db: AsyncSession = Depends(
         raise HTTPException(status_code=429, detail="Too many failed attempts")
 
     if stored["code"] != data.code:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid reset code")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid reset code"
+        )
 
     validate_password(data.new_password)
     result = await db.execute(select(User).where(User.email == data.email))
     user = result.scalar_one_or_none()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
 
     user.hashed_password = hash_password(data.new_password)
     await db.commit()
@@ -311,16 +349,25 @@ async def reset_password(data: ResetPasswordRequest, db: AsyncSession = Depends(
 async def verify_email(data: VerifyEmailRequest, db: AsyncSession = Depends(get_db)):
     stored = _verify_email_store.get(data.code)
     if not stored:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Verification code not found or expired")
-    if (datetime.now(timezone.utc) - stored["created_at"]).total_seconds() > CODE_EXPIRY_SECONDS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Verification code not found or expired",
+        )
+    if (
+        datetime.now(timezone.utc) - stored["created_at"]
+    ).total_seconds() > CODE_EXPIRY_SECONDS:
         del _verify_email_store[data.code]
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Verification code expired")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Verification code expired"
+        )
 
     user_id = stored["user_id"]
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one_or_none()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
 
     user.is_email_verified = True
     await db.commit()
@@ -347,10 +394,17 @@ async def send_phone_verification(data: SendPhoneVerificationRequest):
 async def verify_phone(data: VerifyPhoneRequest, db: AsyncSession = Depends(get_db)):
     stored = _phone_verify_store.get(data.phone)
     if not stored:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Verification code not found or expired")
-    if (datetime.now(timezone.utc) - stored["created_at"]).total_seconds() > CODE_EXPIRY_SECONDS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Verification code not found or expired",
+        )
+    if (
+        datetime.now(timezone.utc) - stored["created_at"]
+    ).total_seconds() > CODE_EXPIRY_SECONDS:
         del _phone_verify_store[data.phone]
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Verification code expired")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Verification code expired"
+        )
 
     stored["attempts"] += 1
     if stored["attempts"] > 3:
@@ -358,12 +412,16 @@ async def verify_phone(data: VerifyPhoneRequest, db: AsyncSession = Depends(get_
         raise HTTPException(status_code=429, detail="Too many failed attempts")
 
     if stored["code"] != data.code:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid verification code")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid verification code"
+        )
 
     result = await db.execute(select(User).where(User.phone == data.phone))
     user = result.scalar_one_or_none()
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
 
     user.is_phone_verified = True
     await db.commit()
@@ -425,7 +483,9 @@ async def send_otp(data: OtpRequest, request: Request):
 
     recent = [v for k, v in _otp_store.items() if k == phone]
     if len(recent) >= 5:
-        raise HTTPException(status_code=429, detail="Too many OTP requests. Try again later.")
+        raise HTTPException(
+            status_code=429, detail="Too many OTP requests. Try again later."
+        )
 
     otp = str(secrets.randbelow(9000) + 1000)
     _otp_store[phone] = {
@@ -436,7 +496,10 @@ async def send_otp(data: OtpRequest, request: Request):
     }
     sent = await send_otp_sms(phone, otp)
     if not sent:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to send OTP")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send OTP",
+        )
     return {"message": "OTP sent successfully", "otp_length": 4}
 
 
@@ -446,16 +509,24 @@ async def verify_otp(data: OtpVerifyRequest, db: AsyncSession = Depends(get_db))
     otp = data.otp
     stored = _otp_store.get(phone)
     if not stored:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="OTP not found or expired")
-    if (datetime.now(timezone.utc) - stored["created_at"]).total_seconds() > CODE_EXPIRY_SECONDS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="OTP not found or expired"
+        )
+    if (
+        datetime.now(timezone.utc) - stored["created_at"]
+    ).total_seconds() > CODE_EXPIRY_SECONDS:
         del _otp_store[phone]
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="OTP expired")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="OTP expired"
+        )
     stored["attempts"] += 1
     if stored["attempts"] > 3:
         del _otp_store[phone]
         raise HTTPException(status_code=429, detail="Too many failed attempts")
     if stored["otp"] != otp:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid OTP")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid OTP"
+        )
     stored["verified"] = True
 
     result = await db.execute(select(User).where(User.phone == phone))
@@ -484,7 +555,9 @@ async def verify_otp(data: OtpVerifyRequest, db: AsyncSession = Depends(get_db))
 async def emergency_sms(data: EmergencySmsRequest):
     if not data.emergency_phone or len(data.emergency_phone) < 8:
         raise HTTPException(status_code=400, detail="Invalid emergency phone number")
-    sent = await send_emergency_alert(data.emergency_phone, data.patient_name, data.risk_level)
+    sent = await send_emergency_alert(
+        data.emergency_phone, data.patient_name, data.risk_level
+    )
     if not sent:
         raise HTTPException(status_code=500, detail="Failed to send emergency SMS")
     return {"message": "Emergency SMS sent"}

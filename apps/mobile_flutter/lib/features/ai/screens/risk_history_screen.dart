@@ -104,11 +104,14 @@ class _RiskHistoryScreenState extends ConsumerState<RiskHistoryScreen> {
                             if (item.rulesTriggered.isNotEmpty)
                               Text(
                                 '${item.rulesTriggered.length} rules',
-                                style: const TextStyle(fontSize: 10, color: NeuroColors.high),
+                                style: const TextStyle(
+                                    fontSize: 10, color: NeuroColors.high),
                               ),
                             Text(
                               '${item.confidence.toStringAsFixed(2)}',
-                              style: const TextStyle(fontSize: 10, color: NeuroColors.textSecondary),
+                              style: const TextStyle(
+                                  fontSize: 10,
+                                  color: NeuroColors.textSecondary),
                             ),
                           ],
                         ),

@@ -37,7 +37,8 @@ class DeviceOtaNotifier extends StateNotifier<DeviceOtaState> {
 
   DeviceOtaNotifier(this._repository) : super(const DeviceOtaState());
 
-  Future<Either<Failure, dynamic>> triggerOta(String deviceId, String firmwareVersion) async {
+  Future<Either<Failure, dynamic>> triggerOta(
+      String deviceId, String firmwareVersion) async {
     state = state.copyWith(isUpdating: true, progress: 0, clearError: true);
 
     final request = BulkOperationRequest(
@@ -53,7 +54,8 @@ class DeviceOtaNotifier extends StateNotifier<DeviceOtaState> {
         state = state.copyWith(isUpdating: false, error: failure.message);
       },
       (response) {
-        state = state.copyWith(isUpdating: false, progress: 100, result: response);
+        state =
+            state.copyWith(isUpdating: false, progress: 100, result: response);
       },
     );
 
@@ -69,7 +71,8 @@ class DeviceOtaNotifier extends StateNotifier<DeviceOtaState> {
   }
 }
 
-final deviceOtaProvider = StateNotifierProvider<DeviceOtaNotifier, DeviceOtaState>((ref) {
+final deviceOtaProvider =
+    StateNotifierProvider<DeviceOtaNotifier, DeviceOtaState>((ref) {
   final repository = ref.watch(deviceRepositoryProvider);
   return DeviceOtaNotifier(repository);
 });

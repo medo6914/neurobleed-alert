@@ -105,7 +105,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> login(String email, String password, {bool rememberMe = true}) async {
+  Future<void> login(String email, String password,
+      {bool rememberMe = true}) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
       await _storage.saveRememberMe(rememberMe);

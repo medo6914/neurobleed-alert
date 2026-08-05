@@ -16,7 +16,9 @@ from app.models.patient import Patient
 from app.models.user import User
 from app.models.enums import ReportStatus, ReportFormat
 from app.schemas.clinical_report import (
-    ClinicalReportCreate, ClinicalReportUpdate, ClinicalReportResponse,
+    ClinicalReportCreate,
+    ClinicalReportUpdate,
+    ClinicalReportResponse,
     ClinicalReportListResponse,
 )
 from app.services.report_generator import report_generator
@@ -27,16 +29,22 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/reports", tags=["clinical-reports"])
 
 
-@router.post("/", response_model=ClinicalReportResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/", response_model=ClinicalReportResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_report_request(
     data: ClinicalReportCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.REPORT_CREATE)),
 ):
-    patient_result = await db.execute(select(Patient).where(Patient.id == data.patient_id))
+    patient_result = await db.execute(
+        select(Patient).where(Patient.id == data.patient_id)
+    )
     patient = patient_result.scalar_one_or_none()
     if not patient:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
+        )
 
     report = ClinicalReport(
         patient_id=data.patient_id,
@@ -59,7 +67,9 @@ async def create_report_request(
         generated = await report_generator.generate(
             patient_id=str(data.patient_id),
             report_title=data.title,
-            report_format=ReportFormat(data.format) if data.format else ReportFormat.PDF,
+            report_format=ReportFormat(data.format)
+            if data.format
+            else ReportFormat.PDF,
             include_shap=data.include_shap,
             include_trends=data.include_trends,
             language=data.language,
@@ -82,7 +92,10 @@ async def create_report_request(
 
         await db.commit()
         await db.refresh(report)
-        logger.info("Report generated", extra={"report_id": str(report.id), "patient_id": str(data.patient_id)})
+        logger.info(
+            "Report generated",
+            extra={"report_id": str(report.id), "patient_id": str(data.patient_id)},
+        )
 
     except Exception as e:
         report.status = ReportStatus.FAILED
@@ -117,7 +130,9 @@ async def list_reports(
 
     total = await db.scalar(select(func.count()).select_from(query.subquery()))
 
-    sort_column = getattr(ClinicalReport, sort_by, None) if sort_by else ClinicalReport.created_at
+    sort_column = (
+        getattr(ClinicalReport, sort_by, None) if sort_by else ClinicalReport.created_at
+    )
     if sort_column is not None:
         order_fn = desc if sort_order == "desc" else asc
         query = query.order_by(order_fn(sort_column))
@@ -129,9 +144,12 @@ async def list_reports(
     total_pages = max(1, (total + per_page - 1) // per_page)
     return ClinicalReportListResponse(
         items=[ClinicalReportResponse.model_validate(r) for r in reports],
-        total=total, page=page, per_page=per_page,
+        total=total,
+        page=page,
+        per_page=per_page,
         total_pages=total_pages,
-        has_next=page < total_pages, has_prev=page > 1,
+        has_next=page < total_pages,
+        has_prev=page > 1,
     )
 
 
@@ -141,10 +159,14 @@ async def get_report(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.REPORT_VIEW)),
 ):
-    result = await db.execute(select(ClinicalReport).where(ClinicalReport.id == report_id))
+    result = await db.execute(
+        select(ClinicalReport).where(ClinicalReport.id == report_id)
+    )
     report = result.scalar_one_or_none()
     if not report:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
+        )
     return report
 
 
@@ -154,12 +176,18 @@ async def view_report_html(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.REPORT_VIEW)),
 ):
-    result = await db.execute(select(ClinicalReport).where(ClinicalReport.id == report_id))
+    result = await db.execute(
+        select(ClinicalReport).where(ClinicalReport.id == report_id)
+    )
     report = result.scalar_one_or_none()
     if not report:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
+        )
     if not report.content_html:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report content not available")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Report content not available"
+        )
     return HTMLResponse(content=report.content_html)
 
 
@@ -169,15 +197,25 @@ async def download_report(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.REPORT_VIEW)),
 ):
-    result = await db.execute(select(ClinicalReport).where(ClinicalReport.id == report_id))
+    result = await db.execute(
+        select(ClinicalReport).where(ClinicalReport.id == report_id)
+    )
     report = result.scalar_one_or_none()
     if not report:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
+        )
     if not report.file_path:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report file not generated yet")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report file not generated yet",
+        )
     path = Path(report.file_path)
     if not path.exists():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report file missing on server")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Report file missing on server",
+        )
     media_type = (
         "application/pdf"
         if report.format == "pdf"
@@ -201,10 +239,14 @@ async def update_report(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.REPORT_CREATE)),
 ):
-    result = await db.execute(select(ClinicalReport).where(ClinicalReport.id == report_id))
+    result = await db.execute(
+        select(ClinicalReport).where(ClinicalReport.id == report_id)
+    )
     report = result.scalar_one_or_none()
     if not report:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
+        )
 
     update_data = data.model_dump(exclude_unset=True)
     if update_data:
@@ -222,10 +264,14 @@ async def delete_report(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.REPORT_CREATE)),
 ):
-    result = await db.execute(select(ClinicalReport).where(ClinicalReport.id == report_id))
+    result = await db.execute(
+        select(ClinicalReport).where(ClinicalReport.id == report_id)
+    )
     report = result.scalar_one_or_none()
     if not report:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
+        )
 
     report.is_deleted = True
     await db.commit()

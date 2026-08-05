@@ -68,8 +68,7 @@ class _SignalBarsPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.fill;
+    final paint = Paint()..style = PaintingStyle.fill;
 
     final barWidth = size.width / 5;
     final gap = barWidth * 0.3;

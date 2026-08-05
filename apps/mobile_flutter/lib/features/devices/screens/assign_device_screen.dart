@@ -77,16 +77,22 @@ class _AssignDeviceScreenState extends ConsumerState<AssignDeviceScreen> {
                         children: [
                           Text(
                             device.name ?? device.serialNumber,
-                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                           SizedBox(height: 2),
                           Text(
                             'SN: ${device.serialNumber}',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
                           ),
                         ],
                       ),
@@ -96,14 +102,14 @@ class _AssignDeviceScreenState extends ConsumerState<AssignDeviceScreen> {
                       children: [
                         DeviceStatusIndicator(status: device.status),
                         SizedBox(height: 4),
-                        DeviceBatteryIndicator(batteryLevel: device.batteryLevel),
+                        DeviceBatteryIndicator(
+                            batteryLevel: device.batteryLevel),
                       ],
                     ),
                   ],
                 ),
               ),
               SizedBox(height: NeuroSpacing.xl),
-
               _SectionTitle(title: 'Select Patient'),
               SizedBox(height: NeuroSpacing.sm),
               AppCard(
@@ -134,21 +140,30 @@ class _AssignDeviceScreenState extends ConsumerState<AssignDeviceScreen> {
                       if (_selectedPatientId != null) ...[
                         SizedBox(height: NeuroSpacing.sm),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: NeuroSpacing.sm, vertical: NeuroSpacing.xs),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: NeuroSpacing.sm,
+                              vertical: NeuroSpacing.xs),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primaryContainer
+                                .withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(NeuroRadius.sm),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.check_circle, size: 16, color: NeuroColors.success),
+                              Icon(Icons.check_circle,
+                                  size: 16, color: NeuroColors.success),
                               SizedBox(width: 4),
                               Text(
                                 'Selected: $_selectedPatientName',
-                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: NeuroColors.success,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      color: NeuroColors.success,
+                                    ),
                               ),
                             ],
                           ),
@@ -158,34 +173,36 @@ class _AssignDeviceScreenState extends ConsumerState<AssignDeviceScreen> {
                         SizedBox(height: NeuroSpacing.sm),
                         Divider(height: 1),
                         ..._searchResults.map((r) => ListTile(
-                          dense: true,
-                          title: Text(r['name'] ?? ''),
-                          subtitle: Text('MRN: ${r['mrn'] ?? ''}'),
-                          selected: _selectedPatientId == r['id'],
-                          trailing: _selectedPatientId == r['id']
-                              ? Icon(Icons.check_circle, color: NeuroColors.success, size: 20)
-                              : null,
-                          onTap: () {
-                            setState(() {
-                              _selectedPatientId = r['id'];
-                              _selectedPatientName = r['name'];
-                              _patientSearchController.text = r['name'] ?? '';
-                              _searchResults = [];
-                            });
-                          },
-                        )),
+                              dense: true,
+                              title: Text(r['name'] ?? ''),
+                              subtitle: Text('MRN: ${r['mrn'] ?? ''}'),
+                              selected: _selectedPatientId == r['id'],
+                              trailing: _selectedPatientId == r['id']
+                                  ? Icon(Icons.check_circle,
+                                      color: NeuroColors.success, size: 20)
+                                  : null,
+                              onTap: () {
+                                setState(() {
+                                  _selectedPatientId = r['id'];
+                                  _selectedPatientName = r['name'];
+                                  _patientSearchController.text =
+                                      r['name'] ?? '';
+                                  _searchResults = [];
+                                });
+                              },
+                            )),
                       ],
                       if (_isSearching)
                         Padding(
                           padding: EdgeInsets.all(NeuroSpacing.md),
-                          child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                          child: Center(
+                              child: CircularProgressIndicator(strokeWidth: 2)),
                         ),
                     ],
                   ),
                 ),
               ),
               SizedBox(height: NeuroSpacing.lg),
-
               _SectionTitle(title: 'Assignment Details'),
               SizedBox(height: NeuroSpacing.sm),
               AppCard(
@@ -210,7 +227,6 @@ class _AssignDeviceScreenState extends ConsumerState<AssignDeviceScreen> {
                 ),
               ),
               SizedBox(height: NeuroSpacing.xxl),
-
               if (state.error != null)
                 Padding(
                   padding: EdgeInsets.only(bottom: NeuroSpacing.md),
@@ -220,7 +236,6 @@ class _AssignDeviceScreenState extends ConsumerState<AssignDeviceScreen> {
                     description: state.error,
                   ),
                 ),
-
               SizedBox(
                 width: double.infinity,
                 height: 48,
@@ -244,14 +259,20 @@ class _AssignDeviceScreenState extends ConsumerState<AssignDeviceScreen> {
     final result = await notifier.assignDevice(
       deviceId: widget.deviceId,
       patientId: _selectedPatientId,
-      hospitalId: _hospitalIdController.text.trim().isEmpty ? null : _hospitalIdController.text.trim(),
-      department: _departmentController.text.trim().isEmpty ? null : _departmentController.text.trim(),
+      hospitalId: _hospitalIdController.text.trim().isEmpty
+          ? null
+          : _hospitalIdController.text.trim(),
+      department: _departmentController.text.trim().isEmpty
+          ? null
+          : _departmentController.text.trim(),
     );
 
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
+          SnackBar(
+              content: Text(failure.message),
+              backgroundColor: NeuroColors.critical),
         );
       },
       (_) {
@@ -274,9 +295,9 @@ class _SectionTitle extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-        fontWeight: FontWeight.w600,
-        color: Theme.of(context).colorScheme.primary,
-      ),
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).colorScheme.primary,
+          ),
     );
   }
 }

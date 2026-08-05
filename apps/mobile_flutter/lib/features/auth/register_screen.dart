@@ -112,7 +112,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       if (v == null || v.isEmpty) {
                                         return 'الاسم مطلوب';
                                       }
-                                      if (v.length < 2) return 'الاسم قصير جداً';
+                                      if (v.length < 2)
+                                        return 'الاسم قصير جداً';
                                       return null;
                                     },
                                   ),
@@ -121,7 +122,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     label: 'البريد الإلكتروني',
                                     controller: _emailController,
                                     keyboardType: TextInputType.emailAddress,
-                                    prefixIcon: const Icon(Icons.email_outlined),
+                                    prefixIcon:
+                                        const Icon(Icons.email_outlined),
                                     validator: (v) {
                                       if (v == null || v.isEmpty) {
                                         return 'البريد الإلكتروني مطلوب';
@@ -145,8 +147,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                             : Icons.visibility_off_outlined,
                                       ),
                                       onPressed: () => setState(() =>
-                                          _obscurePassword =
-                                              !_obscurePassword),
+                                          _obscurePassword = !_obscurePassword),
                                     ),
                                     validator: (v) {
                                       if (v == null || v.isEmpty) {
@@ -177,8 +178,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                             : Icons.visibility_off_outlined,
                                       ),
                                       onPressed: () => setState(() =>
-                                          _obscureConfirm =
-                                              !_obscureConfirm),
+                                          _obscureConfirm = !_obscureConfirm),
                                     ),
                                     validator: (v) {
                                       if (v != _passwordController.text) {

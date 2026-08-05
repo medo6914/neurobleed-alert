@@ -2,7 +2,17 @@ import 'package:equatable/equatable.dart';
 
 enum Gender { male, female, other }
 
-enum BloodType { aPositive, aNegative, bPositive, bNegative, abPositive, abNegative, oPositive, oNegative, unknown }
+enum BloodType {
+  aPositive,
+  aNegative,
+  bPositive,
+  bNegative,
+  abPositive,
+  abNegative,
+  oPositive,
+  oNegative,
+  unknown
+}
 
 enum PatientStatus { active, inactive, transferred, deceased }
 
@@ -113,7 +123,8 @@ class Patient extends Equatable {
     this.isDeleted = false,
   });
 
-  String get fullName => '${firstName}${middleName != null ? ' $middleName ' : ' '}$lastName';
+  String get fullName =>
+      '${firstName}${middleName != null ? ' $middleName ' : ' '}$lastName';
 
   Patient copyWith({
     String? id,
@@ -193,7 +204,8 @@ class Patient extends Equatable {
       employer: employer ?? this.employer,
       insuranceProvider: insuranceProvider ?? this.insuranceProvider,
       insuranceId: insuranceId ?? this.insuranceId,
-      insurancePolicyNumber: insurancePolicyNumber ?? this.insurancePolicyNumber,
+      insurancePolicyNumber:
+          insurancePolicyNumber ?? this.insurancePolicyNumber,
       status: status ?? this.status,
       hospitalId: hospitalId ?? this.hospitalId,
       hospitalName: hospitalName ?? this.hospitalName,
@@ -244,7 +256,8 @@ class Patient extends Equatable {
       country: json['country'] as String?,
       postalCode: json['postalCode'] as String?,
       maritalStatus: json['maritalStatus'] != null
-          ? MaritalStatus.values.firstWhere((e) => e.name == json['maritalStatus'])
+          ? MaritalStatus.values
+              .firstWhere((e) => e.name == json['maritalStatus'])
           : MaritalStatus.single,
       language: json['language'] != null
           ? Language.values.firstWhere((e) => e.name == json['language'])
@@ -264,13 +277,27 @@ class Patient extends Equatable {
       ward: json['ward'] as String?,
       bedNumber: json['bedNumber'] as String?,
       primaryDiagnosis: json['primaryDiagnosis'] as String?,
-      diagnoses: json['diagnoses'] != null ? List<String>.from(json['diagnoses'] as List) : const [],
-      allergies: json['allergies'] != null ? List<String>.from(json['allergies'] as List) : const [],
-      medications: json['medications'] != null ? List<String>.from(json['medications'] as List) : const [],
-      comorbidities: json['comorbidities'] != null ? List<String>.from(json['comorbidities'] as List) : const [],
-      surgicalHistory: json['surgicalHistory'] != null ? List<String>.from(json['surgicalHistory'] as List) : const [],
-      familyHistory: json['familyHistory'] != null ? List<String>.from(json['familyHistory'] as List) : const [],
-      socialHistory: json['socialHistory'] != null ? List<String>.from(json['socialHistory'] as List) : const [],
+      diagnoses: json['diagnoses'] != null
+          ? List<String>.from(json['diagnoses'] as List)
+          : const [],
+      allergies: json['allergies'] != null
+          ? List<String>.from(json['allergies'] as List)
+          : const [],
+      medications: json['medications'] != null
+          ? List<String>.from(json['medications'] as List)
+          : const [],
+      comorbidities: json['comorbidities'] != null
+          ? List<String>.from(json['comorbidities'] as List)
+          : const [],
+      surgicalHistory: json['surgicalHistory'] != null
+          ? List<String>.from(json['surgicalHistory'] as List)
+          : const [],
+      familyHistory: json['familyHistory'] != null
+          ? List<String>.from(json['familyHistory'] as List)
+          : const [],
+      socialHistory: json['socialHistory'] != null
+          ? List<String>.from(json['socialHistory'] as List)
+          : const [],
       notes: json['notes'] as String?,
       profileImageUrl: json['profileImageUrl'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -336,5 +363,6 @@ class Patient extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, mrn, firstName, lastName, dateOfBirth, gender, status];
+  List<Object?> get props =>
+      [id, mrn, firstName, lastName, dateOfBirth, gender, status];
 }

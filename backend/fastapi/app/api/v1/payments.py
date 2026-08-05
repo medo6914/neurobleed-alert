@@ -33,7 +33,9 @@ async def stripe_payment_intent(
     data: PaymentIntentRequest,
     current_user: User = Depends(get_current_user),
 ) -> dict[str, Any]:
-    result = await payment_service.stripe_create_payment_intent(data.amount_cents, data.currency)
+    result = await payment_service.stripe_create_payment_intent(
+        data.amount_cents, data.currency
+    )
     if result is None:
         return {"status": "unconfigured", "message": "STRIPE_SECRET_KEY not set"}
     return {"status": "ok", **result}
@@ -44,7 +46,9 @@ async def paymob_payment(
     data: PaymentIntentRequest,
     current_user: User = Depends(get_current_user),
 ) -> dict[str, Any]:
-    result = await payment_service.paymob_create_payment(data.amount_cents, data.currency)
+    result = await payment_service.paymob_create_payment(
+        data.amount_cents, data.currency
+    )
     if result is None:
         return {"status": "unconfigured", "message": "PAYMOB_API_KEY not set"}
     return {"status": "ok", **result}

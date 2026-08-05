@@ -14,7 +14,9 @@ from app.schemas.sensor_reading import SensorReadingCreate, SensorReadingRespons
 router = APIRouter(prefix="/readings", tags=["readings"])
 
 
-@router.post("/", response_model=SensorReadingResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/", response_model=SensorReadingResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_reading(
     data: SensorReadingCreate,
     db: AsyncSession = Depends(get_db),
@@ -25,28 +27,35 @@ async def create_reading(
     await db.commit()
     await db.refresh(reading)
 
-    await event_bus.publish("reading.created", {
-        "reading_id": reading.id,
-        "patient_id": reading.patient_id,
-        "device_id": reading.device_id,
-        "timestamp": reading.timestamp.isoformat() if reading.timestamp else None,
-    })
+    await event_bus.publish(
+        "reading.created",
+        {
+            "reading_id": reading.id,
+            "patient_id": reading.patient_id,
+            "device_id": reading.device_id,
+            "timestamp": reading.timestamp.isoformat() if reading.timestamp else None,
+        },
+    )
 
     from app.api.v1.device_ws import manager
 
-    await manager.broadcast_reading({
-        "type": "vitals_update",
-        "patient_id": str(reading.patient_id),
-        "device_id": str(reading.device_id) if reading.device_id else None,
-        "heart_rate": reading.heart_rate,
-        "spo2": reading.spo2,
-        "rso2": reading.rso2,
-        "signal_quality": reading.signal_quality,
-        "motion_artifact": reading.motion_artifact,
-        "risk_score": reading.risk_score,
-        "risk_level": reading.risk_level.value if hasattr(reading.risk_level, "value") else str(reading.risk_level),
-        "timestamp": reading.timestamp.isoformat() if reading.timestamp else None,
-    })
+    await manager.broadcast_reading(
+        {
+            "type": "vitals_update",
+            "patient_id": str(reading.patient_id),
+            "device_id": str(reading.device_id) if reading.device_id else None,
+            "heart_rate": reading.heart_rate,
+            "spo2": reading.spo2,
+            "rso2": reading.rso2,
+            "signal_quality": reading.signal_quality,
+            "motion_artifact": reading.motion_artifact,
+            "risk_score": reading.risk_score,
+            "risk_level": reading.risk_level.value
+            if hasattr(reading.risk_level, "value")
+            else str(reading.risk_level),
+            "timestamp": reading.timestamp.isoformat() if reading.timestamp else None,
+        }
+    )
 
     return reading
 

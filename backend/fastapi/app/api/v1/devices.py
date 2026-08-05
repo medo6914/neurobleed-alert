@@ -15,12 +15,21 @@ from app.models.device_diagnostic_log import DeviceDiagnosticLog
 from app.models.user import User
 from app.models.enums import DeviceType, DeviceStatus, DeviceEventType
 from app.schemas.device import (
-    DeviceCreate, DeviceUpdate, DeviceResponse, DeviceListResponse,
-    DeviceStatusUpdate, DeviceAssignRequest, DeviceDiagnosticResponse,
-    DeviceHeartbeatRequest, DeviceCertRequest, BulkDeviceOperation,
+    DeviceCreate,
+    DeviceUpdate,
+    DeviceResponse,
+    DeviceListResponse,
+    DeviceStatusUpdate,
+    DeviceAssignRequest,
+    DeviceDiagnosticResponse,
+    DeviceHeartbeatRequest,
+    DeviceCertRequest,
+    BulkDeviceOperation,
 )
 from app.schemas.diagnostic_log import (
-    DiagnosticLogCreate, DiagnosticLogResponse, DiagnosticLogListResponse,
+    DiagnosticLogCreate,
+    DiagnosticLogResponse,
+    DiagnosticLogListResponse,
 )
 from app.services.device_service import DeviceService
 
@@ -60,16 +69,25 @@ async def list_devices(
     current_user: User = Depends(require_permission(Permission.DEVICE_LIST)),
 ):
     devices, total = await service.list_devices(
-        page=page, per_page=per_page, sort_by=sort_by, sort_order=sort_order,
-        status=status, device_type=device_type,
-        hospital_id=hospital_id, patient_id=patient_id, search=search,
+        page=page,
+        per_page=per_page,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        status=status,
+        device_type=device_type,
+        hospital_id=hospital_id,
+        patient_id=patient_id,
+        search=search,
     )
     total_pages = max(1, (total + per_page - 1) // per_page)
     return DeviceListResponse(
         items=[DeviceResponse.model_validate(d) for d in devices],
-        total=total, page=page, per_page=per_page,
+        total=total,
+        page=page,
+        per_page=per_page,
         total_pages=total_pages,
-        has_next=page < total_pages, has_prev=page > 1,
+        has_next=page < total_pages,
+        has_prev=page > 1,
     )
 
 
@@ -143,7 +161,8 @@ async def unassign_device(
     current_user: User = Depends(require_permission(Permission.DEVICE_UPDATE)),
 ):
     return await service.assign_device(
-        device_id, DeviceAssignRequest(patient_id=None, hospital_id=None, department=None)
+        device_id,
+        DeviceAssignRequest(patient_id=None, hospital_id=None, department=None),
     )
 
 
@@ -159,13 +178,18 @@ async def device_diagnostics(
     return await service.get_diagnostics(device_id)
 
 
-@router.post("/{device_id}/diagnostics/log", response_model=DiagnosticLogResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/{device_id}/diagnostics/log",
+    response_model=DiagnosticLogResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 async def log_device_diagnostics(
     device_id: UUID,
     data: DiagnosticLogCreate,
     service: DeviceService = Depends(get_device_service),
 ):
     from datetime import datetime, timezone
+
     log_entry = DeviceDiagnosticLog(
         device_id=device_id,
         status=data.status,
@@ -200,9 +224,13 @@ async def list_device_diagnostics_log(
     service: DeviceService = Depends(get_device_service),
     current_user: User = Depends(require_permission(Permission.DEVICE_VIEW)),
 ):
-    query = select(DeviceDiagnosticLog).where(
-        DeviceDiagnosticLog.device_id == device_id,
-    ).order_by(DeviceDiagnosticLog.recorded_at.desc())
+    query = (
+        select(DeviceDiagnosticLog)
+        .where(
+            DeviceDiagnosticLog.device_id == device_id,
+        )
+        .order_by(DeviceDiagnosticLog.recorded_at.desc())
+    )
 
     count_query = select(func.count()).select_from(query.subquery())
     total_result = await service.db.execute(count_query)
@@ -215,9 +243,12 @@ async def list_device_diagnostics_log(
     total_pages = max(1, (total + per_page - 1) // per_page)
     return DiagnosticLogListResponse(
         items=[DiagnosticLogResponse.model_validate(l) for l in logs],
-        total=total, page=page, per_page=per_page,
+        total=total,
+        page=page,
+        per_page=per_page,
         total_pages=total_pages,
-        has_next=page < total_pages, has_prev=page > 1,
+        has_next=page < total_pages,
+        has_prev=page > 1,
     )
 
 

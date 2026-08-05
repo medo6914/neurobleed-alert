@@ -53,9 +53,7 @@ class DeviceValidator {
         message: 'Firmware version must be semantic (e.g. 1.0.0)',
         code: 'VALIDATION_ERROR',
         errors: {
-          'firmwareVersion': [
-            'Firmware version must be semantic (e.g. 1.0.0)'
-          ]
+          'firmwareVersion': ['Firmware version must be semantic (e.g. 1.0.0)']
         },
       ));
     }
@@ -97,9 +95,7 @@ class DeviceValidator {
         message: 'Signal strength must be between -100 and 0 dBm',
         code: 'VALIDATION_ERROR',
         errors: {
-          'signalStrength': [
-            'Signal strength must be between -100 and 0 dBm'
-          ]
+          'signalStrength': ['Signal strength must be between -100 and 0 dBm']
         },
       ));
     }

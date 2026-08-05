@@ -99,12 +99,16 @@ class PatientNote extends Equatable {
       authorId: json['authorId'] as String?,
       authorName: json['authorName'] as String?,
       authorRole: json['authorRole'] as String?,
-      tags: json['tags'] != null ? List<String>.from(json['tags'] as List) : const [],
+      tags: json['tags'] != null
+          ? List<String>.from(json['tags'] as List)
+          : const [],
       isConfidential: json['isConfidential'] as bool? ?? false,
       isSticky: json['isSticky'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
-      amendedAt: json['amendedAt'] != null ? DateTime.parse(json['amendedAt'] as String) : null,
+      amendedAt: json['amendedAt'] != null
+          ? DateTime.parse(json['amendedAt'] as String)
+          : null,
       amendedBy: json['amendedBy'] as String?,
     );
   }

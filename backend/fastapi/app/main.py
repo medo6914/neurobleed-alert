@@ -77,7 +77,9 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
 
 class CorrelationIDMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        correlation_id = request.headers.get("X-Correlation-ID") or generate_correlation_id()
+        correlation_id = (
+            request.headers.get("X-Correlation-ID") or generate_correlation_id()
+        )
         request.state.correlation_id = correlation_id
         response = await call_next(request)
         response.headers["X-Correlation-ID"] = correlation_id
@@ -101,7 +103,13 @@ app.include_router(v1_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.ENVIRONMENT == "development" else ["https://neurobleed.com", "https://*.neurobleed.com", "https://app.neurobleed.com"],
+    allow_origins=["*"]
+    if settings.ENVIRONMENT == "development"
+    else [
+        "https://neurobleed.com",
+        "https://*.neurobleed.com",
+        "https://app.neurobleed.com",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -126,13 +134,19 @@ async def health_check():
 @app.middleware("http")
 async def audit_logging_middleware(request: Request, call_next):
     response = await call_next(request)
-    if request.url.path.startswith("/api/v1/") and request.method not in ("GET", "HEAD", "OPTIONS"):
+    if request.url.path.startswith("/api/v1/") and request.method not in (
+        "GET",
+        "HEAD",
+        "OPTIONS",
+    ):
         await log_action(
             user_id=getattr(request.state, "user_id", None),
             action=request.method,
             resource=request.url.path,
             resource_id=request.path_params.get("id"),
-            details={"query_params": dict(request.query_params)} if request.query_params else None,
+            details={"query_params": dict(request.query_params)}
+            if request.query_params
+            else None,
             ip_address=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent"),
             correlation_id=getattr(request.state, "correlation_id", None),

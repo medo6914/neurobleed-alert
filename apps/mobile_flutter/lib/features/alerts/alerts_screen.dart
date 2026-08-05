@@ -279,7 +279,8 @@ class _AlertCard extends StatelessWidget {
                     onPressed: onAcknowledge,
                     style: OutlinedButton.styleFrom(
                       foregroundColor: _severityColor,
-                      side: BorderSide(color: _severityColor.withValues(alpha: 0.6)),
+                      side: BorderSide(
+                          color: _severityColor.withValues(alpha: 0.6)),
                       padding: const EdgeInsets.symmetric(
                         vertical: 10,
                       ),

@@ -35,7 +35,8 @@ class _PatientDetailContent extends ConsumerStatefulWidget {
   const _PatientDetailContent({required this.patient});
 
   @override
-  ConsumerState<_PatientDetailContent> createState() => _PatientDetailContentState();
+  ConsumerState<_PatientDetailContent> createState() =>
+      _PatientDetailContentState();
 }
 
 class _PatientDetailContentState extends ConsumerState<_PatientDetailContent>
@@ -248,7 +249,6 @@ class _ProfileTab extends StatelessWidget {
             ),
           ),
           SizedBox(height: NeuroSpacing.md),
-
           _SectionTitle(title: 'Personal Information'),
           SizedBox(height: NeuroSpacing.sm),
           AppCard(
@@ -256,56 +256,77 @@ class _ProfileTab extends StatelessWidget {
               children: [
                 _InfoRow(label: 'Date of Birth', value: patient.dateOfBirth),
                 _InfoRow(label: 'Gender', value: patient.gender.name),
-                _InfoRow(label: 'Nationality', value: patient.nationality ?? '-'),
-                _InfoRow(label: 'National ID', value: patient.nationalId ?? '-'),
-                _InfoRow(label: 'Marital Status', value: patient.maritalStatus.name),
+                _InfoRow(
+                    label: 'Nationality', value: patient.nationality ?? '-'),
+                _InfoRow(
+                    label: 'National ID', value: patient.nationalId ?? '-'),
+                _InfoRow(
+                    label: 'Marital Status', value: patient.maritalStatus.name),
                 _InfoRow(label: 'Blood Type', value: patient.bloodType.name),
-                _InfoRow(label: 'Weight', value: patient.weight != null ? '${patient.weight} kg' : '-'),
-                _InfoRow(label: 'Height', value: patient.height != null ? '${patient.height} cm' : '-'),
+                _InfoRow(
+                    label: 'Weight',
+                    value:
+                        patient.weight != null ? '${patient.weight} kg' : '-'),
+                _InfoRow(
+                    label: 'Height',
+                    value:
+                        patient.height != null ? '${patient.height} cm' : '-'),
               ],
             ),
           ),
           SizedBox(height: NeuroSpacing.md),
-
           _SectionTitle(title: 'Contact Information'),
           SizedBox(height: NeuroSpacing.sm),
           AppCard(
             child: Column(
               children: [
-                _InfoRow(label: 'Phone', value: patient.phone ?? '-', icon: Icons.phone),
-                _InfoRow(label: 'Email', value: patient.email ?? '-', icon: Icons.email),
-                _InfoRow(label: 'Address', value: patient.address ?? '-', icon: Icons.location_on),
+                _InfoRow(
+                    label: 'Phone',
+                    value: patient.phone ?? '-',
+                    icon: Icons.phone),
+                _InfoRow(
+                    label: 'Email',
+                    value: patient.email ?? '-',
+                    icon: Icons.email),
+                _InfoRow(
+                    label: 'Address',
+                    value: patient.address ?? '-',
+                    icon: Icons.location_on),
               ],
             ),
           ),
           SizedBox(height: NeuroSpacing.md),
-
           _SectionTitle(title: 'Insurance'),
           SizedBox(height: NeuroSpacing.sm),
           AppCard(
             child: Column(
               children: [
-                _InfoRow(label: 'Provider', value: patient.insuranceProvider ?? '-'),
-                _InfoRow(label: 'Insurance ID', value: patient.insuranceId ?? '-'),
+                _InfoRow(
+                    label: 'Provider', value: patient.insuranceProvider ?? '-'),
+                _InfoRow(
+                    label: 'Insurance ID', value: patient.insuranceId ?? '-'),
               ],
             ),
           ),
           SizedBox(height: NeuroSpacing.md),
-
           _SectionTitle(title: 'Assignment'),
           SizedBox(height: NeuroSpacing.sm),
           AppCard(
             child: Column(
               children: [
-                _InfoRow(label: 'Hospital', value: patient.hospitalName ?? patient.hospitalId ?? '-'),
-                _InfoRow(label: 'Department', value: patient.departmentName ?? patient.departmentId ?? '-'),
+                _InfoRow(
+                    label: 'Hospital',
+                    value: patient.hospitalName ?? patient.hospitalId ?? '-'),
+                _InfoRow(
+                    label: 'Department',
+                    value:
+                        patient.departmentName ?? patient.departmentId ?? '-'),
                 _InfoRow(label: 'Ward', value: patient.ward ?? '-'),
                 _InfoRow(label: 'Bed', value: patient.bedNumber ?? '-'),
               ],
             ),
           ),
           SizedBox(height: NeuroSpacing.md),
-
           _SectionTitle(title: 'Actions'),
           SizedBox(height: NeuroSpacing.sm),
           Row(
@@ -315,7 +336,8 @@ class _ProfileTab extends StatelessWidget {
                   label: 'Admit',
                   icon: Icons.local_hospital,
                   variant: ButtonVariant.primary,
-                  onPressed: () => context.push('/patients/${patient.id}/admit'),
+                  onPressed: () =>
+                      context.push('/patients/${patient.id}/admit'),
                 ),
               ),
               SizedBox(width: NeuroSpacing.sm),
@@ -324,7 +346,8 @@ class _ProfileTab extends StatelessWidget {
                   label: 'Add Note',
                   icon: Icons.note_add,
                   variant: ButtonVariant.secondary,
-                  onPressed: () => context.push('/patients/${patient.id}/notes/add'),
+                  onPressed: () =>
+                      context.push('/patients/${patient.id}/notes/add'),
                 ),
               ),
             ],
@@ -337,7 +360,8 @@ class _ProfileTab extends StatelessWidget {
                   label: 'Add Document',
                   icon: Icons.upload_file,
                   variant: ButtonVariant.secondary,
-                  onPressed: () => context.push('/patients/${patient.id}/documents/add'),
+                  onPressed: () =>
+                      context.push('/patients/${patient.id}/documents/add'),
                 ),
               ),
               SizedBox(width: NeuroSpacing.sm),
@@ -346,7 +370,8 @@ class _ProfileTab extends StatelessWidget {
                   label: 'Emergency Contact',
                   icon: Icons.emergency,
                   variant: ButtonVariant.danger,
-                  onPressed: () => context.push('/patients/${patient.id}/emergency-contacts'),
+                  onPressed: () => context
+                      .push('/patients/${patient.id}/emergency-contacts'),
                 ),
               ),
             ],
@@ -366,27 +391,44 @@ class _ProfileTab extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.transfer_within_a_station),
               title: const Text('Transfer Patient'),
-              onTap: () { Navigator.pop(context); context.push('/patients/${patient.id}/transfer'); },
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/patients/${patient.id}/transfer');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.history),
               title: const Text('View History'),
-              onTap: () { Navigator.pop(context); context.push('/patients/${patient.id}/history'); },
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/patients/${patient.id}/history');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.history),
               title: const Text('Audit Log'),
-              onTap: () { Navigator.pop(context); context.push('/patients/${patient.id}/audit'); },
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/patients/${patient.id}/audit');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.warning, color: NeuroColors.critical),
-              title: const Text('Emergency SOS', style: TextStyle(color: NeuroColors.critical)),
-              onTap: () { Navigator.pop(context); context.push('/patients/${patient.id}/sos'); },
+              title: const Text('Emergency SOS',
+                  style: TextStyle(color: NeuroColors.critical)),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/patients/${patient.id}/sos');
+              },
             ),
             ListTile(
               leading: Icon(Icons.archive, color: NeuroColors.high),
-              title: Text('Archive Patient', style: TextStyle(color: NeuroColors.high)),
-              onTap: () { Navigator.pop(context); _confirmArchive(context); },
+              title: Text('Archive Patient',
+                  style: TextStyle(color: NeuroColors.high)),
+              onTap: () {
+                Navigator.pop(context);
+                _confirmArchive(context);
+              },
             ),
           ],
         ),
@@ -437,7 +479,6 @@ class _MedicalTab extends StatelessWidget {
             ),
             SizedBox(height: NeuroSpacing.md),
           ],
-
           _SectionTitle(title: 'Diagnoses'),
           SizedBox(height: NeuroSpacing.sm),
           AppCard(
@@ -447,14 +488,16 @@ class _MedicalTab extends StatelessWidget {
                     child: Text('No data'),
                   )
                 : Column(
-                    children: patient.diagnoses.map((d) => ListTile(
-                      leading: Icon(Icons.check_circle_outline, color: NeuroColors.stable),
-                      title: Text(d),
-                    )).toList(),
+                    children: patient.diagnoses
+                        .map((d) => ListTile(
+                              leading: Icon(Icons.check_circle_outline,
+                                  color: NeuroColors.stable),
+                              title: Text(d),
+                            ))
+                        .toList(),
                   ),
           ),
           SizedBox(height: NeuroSpacing.md),
-
           _SectionTitle(title: 'Allergies'),
           SizedBox(height: NeuroSpacing.sm),
           AppCard(
@@ -462,19 +505,24 @@ class _MedicalTab extends StatelessWidget {
               spacing: NeuroSpacing.xs,
               runSpacing: NeuroSpacing.xs,
               children: patient.allergies.isEmpty
-                  ? [Padding(
-                      padding: EdgeInsets.all(NeuroSpacing.md),
-                      child: Text('No known allergies'),
-                    )]
-                  : patient.allergies.map((a) => Chip(
-                      label: Text(a),
-                      backgroundColor: NeuroColors.high.withValues(alpha: 0.1),
-                      avatar: const Icon(Icons.warning_amber, size: 16, color: NeuroColors.high),
-                    )).toList(),
+                  ? [
+                      Padding(
+                        padding: EdgeInsets.all(NeuroSpacing.md),
+                        child: Text('No known allergies'),
+                      )
+                    ]
+                  : patient.allergies
+                      .map((a) => Chip(
+                            label: Text(a),
+                            backgroundColor:
+                                NeuroColors.high.withValues(alpha: 0.1),
+                            avatar: const Icon(Icons.warning_amber,
+                                size: 16, color: NeuroColors.high),
+                          ))
+                      .toList(),
             ),
           ),
           SizedBox(height: NeuroSpacing.md),
-
           _SectionTitle(title: 'Medications'),
           SizedBox(height: NeuroSpacing.sm),
           AppCard(
@@ -484,14 +532,16 @@ class _MedicalTab extends StatelessWidget {
                     child: Text('No data'),
                   )
                 : Column(
-                    children: patient.medications.map((m) => ListTile(
-                      leading: Icon(Icons.medication, color: NeuroColors.primary),
-                      title: Text(m),
-                    )).toList(),
+                    children: patient.medications
+                        .map((m) => ListTile(
+                              leading: Icon(Icons.medication,
+                                  color: NeuroColors.primary),
+                              title: Text(m),
+                            ))
+                        .toList(),
                   ),
           ),
           SizedBox(height: NeuroSpacing.md),
-
           _SectionTitle(title: 'Comorbidities'),
           SizedBox(height: NeuroSpacing.sm),
           AppCard(
@@ -499,14 +549,19 @@ class _MedicalTab extends StatelessWidget {
               spacing: NeuroSpacing.xs,
               runSpacing: NeuroSpacing.xs,
               children: patient.comorbidities.isEmpty
-                  ? [Padding(
-                      padding: EdgeInsets.all(NeuroSpacing.md),
-                      child: Text('No data'),
-                    )]
-                  : patient.comorbidities.map((c) => Chip(
-                      label: Text(c),
-                      backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                    )).toList(),
+                  ? [
+                      Padding(
+                        padding: EdgeInsets.all(NeuroSpacing.md),
+                        child: Text('No data'),
+                      )
+                    ]
+                  : patient.comorbidities
+                      .map((c) => Chip(
+                            label: Text(c),
+                            backgroundColor:
+                                theme.colorScheme.surfaceContainerHighest,
+                          ))
+                      .toList(),
             ),
           ),
         ],
@@ -539,7 +594,8 @@ class _HistoryTab extends ConsumerWidget {
             icon: Icons.local_hospital,
             iconColor: NeuroColors.primary,
             title: 'Admission - ${admission.admissionType ?? "N/A"}',
-            subtitle: admission.admissionDate.toLocal().toString().substring(0, 16),
+            subtitle:
+                admission.admissionDate.toLocal().toString().substring(0, 16),
             trailing: admission.status.name,
           ));
         }
@@ -557,7 +613,9 @@ class _HistoryTab extends ConsumerWidget {
         for (final alert in data.alerts) {
           timeline.add(_TimelineTile(
             icon: Icons.warning,
-            iconColor: alert.level == 'critical' ? NeuroColors.critical : NeuroColors.warning,
+            iconColor: alert.level == 'critical'
+                ? NeuroColors.critical
+                : NeuroColors.warning,
             title: alert.title,
             subtitle: alert.createdAt.toLocal().toString().substring(0, 16),
             trailing: alert.status.name,
@@ -618,11 +676,14 @@ class _DocumentsTab extends ConsumerWidget {
               child: AppCard(
                 onTap: () {},
                 child: ListTile(
-                  leading: Icon(_documentIcon(doc.type), color: NeuroColors.primary),
+                  leading:
+                      Icon(_documentIcon(doc.type), color: NeuroColors.primary),
                   title: Text(doc.title),
-                  subtitle: Text('${doc.fileName}  ${_formatSize(doc.fileSize)}'),
+                  subtitle:
+                      Text('${doc.fileName}  ${_formatSize(doc.fileSize)}'),
                   trailing: Chip(
-                    label: Text(doc.status.name, style: const TextStyle(fontSize: 11)),
+                    label: Text(doc.status.name,
+                        style: const TextStyle(fontSize: 11)),
                     backgroundColor: doc.status == DocumentStatus.verified
                         ? NeuroColors.success.withValues(alpha: 0.1)
                         : NeuroColors.high.withValues(alpha: 0.1),
@@ -638,14 +699,22 @@ class _DocumentsTab extends ConsumerWidget {
 
   IconData _documentIcon(DocumentType type) {
     switch (type) {
-      case DocumentType.labReport: return Icons.science;
-      case DocumentType.imaging: return Icons.image;
-      case DocumentType.prescription: return Icons.medication;
-      case DocumentType.consentForm: return Icons.description;
-      case DocumentType.medicalReport: return Icons.article;
-      case DocumentType.dischargeSummary: return Icons.summarize;
-      case DocumentType.referral: return Icons.send;
-      case DocumentType.other: return Icons.insert_drive_file;
+      case DocumentType.labReport:
+        return Icons.science;
+      case DocumentType.imaging:
+        return Icons.image;
+      case DocumentType.prescription:
+        return Icons.medication;
+      case DocumentType.consentForm:
+        return Icons.description;
+      case DocumentType.medicalReport:
+        return Icons.article;
+      case DocumentType.dischargeSummary:
+        return Icons.summarize;
+      case DocumentType.referral:
+        return Icons.send;
+      case DocumentType.other:
+        return Icons.insert_drive_file;
     }
   }
 
@@ -696,18 +765,36 @@ class _VitalsTab extends ConsumerWidget {
                     children: [
                       Text(
                         v.timestamp.toLocal().toString().substring(0, 16),
-                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.labelMedium?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
                       ),
                       SizedBox(height: NeuroSpacing.sm),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _VitalChip(label: 'HR', value: v.heartRate?.toStringAsFixed(0) ?? '-', unit: 'bpm'),
-                          _VitalChip(label: 'SpO2', value: v.oxygenSaturation?.toStringAsFixed(0) ?? '-', unit: '%'),
-                          _VitalChip(label: 'BP', value: v.systolicBP != null ? '${v.systolicBP!.toInt()}/${v.diastolicBP!.toInt()}' : '-', unit: 'mmHg'),
-                          _VitalChip(label: 'Temp', value: v.temperature?.toStringAsFixed(1) ?? '-', unit: '\u00b0C'),
+                          _VitalChip(
+                              label: 'HR',
+                              value: v.heartRate?.toStringAsFixed(0) ?? '-',
+                              unit: 'bpm'),
+                          _VitalChip(
+                              label: 'SpO2',
+                              value:
+                                  v.oxygenSaturation?.toStringAsFixed(0) ?? '-',
+                              unit: '%'),
+                          _VitalChip(
+                              label: 'BP',
+                              value: v.systolicBP != null
+                                  ? '${v.systolicBP!.toInt()}/${v.diastolicBP!.toInt()}'
+                                  : '-',
+                              unit: 'mmHg'),
+                          _VitalChip(
+                              label: 'Temp',
+                              value: v.temperature?.toStringAsFixed(1) ?? '-',
+                              unit: '\u00b0C'),
                         ],
                       ),
                     ],
@@ -796,9 +883,9 @@ class _SectionTitle extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-        fontWeight: FontWeight.w600,
-        color: Theme.of(context).colorScheme.primary,
-      ),
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).colorScheme.primary,
+          ),
     );
   }
 }
@@ -823,9 +910,10 @@ class _InfoRow extends StatelessWidget {
           ],
           SizedBox(
             width: 120,
-            child: Text(label, style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            )),
+            child: Text(label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                )),
           ),
           Expanded(
             child: Text(value, style: theme.textTheme.bodyMedium),
@@ -873,8 +961,11 @@ class _TimelineTile extends StatelessWidget {
   final String trailing;
 
   const _TimelineTile({
-    required this.icon, required this.iconColor,
-    required this.title, required this.subtitle, required this.trailing,
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
   });
 
   @override
@@ -901,11 +992,14 @@ class _TimelineTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                    Text(title,
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(fontWeight: FontWeight.w600)),
                     SizedBox(height: 2),
-                    Text(subtitle, style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    )),
+                    Text(subtitle,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        )),
                   ],
                 ),
               ),
@@ -927,21 +1021,26 @@ class _VitalChip extends StatelessWidget {
   final String value;
   final String unit;
 
-  const _VitalChip({required this.label, required this.value, required this.unit});
+  const _VitalChip(
+      {required this.label, required this.value, required this.unit});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Column(
       children: [
-        Text(label, style: theme.textTheme.labelSmall?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-        )),
+        Text(label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            )),
         SizedBox(height: 2),
-        Text(value, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-        Text(unit, style: theme.textTheme.labelSmall?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-        )),
+        Text(value,
+            style: theme.textTheme.titleMedium
+                ?.copyWith(fontWeight: FontWeight.bold)),
+        Text(unit,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            )),
       ],
     );
   }

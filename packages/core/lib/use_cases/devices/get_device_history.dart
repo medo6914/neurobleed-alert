@@ -16,7 +16,9 @@ class GetDeviceHistory {
       return Left(ValidationFailure(
         message: 'Device ID is required',
         code: 'VALIDATION_ERROR',
-        errors: {'deviceId': ['Device ID is required']},
+        errors: {
+          'deviceId': ['Device ID is required']
+        },
       ));
     }
     return _repository.getHistory(deviceId, page: page, limit: limit);

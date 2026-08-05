@@ -34,7 +34,8 @@ class RegisterDeviceNotifier extends StateNotifier<DeviceFormState> {
 
   RegisterDeviceNotifier(this._repository) : super(const DeviceFormState());
 
-  Future<Either<Failure, Device>> submitRegister(DeviceCreateRequest request) async {
+  Future<Either<Failure, Device>> submitRegister(
+      DeviceCreateRequest request) async {
     state = state.copyWith(isSubmitting: true, clearError: true);
 
     final result = await _repository.registerDevice(request);
@@ -56,7 +57,8 @@ class RegisterDeviceNotifier extends StateNotifier<DeviceFormState> {
   }
 }
 
-final registerDeviceProvider = StateNotifierProvider<RegisterDeviceNotifier, DeviceFormState>((ref) {
+final registerDeviceProvider =
+    StateNotifierProvider<RegisterDeviceNotifier, DeviceFormState>((ref) {
   final repository = ref.watch(deviceRepositoryProvider);
   return RegisterDeviceNotifier(repository);
 });
@@ -66,7 +68,8 @@ class UpdateDeviceNotifier extends StateNotifier<DeviceFormState> {
 
   UpdateDeviceNotifier(this._repository) : super(const DeviceFormState());
 
-  Future<Either<Failure, Device>> submitUpdate(String id, DeviceUpdateRequest request) async {
+  Future<Either<Failure, Device>> submitUpdate(
+      String id, DeviceUpdateRequest request) async {
     state = state.copyWith(isSubmitting: true, clearError: true);
 
     final result = await _repository.updateDevice(id, request);
@@ -88,7 +91,8 @@ class UpdateDeviceNotifier extends StateNotifier<DeviceFormState> {
   }
 }
 
-final updateDeviceProvider = StateNotifierProvider<UpdateDeviceNotifier, DeviceFormState>((ref) {
+final updateDeviceProvider =
+    StateNotifierProvider<UpdateDeviceNotifier, DeviceFormState>((ref) {
   final repository = ref.watch(deviceRepositoryProvider);
   return UpdateDeviceNotifier(repository);
 });

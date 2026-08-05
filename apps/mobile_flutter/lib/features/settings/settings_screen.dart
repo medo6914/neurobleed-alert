@@ -66,7 +66,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: NeuroColors.textPrimary),
+            icon: const Icon(Icons.arrow_back_ios,
+                color: NeuroColors.textPrimary),
             onPressed: () => context.pop(),
           ),
           Expanded(
@@ -88,7 +89,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,7 +132,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +163,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,7 +200,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,7 +231,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

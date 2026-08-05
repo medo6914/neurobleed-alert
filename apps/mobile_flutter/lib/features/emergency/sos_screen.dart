@@ -127,7 +127,9 @@ class _SosScreenState extends ConsumerState<SosScreen>
             _buildHeader(context),
             Expanded(
               child: Center(
-                child: _isEmergencyActive ? _buildEmergencyActive() : _buildEmergencyButton(),
+                child: _isEmergencyActive
+                    ? _buildEmergencyActive()
+                    : _buildEmergencyButton(),
               ),
             ),
             Padding(
@@ -159,7 +161,8 @@ class _SosScreenState extends ConsumerState<SosScreen>
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: NeuroColors.textPrimary),
+            icon: const Icon(Icons.arrow_back_ios,
+                color: NeuroColors.textPrimary),
             onPressed: () => context.pop(),
           ),
           Expanded(
@@ -269,7 +272,8 @@ class _SosScreenState extends ConsumerState<SosScreen>
               ),
               Text(
                 'ثانية',
-                style: NeuroTypography.caption?.copyWith(color: NeuroColors.textPrimary),
+                style: NeuroTypography.caption
+                    ?.copyWith(color: NeuroColors.textPrimary),
               ),
             ],
           ),
@@ -299,25 +303,25 @@ class _SosScreenState extends ConsumerState<SosScreen>
     final (IconData icon, String label, Color color, bool retry) =
         switch (_locationStatus) {
       _LocationStatus.checking => (
-        Icons.location_searching,
-        'جاري تحديد موقعك...',
-        NeuroColors.high,
-        false,
-      ),
+          Icons.location_searching,
+          'جاري تحديد موقعك...',
+          NeuroColors.high,
+          false,
+        ),
       _LocationStatus.denied => (
-        Icons.location_off,
-        'الموقع غير مفعّل — اضغط للتفعيل',
-        NeuroColors.critical,
-        true,
-      ),
+          Icons.location_off,
+          'الموقع غير مفعّل — اضغط للتفعيل',
+          NeuroColors.critical,
+          true,
+        ),
       _LocationStatus.locked => (
-        Icons.my_location,
-        _locationAccuracy > 0
-            ? 'تم تحديد موقعك — الدقة ±${_locationAccuracy.round()} متر'
-            : 'تم تحديد موقعك',
-        NeuroColors.success,
-        false,
-      ),
+          Icons.my_location,
+          _locationAccuracy > 0
+              ? 'تم تحديد موقعك — الدقة ±${_locationAccuracy.round()} متر'
+              : 'تم تحديد موقعك',
+          NeuroColors.success,
+          false,
+        ),
     };
 
     return GestureDetector(
@@ -391,7 +395,8 @@ class _SosScreenState extends ConsumerState<SosScreen>
     );
   }
 
-  Widget _buildActionCard(IconData icon, String label, Color color, VoidCallback onTap) {
+  Widget _buildActionCard(
+      IconData icon, String label, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

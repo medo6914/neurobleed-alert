@@ -111,12 +111,14 @@ class DeviceListNotifier extends StateNotifier<DeviceListState> {
   }
 }
 
-final deviceListProvider = StateNotifierProvider<DeviceListNotifier, DeviceListState>((ref) {
+final deviceListProvider =
+    StateNotifierProvider<DeviceListNotifier, DeviceListState>((ref) {
   final repository = ref.watch(deviceRepositoryProvider);
   return DeviceListNotifier(repository);
 });
 
-final deviceDetailProvider = FutureProvider.family<Device, String>((ref, id) async {
+final deviceDetailProvider =
+    FutureProvider.family<Device, String>((ref, id) async {
   final repository = ref.watch(deviceRepositoryProvider);
   final result = await repository.getDevice(id);
   return result.fold(
@@ -125,7 +127,8 @@ final deviceDetailProvider = FutureProvider.family<Device, String>((ref, id) asy
   );
 });
 
-final deviceDiagnosticsProvider = FutureProvider.family<DeviceDiagnostics, String>((ref, id) async {
+final deviceDiagnosticsProvider =
+    FutureProvider.family<DeviceDiagnostics, String>((ref, id) async {
   final repository = ref.watch(deviceRepositoryProvider);
   final result = await repository.getDiagnostics(id);
   return result.fold(
@@ -134,7 +137,8 @@ final deviceDiagnosticsProvider = FutureProvider.family<DeviceDiagnostics, Strin
   );
 });
 
-final deviceHistoryProvider = FutureProvider.family<List<dynamic>, String>((ref, id) async {
+final deviceHistoryProvider =
+    FutureProvider.family<List<dynamic>, String>((ref, id) async {
   final repository = ref.watch(deviceRepositoryProvider);
   final result = await repository.getHistory(id);
   return result.fold(

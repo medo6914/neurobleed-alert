@@ -14,12 +14,12 @@ class ProvisioningKeyCreateRequest {
   });
 
   Map<String, dynamic> toJson() => {
-    'device_type': deviceType,
-    if (label != null) 'label': label,
-    if (hospitalId != null) 'hospital_id': hospitalId,
-    if (expiresAt != null) 'expires_at': expiresAt,
-    'max_uses': maxUses,
-  };
+        'device_type': deviceType,
+        if (label != null) 'label': label,
+        if (hospitalId != null) 'hospital_id': hospitalId,
+        if (expiresAt != null) 'expires_at': expiresAt,
+        'max_uses': maxUses,
+      };
 }
 
 class ProvisioningKey {
@@ -47,18 +47,19 @@ class ProvisioningKey {
     required this.createdAt,
   });
 
-  factory ProvisioningKey.fromJson(Map<String, dynamic> json) => ProvisioningKey(
-    id: json['id'] as String,
-    key: json['key'] as String,
-    deviceType: json['device_type'] as String,
-    label: json['label'] as String?,
-    status: json['status'] as String,
-    expiresAt: json['expires_at'] as String?,
-    usedAt: json['used_at'] as String?,
-    maxUses: (json['max_uses'] as num).toInt(),
-    useCount: (json['use_count'] as num).toInt(),
-    createdAt: json['created_at'] as String,
-  );
+  factory ProvisioningKey.fromJson(Map<String, dynamic> json) =>
+      ProvisioningKey(
+        id: json['id'] as String,
+        key: json['key'] as String,
+        deviceType: json['device_type'] as String,
+        label: json['label'] as String?,
+        status: json['status'] as String,
+        expiresAt: json['expires_at'] as String?,
+        usedAt: json['used_at'] as String?,
+        maxUses: (json['max_uses'] as num).toInt(),
+        useCount: (json['use_count'] as num).toInt(),
+        createdAt: json['created_at'] as String,
+      );
 }
 
 class ProvisioningClaimRequest {
@@ -81,14 +82,14 @@ class ProvisioningClaimRequest {
   });
 
   Map<String, dynamic> toJson() => {
-    'provisioning_key': provisioningKey,
-    'serial_number': serialNumber,
-    if (deviceName != null) 'device_name': deviceName,
-    if (deviceType != null) 'device_type': deviceType,
-    if (macAddress != null) 'mac_address': macAddress,
-    if (firmwareVersion != null) 'firmware_version': firmwareVersion,
-    if (hardwareVersion != null) 'hardware_version': hardwareVersion,
-  };
+        'provisioning_key': provisioningKey,
+        'serial_number': serialNumber,
+        if (deviceName != null) 'device_name': deviceName,
+        if (deviceType != null) 'device_type': deviceType,
+        if (macAddress != null) 'mac_address': macAddress,
+        if (firmwareVersion != null) 'firmware_version': firmwareVersion,
+        if (hardwareVersion != null) 'hardware_version': hardwareVersion,
+      };
 }
 
 class ProvisioningClaimResponse {
@@ -106,11 +107,12 @@ class ProvisioningClaimResponse {
     this.device,
   });
 
-  factory ProvisioningClaimResponse.fromJson(Map<String, dynamic> json) => ProvisioningClaimResponse(
-    success: json['success'] as bool,
-    deviceId: json['device_id'] as String?,
-    serialNumber: json['serial_number'] as String?,
-    message: json['message'] as String,
-    device: json['device'] as Map<String, dynamic>?,
-  );
+  factory ProvisioningClaimResponse.fromJson(Map<String, dynamic> json) =>
+      ProvisioningClaimResponse(
+        success: json['success'] as bool,
+        deviceId: json['device_id'] as String?,
+        serialNumber: json['serial_number'] as String?,
+        message: json['message'] as String,
+        device: json['device'] as Map<String, dynamic>?,
+      );
 }

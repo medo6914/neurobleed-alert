@@ -20,7 +20,8 @@ final recentAlertsProvider = FutureProvider<List<dynamic>>((ref) async {
 
 final dashboardDevicesProvider = FutureProvider<List<dynamic>>((ref) async {
   final api = ref.read(apiClientProvider);
-  final response = await api.get('/v1/devices/', queryParameters: {'per_page': 50});
+  final response =
+      await api.get('/v1/devices/', queryParameters: {'per_page': 50});
   final data = response.data;
   if (data is Map && data['items'] is List) return data['items'] as List;
   if (data is List) return data;
@@ -39,12 +40,10 @@ class DashboardScreen extends ConsumerWidget {
 
     final patientCount = patientsAsync.value?.length ?? 0;
     final alertCount = alertsAsync.value?.length ?? 0;
-    final stableCount = patientsAsync.value
-            ?.where((p) {
-              final level = (p['risk_level'] as String?)?.toLowerCase();
-              return level == null || level == 'low' || level == 'stable';
-            })
-            .length ??
+    final stableCount = patientsAsync.value?.where((p) {
+          final level = (p['risk_level'] as String?)?.toLowerCase();
+          return level == null || level == 'low' || level == 'stable';
+        }).length ??
         0;
 
     return Scaffold(
@@ -189,11 +188,11 @@ class DashboardScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          _buildStatItem(context, 'مرضى', '$patientCount',
-              NeuroColors.textPrimary),
+          _buildStatItem(
+              context, 'مرضى', '$patientCount', NeuroColors.textPrimary),
           _buildStatDivider(context),
-          _buildStatItem(context, 'إنذارات', '$alertCount',
-              NeuroColors.critical),
+          _buildStatItem(
+              context, 'إنذارات', '$alertCount', NeuroColors.critical),
           _buildStatDivider(context),
           _buildStatItem(context, 'مستقر', '$stableCount', NeuroColors.low),
         ],
@@ -289,7 +288,8 @@ class DashboardScreen extends ConsumerWidget {
           colors: [NeuroColors.cardGradTop, NeuroColors.cardGradBottom],
         ),
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
         boxShadow: const [NeuroShadows.card],
       ),
       child: Column(
@@ -430,7 +430,8 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   // ─── Section Header ───────────────────────────────────────────────
-  Widget _buildSectionHeader(BuildContext context, String title, VoidCallback onSeeAll) {
+  Widget _buildSectionHeader(
+      BuildContext context, String title, VoidCallback onSeeAll) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -692,8 +693,8 @@ class _PatientCard extends StatelessWidget {
     final name = patient['full_name'] ?? 'مريض';
     final mrn = patient['mrn'] ?? '—';
     final isActive = patient['is_active'] != false;
-    final riskScore = ((patient['risk_score'] as num?)?.toDouble() ?? 0)
-        .clamp(0.0, 1.0);
+    final riskScore =
+        ((patient['risk_score'] as num?)?.toDouble() ?? 0).clamp(0.0, 1.0);
 
     return Container(
       padding: const EdgeInsets.all(NeuroSpacing.lg),

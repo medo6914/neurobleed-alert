@@ -26,15 +26,21 @@ void main() {
           .thenAnswer((_) async => mockResponse);
 
       when(() => mockResponse.data).thenReturn({
-        'total_patients': 100, 'active_patients': 75,
-        'total_devices': 50, 'online_devices': 40,
-        'total_alerts': 25, 'critical_alerts': 3,
-        'total_hospitals': 5, 'total_users': 20,
-        'reports_generated': 15, 'bed_occupancy_rate': 0.78,
+        'total_patients': 100,
+        'active_patients': 75,
+        'total_devices': 50,
+        'online_devices': 40,
+        'total_alerts': 25,
+        'critical_alerts': 3,
+        'total_hospitals': 5,
+        'total_users': 20,
+        'reports_generated': 15,
+        'bed_occupancy_rate': 0.78,
       });
 
       final response = await mockApi.getOverview();
-      final dto = AnalyticsOverview.fromJson(response.data as Map<String, dynamic>);
+      final dto =
+          AnalyticsOverview.fromJson(response.data as Map<String, dynamic>);
 
       expect(dto.totalPatients, 100);
       expect(dto.activePatients, 75);
@@ -42,52 +48,80 @@ void main() {
     });
 
     test('getPatientAnalytics returns parsed response', () async {
-      when(() => mockApi.getPatientAnalytics(hospitalId: any(named: 'hospitalId')))
+      when(() =>
+              mockApi.getPatientAnalytics(hospitalId: any(named: 'hospitalId')))
           .thenAnswer((_) async => mockResponse);
 
       when(() => mockResponse.data).thenReturn({
-        'total': 100, 'active': 75, 'admitted_today': 5, 'discharged_today': 3,
-        'male': 55, 'female': 45, 'average_age': 52.5, 'average_length_of_stay_days': 4.2,
-        'admissions_by_month': [], 'discharges_by_month': [], 'by_department': [],
+        'total': 100,
+        'active': 75,
+        'admitted_today': 5,
+        'discharged_today': 3,
+        'male': 55,
+        'female': 45,
+        'average_age': 52.5,
+        'average_length_of_stay_days': 4.2,
+        'admissions_by_month': [],
+        'discharges_by_month': [],
+        'by_department': [],
       });
 
       final response = await mockApi.getPatientAnalytics();
-      final dto = PatientAnalytics.fromJson(response.data as Map<String, dynamic>);
+      final dto =
+          PatientAnalytics.fromJson(response.data as Map<String, dynamic>);
 
       expect(dto.total, 100);
       expect(dto.averageAge, 52.5);
     });
 
     test('getDeviceAnalytics returns parsed response', () async {
-      when(() => mockApi.getDeviceAnalytics(hospitalId: any(named: 'hospitalId')))
+      when(() =>
+              mockApi.getDeviceAnalytics(hospitalId: any(named: 'hospitalId')))
           .thenAnswer((_) async => mockResponse);
 
       when(() => mockResponse.data).thenReturn({
-        'total': 50, 'online': 40, 'offline': 5, 'error': 2,
-        'maintenance': 1, 'sleeping': 1, 'updating': 1,
-        'average_battery': 72.5, 'low_battery_count': 3,
-        'by_type': [], 'by_status': [],
+        'total': 50,
+        'online': 40,
+        'offline': 5,
+        'error': 2,
+        'maintenance': 1,
+        'sleeping': 1,
+        'updating': 1,
+        'average_battery': 72.5,
+        'low_battery_count': 3,
+        'by_type': [],
+        'by_status': [],
       });
 
       final response = await mockApi.getDeviceAnalytics();
-      final dto = DeviceAnalytics.fromJson(response.data as Map<String, dynamic>);
+      final dto =
+          DeviceAnalytics.fromJson(response.data as Map<String, dynamic>);
 
       expect(dto.total, 50);
       expect(dto.averageBattery, 72.5);
     });
 
     test('getAlertAnalytics returns parsed response', () async {
-      when(() => mockApi.getAlertAnalytics(hospitalId: any(named: 'hospitalId')))
+      when(() =>
+              mockApi.getAlertAnalytics(hospitalId: any(named: 'hospitalId')))
           .thenAnswer((_) async => mockResponse);
 
       when(() => mockResponse.data).thenReturn({
-        'total': 25, 'critical': 3, 'high': 7, 'medium': 10, 'low': 5,
-        'unacknowledged': 4, 'average_response_time_minutes': 8.5,
-        'by_type': [], 'by_severity': [], 'by_day': [],
+        'total': 25,
+        'critical': 3,
+        'high': 7,
+        'medium': 10,
+        'low': 5,
+        'unacknowledged': 4,
+        'average_response_time_minutes': 8.5,
+        'by_type': [],
+        'by_severity': [],
+        'by_day': [],
       });
 
       final response = await mockApi.getAlertAnalytics();
-      final dto = AlertAnalytics.fromJson(response.data as Map<String, dynamic>);
+      final dto =
+          AlertAnalytics.fromJson(response.data as Map<String, dynamic>);
 
       expect(dto.critical, 3);
       expect(dto.averageResponseTimeMinutes, 8.5);
@@ -98,12 +132,15 @@ void main() {
           .thenAnswer((_) async => mockResponse);
 
       when(() => mockResponse.data).thenReturn({
-        'total_hospitals': 5, 'total_beds': 500, 'occupied_beds': 390,
+        'total_hospitals': 5,
+        'total_beds': 500,
+        'occupied_beds': 390,
         'hospitals': [],
       });
 
       final response = await mockApi.getHospitalOverview();
-      final dto = HospitalOverview.fromJson(response.data as Map<String, dynamic>);
+      final dto =
+          HospitalOverview.fromJson(response.data as Map<String, dynamic>);
 
       expect(dto.totalHospitals, 5);
       expect(dto.totalBeds, 500);
@@ -114,10 +151,15 @@ void main() {
           .thenAnswer((_) async => mockResponse);
 
       when(() => mockResponse.data).thenReturn({
-        'total_requests_24h': 15000, 'active_web_sockets': 25,
-        'avg_response_time_ms': 245.0, 'error_rate_24h': 0.02,
-        'database_connections': 10, 'cache_hit_rate': 0.85,
-        'uptime_hours': 720.0, 'recent_errors': [], 'service_status': [],
+        'total_requests_24h': 15000,
+        'active_web_sockets': 25,
+        'avg_response_time_ms': 245.0,
+        'error_rate_24h': 0.02,
+        'database_connections': 10,
+        'cache_hit_rate': 0.85,
+        'uptime_hours': 720.0,
+        'recent_errors': [],
+        'service_status': [],
       });
 
       final response = await mockApi.getSystemHealth();
@@ -133,10 +175,14 @@ void main() {
 
       when(() => mockResponse.data).thenReturn([
         {
-          'id': 'feed-1', 'event_type': 'alert_created',
-          'description': 'Critical alert', 'entity_type': 'alert',
-          'entity_id': 'alert-123', 'user_name': 'Dr. Smith',
-          'timestamp': '2026-07-24T10:30:00Z', 'metadata': null,
+          'id': 'feed-1',
+          'event_type': 'alert_created',
+          'description': 'Critical alert',
+          'entity_type': 'alert',
+          'entity_id': 'alert-123',
+          'user_name': 'Dr. Smith',
+          'timestamp': '2026-07-24T10:30:00Z',
+          'metadata': null,
         },
       ]);
 
@@ -159,5 +205,4 @@ void main() {
       expect((response.data as List).length, 0);
     });
   });
-
 }

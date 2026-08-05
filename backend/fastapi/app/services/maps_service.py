@@ -117,7 +117,14 @@ class MapsService:
                         "type": el.get("type"),
                         "tags": {
                             k: tags.get(k)
-                            for k in ("amenity", "emergency", "healthcare", "operator", "phone", "opening_hours")
+                            for k in (
+                                "amenity",
+                                "emergency",
+                                "healthcare",
+                                "operator",
+                                "phone",
+                                "opening_hours",
+                            )
                             if tags.get(k)
                         },
                     }
@@ -129,7 +136,9 @@ class MapsService:
             logger.warning("Overpass hospital search failed: %s", e)
             return []
 
-    async def route(self, from_lat: float, from_lng: float, to_lat: float, to_lng: float) -> dict[str, Any] | None:
+    async def route(
+        self, from_lat: float, from_lng: float, to_lat: float, to_lng: float
+    ) -> dict[str, Any] | None:
         """Driving route with polyline + distance + duration (OSRM)."""
         try:
             resp = await self.client.get(
@@ -150,20 +159,30 @@ class MapsService:
             logger.warning("OSRM routing failed: %s", e)
             return None
 
-    async def distance_matrix(self, origins: list[tuple[float, float]], destinations: list[tuple[float, float]]) -> dict[str, Any] | None:
+    async def distance_matrix(
+        self,
+        origins: list[tuple[float, float]],
+        destinations: list[tuple[float, float]],
+    ) -> dict[str, Any] | None:
         """Driving distance/duration matrix (OSRM table)."""
         coords = ";".join(f"{lng},{lat}" for lat, lng in origins + destinations)
         n_src, n_dst = len(origins), len(destinations)
         try:
             resp = await self.client.get(
                 f"{self.osrm}/table/v1/driving/{coords}",
-                params={"sources": ";".join(map(str, range(n_src))), "destinations": ";".join(map(str, range(n_src, n_src + n_dst)))},
+                params={
+                    "sources": ";".join(map(str, range(n_src))),
+                    "destinations": ";".join(map(str, range(n_src, n_src + n_dst))),
+                },
             )
             resp.raise_for_status()
             data = resp.json()
             if data.get("code") != "Ok":
                 return None
-            return {"distances": data.get("distances"), "durations": data.get("durations")}
+            return {
+                "distances": data.get("distances"),
+                "durations": data.get("durations"),
+            }
         except Exception as e:
             logger.warning("OSRM table failed: %s", e)
             return None

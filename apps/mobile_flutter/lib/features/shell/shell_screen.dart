@@ -77,9 +77,9 @@ class _ShellScreenState extends ConsumerState<ShellScreen> {
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.home_outlined),
                     activeIcon: const Icon(Icons.home),
-                    label:
-                        AppLocalizations.of(context).translate(L10n.dashboard) ??
-                            'Home',
+                    label: AppLocalizations.of(context)
+                            .translate(L10n.dashboard) ??
+                        'Home',
                   ),
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.people_outlined),
@@ -91,9 +91,9 @@ class _ShellScreenState extends ConsumerState<ShellScreen> {
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.monitor_heart_outlined),
                     activeIcon: const Icon(Icons.monitor_heart),
-                    label:
-                        AppLocalizations.of(context).translate(L10n.monitoring) ??
-                            'Monitoring',
+                    label: AppLocalizations.of(context)
+                            .translate(L10n.monitoring) ??
+                        'Monitoring',
                   ),
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.notifications_outlined),

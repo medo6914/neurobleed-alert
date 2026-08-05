@@ -10,7 +10,8 @@ void main() {
     });
 
     test('NetworkFailure has correct message', () {
-      const failure = NetworkFailure(message: 'No internet', code: 'NO_INTERNET');
+      const failure =
+          NetworkFailure(message: 'No internet', code: 'NO_INTERNET');
       expect(failure.message, 'No internet');
       expect(failure.code, 'NO_INTERNET');
     });
@@ -23,7 +24,9 @@ void main() {
     test('ValidationFailure has errors', () {
       const failure = ValidationFailure(
         message: 'Validation failed',
-        errors: {'email': ['Invalid']},
+        errors: {
+          'email': ['Invalid']
+        },
       );
       expect(failure.errors, isNotNull);
     });
@@ -99,8 +102,11 @@ void main() {
       final queue = SyncQueue();
       expect(await queue.getPendingCount(), 0);
       await queue.add(SyncQueueEntry(
-        id: '1', entityType: 'test', operation: 'create',
-        data: {}, createdAt: DateTime.now(),
+        id: '1',
+        entityType: 'test',
+        operation: 'create',
+        data: {},
+        createdAt: DateTime.now(),
       ));
       expect(await queue.getPendingCount(), 1);
     });
@@ -108,8 +114,11 @@ void main() {
     test('remove entry', () async {
       final queue = SyncQueue();
       await queue.add(SyncQueueEntry(
-        id: '1', entityType: 'test', operation: 'create',
-        data: {}, createdAt: DateTime.now(),
+        id: '1',
+        entityType: 'test',
+        operation: 'create',
+        data: {},
+        createdAt: DateTime.now(),
       ));
       await queue.remove('1');
       expect(await queue.getPendingCount(), 0);

@@ -10,7 +10,8 @@ final adminStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
   return response.data is Map ? response.data as Map<String, dynamic> : {};
 });
 
-final adminHospitalsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+final adminHospitalsProvider =
+    FutureProvider<Map<String, dynamic>>((ref) async {
   final api = ref.read(apiClientProvider);
   final response = await api.get('/v1/analytics/hospitals');
   return response.data is Map ? response.data as Map<String, dynamic> : {};
@@ -22,7 +23,8 @@ final adminAlertsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
   return response.data is Map ? response.data as Map<String, dynamic> : {};
 });
 
-final adminSystemHealthProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+final adminSystemHealthProvider =
+    FutureProvider<Map<String, dynamic>>((ref) async {
   final api = ref.read(apiClientProvider);
   final response = await api.get('/v1/analytics/system-health');
   return response.data is Map ? response.data as Map<String, dynamic> : {};
@@ -30,7 +32,8 @@ final adminSystemHealthProvider = FutureProvider<Map<String, dynamic>>((ref) asy
 
 final adminActivityProvider = FutureProvider<List<dynamic>>((ref) async {
   final api = ref.read(apiClientProvider);
-  final response = await api.get('/v1/analytics/activity-feed', queryParameters: {'limit': 50});
+  final response = await api
+      .get('/v1/analytics/activity-feed', queryParameters: {'limit': 50});
   final data = response.data;
   if (data is List) return data;
   return [];
@@ -38,7 +41,8 @@ final adminActivityProvider = FutureProvider<List<dynamic>>((ref) async {
 
 final adminDevicesProvider = FutureProvider<List<dynamic>>((ref) async {
   final api = ref.read(apiClientProvider);
-  final response = await api.get('/v1/devices/', queryParameters: {'per_page': 50});
+  final response =
+      await api.get('/v1/devices/', queryParameters: {'per_page': 50});
   final data = response.data;
   if (data is Map && data['items'] is List) return data['items'] as List;
   if (data is List) return data;
@@ -128,7 +132,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: NeuroColors.textPrimary),
+            icon: const Icon(Icons.arrow_back_ios,
+                color: NeuroColors.textPrimary),
             onPressed: () => context.pop(),
           ),
           Expanded(
@@ -159,7 +164,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
   Widget _buildTabBar() {
     return Container(
       height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: NeuroSpacing.sm, vertical: NeuroSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+          horizontal: NeuroSpacing.sm, vertical: NeuroSpacing.sm),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _tabs.length,
@@ -174,7 +180,9 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                 color: isSelected ? NeuroColors.primary : Colors.transparent,
                 borderRadius: BorderRadius.circular(NeuroRadius.chip),
                 border: Border.all(
-                  color: isSelected ? NeuroColors.primary : NeuroColors.navInactive,
+                  color: isSelected
+                      ? NeuroColors.primary
+                      : NeuroColors.navInactive,
                 ),
               ),
               child: Row(
@@ -182,13 +190,17 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                   Icon(
                     _tabs[index].$2,
                     size: 16,
-                    color: isSelected ? NeuroColors.textPrimary : NeuroColors.textSecondary,
+                    color: isSelected
+                        ? NeuroColors.textPrimary
+                        : NeuroColors.textSecondary,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     _tabs[index].$1,
                     style: NeuroTypography.caption?.copyWith(
-                      color: isSelected ? NeuroColors.textPrimary : NeuroColors.textSecondary,
+                      color: isSelected
+                          ? NeuroColors.textPrimary
+                          : NeuroColors.textSecondary,
                     ),
                   ),
                 ],
@@ -296,7 +308,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgInput,
         borderRadius: BorderRadius.circular(NeuroRadius.input),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: const TextField(
         decoration: InputDecoration(
@@ -309,7 +322,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     );
   }
 
-  Widget _buildStatCard(IconData icon, String label, String value, Color color) {
+  Widget _buildStatCard(
+      IconData icon, String label, String value, Color color) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(NeuroSpacing.md),
@@ -324,7 +338,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             const SizedBox(height: NeuroSpacing.sm),
             Text(
               value,
-              style: NeuroTypography.display?.copyWith(fontSize: 24, color: color),
+              style:
+                  NeuroTypography.display?.copyWith(fontSize: 24, color: color),
             ),
             const SizedBox(height: NeuroSpacing.xs),
             Text(
@@ -375,7 +390,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
@@ -441,11 +457,14 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             children: [
               Row(
                 children: [
-                  _buildStatCard(Icons.business, 'المستشفيات', '$total', NeuroColors.primary),
+                  _buildStatCard(Icons.business, 'المستشفيات', '$total',
+                      NeuroColors.primary),
                   const SizedBox(width: NeuroSpacing.md),
-                  _buildStatCard(Icons.hotel, 'الأسرة', '$beds', NeuroColors.info),
+                  _buildStatCard(
+                      Icons.hotel, 'الأسرة', '$beds', NeuroColors.info),
                   const SizedBox(width: NeuroSpacing.md),
-                  _buildStatCard(Icons.meeting_room, 'مشغول', '$occupied', NeuroColors.medium),
+                  _buildStatCard(Icons.meeting_room, 'مشغول', '$occupied',
+                      NeuroColors.medium),
                 ],
               ),
               const SizedBox(height: NeuroSpacing.lg),
@@ -477,7 +496,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,7 +521,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                   ),
                   child: Text(
                     '$alerts تنبيه',
-                    style: NeuroTypography.badge?.copyWith(color: NeuroColors.critical),
+                    style: NeuroTypography.badge
+                        ?.copyWith(color: NeuroColors.critical),
                   ),
                 ),
             ],
@@ -513,7 +534,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
               const SizedBox(width: NeuroSpacing.lg),
               _buildMiniMetric(Icons.devices_other, 'الأجهزة', '$devices'),
               const SizedBox(width: NeuroSpacing.lg),
-              _buildMiniMetric(Icons.meeting_room, 'الإشغال', '${(occupancy * 100).toStringAsFixed(0)}%'),
+              _buildMiniMetric(Icons.meeting_room, 'الإشغال',
+                  '${(occupancy * 100).toStringAsFixed(0)}%'),
             ],
           ),
         ],
@@ -548,11 +570,14 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             children: [
               Row(
                 children: [
-                  _buildStatCard(Icons.notifications, 'إجمالي', '${data['total'] ?? '-'}', NeuroColors.primary),
+                  _buildStatCard(Icons.notifications, 'إجمالي',
+                      '${data['total'] ?? '-'}', NeuroColors.primary),
                   const SizedBox(width: NeuroSpacing.md),
-                  _buildStatCard(Icons.error, 'حرج', '${data['critical'] ?? '-'}', NeuroColors.critical),
+                  _buildStatCard(Icons.error, 'حرج',
+                      '${data['critical'] ?? '-'}', NeuroColors.critical),
                   const SizedBox(width: NeuroSpacing.md),
-                  _buildStatCard(Icons.pending, 'غير معالجة', '${data['unacknowledged'] ?? '-'}', NeuroColors.high),
+                  _buildStatCard(Icons.pending, 'غير معالجة',
+                      '${data['unacknowledged'] ?? '-'}', NeuroColors.high),
                 ],
               ),
               const SizedBox(height: NeuroSpacing.lg),
@@ -614,14 +639,17 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
           Icon(icon, color: color, size: 28),
           const SizedBox(width: NeuroSpacing.lg),
           Expanded(child: Text(label, style: NeuroTypography.h3)),
-          Text(value, style: NeuroTypography.display?.copyWith(fontSize: 24, color: color)),
+          Text(value,
+              style: NeuroTypography.display
+                  ?.copyWith(fontSize: 24, color: color)),
         ],
       ),
     );
@@ -645,25 +673,37 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
               children: [
                 Row(
                   children: [
-                    _buildStatCard(Icons.people, 'مستخدمون', '${stats['total_users'] ?? '-'}', NeuroColors.primary),
+                    _buildStatCard(Icons.people, 'مستخدمون',
+                        '${stats['total_users'] ?? '-'}', NeuroColors.primary),
                     const SizedBox(width: NeuroSpacing.md),
-                    _buildStatCard(Icons.person, 'مرضى', '${stats['total_patients'] ?? '-'}', NeuroColors.info),
+                    _buildStatCard(Icons.person, 'مرضى',
+                        '${stats['total_patients'] ?? '-'}', NeuroColors.info),
                   ],
                 ),
                 const SizedBox(height: NeuroSpacing.md),
                 Row(
                   children: [
-                    _buildStatCard(Icons.devices_other, 'أجهزة', '${stats['total_devices'] ?? '-'}', NeuroColors.low),
+                    _buildStatCard(Icons.devices_other, 'أجهزة',
+                        '${stats['total_devices'] ?? '-'}', NeuroColors.low),
                     const SizedBox(width: NeuroSpacing.md),
-                    _buildStatCard(Icons.notifications, 'إنذارات', '${stats['total_alerts'] ?? '-'}', NeuroColors.medium),
+                    _buildStatCard(Icons.notifications, 'إنذارات',
+                        '${stats['total_alerts'] ?? '-'}', NeuroColors.medium),
                   ],
                 ),
                 const SizedBox(height: NeuroSpacing.md),
                 Row(
                   children: [
-                    _buildStatCard(Icons.description, 'تقارير', '${stats['reports_generated'] ?? '-'}', NeuroColors.high),
+                    _buildStatCard(
+                        Icons.description,
+                        'تقارير',
+                        '${stats['reports_generated'] ?? '-'}',
+                        NeuroColors.high),
                     const SizedBox(width: NeuroSpacing.md),
-                    _buildStatCard(Icons.meeting_room, 'إشغال', '${_percent(stats['bed_occupancy_rate'])}%', NeuroColors.criticalBright),
+                    _buildStatCard(
+                        Icons.meeting_room,
+                        'إشغال',
+                        '${_percent(stats['bed_occupancy_rate'])}%',
+                        NeuroColors.criticalBright),
                   ],
                 ),
               ],
@@ -671,14 +711,22 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
           ),
           const SizedBox(height: NeuroSpacing.lg),
           patientsAsync.when(
-            loading: () => const SizedBox(height: 100, child: Center(child: AppLoading())),
+            loading: () =>
+                const SizedBox(height: 100, child: Center(child: AppLoading())),
             error: (err, _) => _buildErrorCard(err),
             data: (p) => Column(
               children: [
-                _buildAnalyticsCard('إجمالي المرضى', '${p['total'] ?? '-'}', Icons.person, NeuroColors.primary),
-                _buildAnalyticsCard('مرضى نشطون', '${p['active'] ?? '-'}', Icons.person_outline, NeuroColors.low),
-                _buildAnalyticsCard('مقبولون اليوم', '${p['admitted_today'] ?? '-'}', Icons.arrow_downward, NeuroColors.info),
-                _buildAnalyticsCard('متوسط العمر', _dec(p['average_age']), Icons.cake_outlined, NeuroColors.medium),
+                _buildAnalyticsCard('إجمالي المرضى', '${p['total'] ?? '-'}',
+                    Icons.person, NeuroColors.primary),
+                _buildAnalyticsCard('مرضى نشطون', '${p['active'] ?? '-'}',
+                    Icons.person_outline, NeuroColors.low),
+                _buildAnalyticsCard(
+                    'مقبولون اليوم',
+                    '${p['admitted_today'] ?? '-'}',
+                    Icons.arrow_downward,
+                    NeuroColors.info),
+                _buildAnalyticsCard('متوسط العمر', _dec(p['average_age']),
+                    Icons.cake_outlined, NeuroColors.medium),
               ],
             ),
           ),
@@ -697,21 +745,25 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     return n == null ? '-' : n.toStringAsFixed(1);
   }
 
-  Widget _buildAnalyticsCard(String title, String value, IconData icon, Color color) {
+  Widget _buildAnalyticsCard(
+      String title, String value, IconData icon, Color color) {
     return Container(
       margin: const EdgeInsets.only(bottom: NeuroSpacing.md),
       padding: const EdgeInsets.all(NeuroSpacing.lg),
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
           Icon(icon, color: color, size: 32),
           const SizedBox(width: NeuroSpacing.lg),
           Expanded(child: Text(title, style: NeuroTypography.h3)),
-          Text(value, style: NeuroTypography.display?.copyWith(fontSize: 24, color: color)),
+          Text(value,
+              style: NeuroTypography.display
+                  ?.copyWith(fontSize: 24, color: color)),
         ],
       ),
     );
@@ -735,9 +787,11 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             children: [
               Row(
                 children: [
-                  _buildStatCard(Icons.devices_other, 'إجمالي', '${devices.length}', NeuroColors.primary),
+                  _buildStatCard(Icons.devices_other, 'إجمالي',
+                      '${devices.length}', NeuroColors.primary),
                   const SizedBox(width: NeuroSpacing.md),
-                  _buildStatCard(Icons.wifi, 'متصل', '$online', NeuroColors.low),
+                  _buildStatCard(
+                      Icons.wifi, 'متصل', '$online', NeuroColors.low),
                 ],
               ),
               const SizedBox(height: NeuroSpacing.lg),
@@ -750,9 +804,12 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
               else
                 ...devices.map((d) {
                   final name = d['device_name'] ?? d['serial_number'] ?? 'جهاز';
-                  final status = (d['status'] as String? ?? 'offline').toLowerCase();
+                  final status =
+                      (d['status'] as String? ?? 'offline').toLowerCase();
                   final battery = (d['battery_level'] as num?)?.toDouble();
-                  final isOnline = status == 'online' || status == 'active' || status == 'connected';
+                  final isOnline = status == 'online' ||
+                      status == 'active' ||
+                      status == 'connected';
                   return _buildDeviceCard(
                     name: '$name',
                     serial: d['serial_number'] as String? ?? '',
@@ -779,7 +836,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
@@ -787,7 +845,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: (online ? NeuroColors.low : NeuroColors.critical).withValues(alpha: 0.15),
+              color: (online ? NeuroColors.low : NeuroColors.critical)
+                  .withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(NeuroRadius.md),
             ),
             child: Icon(
@@ -803,7 +862,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
               children: [
                 Text(name, style: NeuroTypography.h3),
                 if (serial.isNotEmpty)
-                  Text('SN: $serial', style: NeuroTypography.caption?.copyWith(fontSize: 10)),
+                  Text('SN: $serial',
+                      style: NeuroTypography.caption?.copyWith(fontSize: 10)),
               ],
             ),
           ),
@@ -821,7 +881,9 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                 Text(
                   '${battery.toStringAsFixed(0)}%',
                   style: NeuroTypography.caption?.copyWith(
-                    color: battery < 20 ? NeuroColors.critical : NeuroColors.textSecondary,
+                    color: battery < 20
+                        ? NeuroColors.critical
+                        : NeuroColors.textSecondary,
                   ),
                 ),
               ],
@@ -871,7 +933,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.md),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -897,11 +960,13 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                 ),
                 if (user.isNotEmpty) ...[
                   const SizedBox(height: 2),
-                  Text(user, style: NeuroTypography.caption?.copyWith(fontSize: 10)),
+                  Text(user,
+                      style: NeuroTypography.caption?.copyWith(fontSize: 10)),
                 ],
                 if (time.isNotEmpty) ...[
                   const SizedBox(height: 2),
-                  Text(_formatTime(time), style: NeuroTypography.caption?.copyWith(fontSize: 10)),
+                  Text(_formatTime(time),
+                      style: NeuroTypography.caption?.copyWith(fontSize: 10)),
                 ],
               ],
             ),
@@ -953,7 +1018,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
       child: Column(
         children: [
           aiAsync.when(
-            loading: () => const SizedBox(height: 120, child: Center(child: AppLoading())),
+            loading: () =>
+                const SizedBox(height: 120, child: Center(child: AppLoading())),
             error: (err, _) => _buildErrorCard(err),
             data: (health) => Column(
               children: [
@@ -964,19 +1030,27 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [NeuroColors.cardGradTop, NeuroColors.cardGradBottom],
+                      colors: [
+                        NeuroColors.cardGradTop,
+                        NeuroColors.cardGradBottom
+                      ],
                     ),
                     borderRadius: BorderRadius.circular(NeuroRadius.card),
                     boxShadow: const [NeuroShadows.card],
                   ),
                   child: Column(
                     children: [
-                      const Icon(Icons.psychology, size: 56, color: NeuroColors.primaryLight),
+                      const Icon(Icons.psychology,
+                          size: 56, color: NeuroColors.primaryLight),
                       const SizedBox(height: NeuroSpacing.md),
                       Text(
-                        health['status'] == 'ok' ? 'الخدمة تعمل' : 'خدمة غير متاحة',
+                        health['status'] == 'ok'
+                            ? 'الخدمة تعمل'
+                            : 'خدمة غير متاحة',
                         style: NeuroTypography.h2?.copyWith(
-                          color: health['status'] == 'ok' ? NeuroColors.low : NeuroColors.critical,
+                          color: health['status'] == 'ok'
+                              ? NeuroColors.low
+                              : NeuroColors.critical,
                         ),
                       ),
                       const SizedBox(height: NeuroSpacing.sm),
@@ -987,11 +1061,14 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                       const SizedBox(height: NeuroSpacing.md),
                       Row(
                         children: [
-                          _buildAiStatusChip('النموذج', health['model_trained'] == true),
+                          _buildAiStatusChip(
+                              'النموذج', health['model_trained'] == true),
                           const SizedBox(width: NeuroSpacing.sm),
-                          _buildAiStatusChip('القواعد', health['rules_loaded'] == true),
+                          _buildAiStatusChip(
+                              'القواعد', health['rules_loaded'] == true),
                           const SizedBox(width: NeuroSpacing.sm),
-                          _buildAiStatusChip('RAG', health['rag_loaded'] == true),
+                          _buildAiStatusChip(
+                              'RAG', health['rag_loaded'] == true),
                         ],
                       ),
                     ],
@@ -1004,14 +1081,19 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             ),
           ),
           activityAsync.when(
-            loading: () => const SizedBox(height: 80, child: Center(child: AppLoading())),
+            loading: () =>
+                const SizedBox(height: 80, child: Center(child: AppLoading())),
             error: (err, _) => _buildErrorCard(err),
             data: (items) {
               final aiItems = items.where((i) {
                 final t = (i['event_type'] as String? ?? '').toLowerCase();
-                return t.contains('ai') || t.contains('risk') || t.contains('report');
+                return t.contains('ai') ||
+                    t.contains('risk') ||
+                    t.contains('report');
               }).toList();
-              final display = aiItems.isEmpty ? items.take(10).toList() : aiItems.take(10).toList();
+              final display = aiItems.isEmpty
+                  ? items.take(10).toList()
+                  : aiItems.take(10).toList();
               if (display.isEmpty) {
                 return const AppEmptyState(
                   icon: Icons.psychology_outlined,
@@ -1034,10 +1116,12 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: NeuroSpacing.sm),
         decoration: BoxDecoration(
-          color: (ok ? NeuroColors.low : NeuroColors.critical).withValues(alpha: 0.12),
+          color: (ok ? NeuroColors.low : NeuroColors.critical)
+              .withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(NeuroRadius.md),
           border: Border.all(
-            color: (ok ? NeuroColors.low : NeuroColors.critical).withValues(alpha: 0.3),
+            color: (ok ? NeuroColors.low : NeuroColors.critical)
+                .withValues(alpha: 0.3),
           ),
         ),
         child: Column(
@@ -1075,17 +1159,33 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             children: [
               Row(
                 children: [
-                  _buildStatCard(Icons.speed, 'متوسط الاستجابة', '${data['avg_response_time_ms'] ?? '-'}ms', NeuroColors.info),
+                  _buildStatCard(
+                      Icons.speed,
+                      'متوسط الاستجابة',
+                      '${data['avg_response_time_ms'] ?? '-'}ms',
+                      NeuroColors.info),
                   const SizedBox(width: NeuroSpacing.md),
-                  _buildStatCard(Icons.error_outline, 'معدل الخطأ', '${_percent(data['error_rate_24h'])}%', NeuroColors.critical),
+                  _buildStatCard(
+                      Icons.error_outline,
+                      'معدل الخطأ',
+                      '${_percent(data['error_rate_24h'])}%',
+                      NeuroColors.critical),
                 ],
               ),
               const SizedBox(height: NeuroSpacing.md),
               Row(
                 children: [
-                  _buildStatCard(Icons.timer, 'وقت التشغيل', '${(data['uptime_hours'] as num?)?.toStringAsFixed(0) ?? '-'}h', NeuroColors.low),
+                  _buildStatCard(
+                      Icons.timer,
+                      'وقت التشغيل',
+                      '${(data['uptime_hours'] as num?)?.toStringAsFixed(0) ?? '-'}h',
+                      NeuroColors.low),
                   const SizedBox(width: NeuroSpacing.md),
-                  _buildStatCard(Icons.cloud_done, 'الطلبات (24h)', '${data['total_requests_24h'] ?? '-'}', NeuroColors.medium),
+                  _buildStatCard(
+                      Icons.cloud_done,
+                      'الطلبات (24h)',
+                      '${data['total_requests_24h'] ?? '-'}',
+                      NeuroColors.medium),
                 ],
               ),
               const SizedBox(height: NeuroSpacing.lg),
@@ -1094,9 +1194,12 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                 const SizedBox(height: NeuroSpacing.md),
                 ...services.map((s) {
                   final name = s['service'] ?? s['name'] ?? 'خدمة';
-                  final status = (s['status'] as String? ?? 'unknown').toLowerCase();
-                  final ok = status == 'ok' || status == 'healthy' || status == 'up';
-                  return _buildSystemRow('$name', ok ? 'يعمل' : status, ok ? NeuroColors.low : NeuroColors.critical);
+                  final status =
+                      (s['status'] as String? ?? 'unknown').toLowerCase();
+                  final ok =
+                      status == 'ok' || status == 'healthy' || status == 'up';
+                  return _buildSystemRow('$name', ok ? 'يعمل' : status,
+                      ok ? NeuroColors.low : NeuroColors.critical);
                 }),
                 const SizedBox(height: NeuroSpacing.lg),
               ],
@@ -1111,7 +1214,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                     decoration: BoxDecoration(
                       color: NeuroColors.critical.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(NeuroRadius.md),
-                      border: Border.all(color: NeuroColors.critical.withValues(alpha: 0.2)),
+                      border: Border.all(
+                          color: NeuroColors.critical.withValues(alpha: 0.2)),
                     ),
                     child: Text('$msg', style: NeuroTypography.caption),
                   );
@@ -1131,7 +1235,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
@@ -1145,7 +1250,8 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
           ),
           const SizedBox(width: NeuroSpacing.md),
           Expanded(child: Text(title, style: NeuroTypography.h3)),
-          Text(value, style: NeuroTypography.bodyMedium?.copyWith(color: color)),
+          Text(value,
+              style: NeuroTypography.bodyMedium?.copyWith(color: color)),
         ],
       ),
     );

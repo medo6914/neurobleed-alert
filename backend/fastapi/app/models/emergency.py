@@ -43,13 +43,17 @@ class EmergencyEvent(TimestampMixin, SoftDeleteMixin, Base):
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
     status: Mapped[EmergencyEventStatus] = mapped_column(
-        SAEnum(EmergencyEventStatus), nullable=False, default=EmergencyEventStatus.TRIGGERED
+        SAEnum(EmergencyEventStatus),
+        nullable=False,
+        default=EmergencyEventStatus.TRIGGERED,
     )
     sos_type: Mapped[str] = mapped_column(String(50), default="manual")
     location_lat: Mapped[float | None] = mapped_column(Float, nullable=True)
     location_lng: Mapped[float | None] = mapped_column(Float, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    resolved_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     resolved_by: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )

@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/core.dart';
 
-final pushNotificationServiceProvider = Provider<PushNotificationService>((ref) {
+final pushNotificationServiceProvider =
+    Provider<PushNotificationService>((ref) {
   final api = ref.read(apiClientProvider);
   return PushNotificationService(api);
 });
@@ -44,7 +45,8 @@ class PushNotificationService {
     try {
       await _api.post('/v1/notifications/register-token', data: {
         'fcm_token': token,
-        'platform': defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
+        'platform':
+            defaultTargetPlatform == TargetPlatform.iOS ? 'ios' : 'android',
       });
       debugPrint('[FCM] token registered');
     } catch (e) {

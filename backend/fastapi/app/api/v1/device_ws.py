@@ -108,39 +108,52 @@ async def device_telemetry(websocket: WebSocket, device_id: str):
         while True:
             data = await websocket.receive_text()
             msg = json.loads(data)
-            await manager.broadcast_reading({
-                "type": "device_telemetry",
-                "device_id": device_id,
-                "data": msg,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-            })
+            await manager.broadcast_reading(
+                {
+                    "type": "device_telemetry",
+                    "device_id": device_id,
+                    "data": msg,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }
+            )
     except WebSocketDisconnect:
         pass
     except Exception as e:
-        logger.error("Telemetry WS error", extra={"device_id": device_id, "error": str(e)})
+        logger.error(
+            "Telemetry WS error", extra={"device_id": device_id, "error": str(e)}
+        )
 
 
 @router.websocket("/ws/devices/monitor")
 async def device_monitor(websocket: WebSocket):
     token = websocket.query_params.get("token")
     if not token:
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason="Missing token")
+        await websocket.close(
+            code=status.WS_1008_POLICY_VIOLATION, reason="Missing token"
+        )
         return
 
     user = await _verify_ws_token(token)
     if user is None:
-        await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason="Invalid token")
+        await websocket.close(
+            code=status.WS_1008_POLICY_VIOLATION, reason="Invalid token"
+        )
         return
 
     user_id = str(user.id)
     await manager.connect(user_id, websocket)
 
     try:
-        await manager._send_to_user(user_id, {
-            "type": "connected",
-            "user_id": user_id,
-            "role": user.role.value if hasattr(user.role, "value") else str(user.role),
-        })
+        await manager._send_to_user(
+            user_id,
+            {
+                "type": "connected",
+                "user_id": user_id,
+                "role": user.role.value
+                if hasattr(user.role, "value")
+                else str(user.role),
+            },
+        )
 
         while True:
             data = await websocket.receive_text()
@@ -151,19 +164,25 @@ async def device_monitor(websocket: WebSocket):
                 patient_id = msg.get("patient_id")
                 if patient_id:
                     manager.subscribe(user_id, patient_id)
-                    await manager._send_to_user(user_id, {
-                        "type": "subscribed",
-                        "patient_id": patient_id,
-                    })
+                    await manager._send_to_user(
+                        user_id,
+                        {
+                            "type": "subscribed",
+                            "patient_id": patient_id,
+                        },
+                    )
 
             elif action == "unsubscribe":
                 patient_id = msg.get("patient_id")
                 if patient_id:
                     manager.unsubscribe(user_id, patient_id)
-                    await manager._send_to_user(user_id, {
-                        "type": "unsubscribed",
-                        "patient_id": patient_id,
-                    })
+                    await manager._send_to_user(
+                        user_id,
+                        {
+                            "type": "unsubscribed",
+                            "patient_id": patient_id,
+                        },
+                    )
 
             elif action == "ping":
                 await manager._send_to_user(user_id, {"type": "pong"})

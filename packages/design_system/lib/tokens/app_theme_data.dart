@@ -77,7 +77,8 @@ class NeuroThemeData {
         unselectedItemColor: navInactive,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
-        selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+        selectedLabelStyle:
+            const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
         unselectedLabelStyle: const TextStyle(fontSize: 11),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -170,12 +171,15 @@ class NeuroThemeData {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(NeuroRadius.xxl),
         ),
-        titleTextStyle: textTheme.headlineSmall?.copyWith(color: NeuroColors.textPrimary),
-        contentTextStyle: textTheme.bodyMedium?.copyWith(color: NeuroColors.textBody),
+        titleTextStyle:
+            textTheme.headlineSmall?.copyWith(color: NeuroColors.textPrimary),
+        contentTextStyle:
+            textTheme.bodyMedium?.copyWith(color: NeuroColors.textBody),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: NeuroColors.bgElevated,
-        contentTextStyle: textTheme.bodyMedium?.copyWith(color: NeuroColors.textPrimary),
+        contentTextStyle:
+            textTheme.bodyMedium?.copyWith(color: NeuroColors.textPrimary),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(NeuroRadius.md),
@@ -183,7 +187,8 @@ class NeuroThemeData {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: NeuroColors.bgCard,
-        labelStyle: textTheme.labelMedium?.copyWith(color: NeuroColors.textBody),
+        labelStyle:
+            textTheme.labelMedium?.copyWith(color: NeuroColors.textBody),
         padding: const EdgeInsets.symmetric(
           horizontal: NeuroSpacing.md,
           vertical: NeuroSpacing.xs,
@@ -208,7 +213,8 @@ class NeuroThemeData {
           color: NeuroColors.bgElevated,
           borderRadius: BorderRadius.circular(NeuroRadius.sm),
         ),
-        textStyle: textTheme.bodySmall?.copyWith(color: NeuroColors.textPrimary),
+        textStyle:
+            textTheme.bodySmall?.copyWith(color: NeuroColors.textPrimary),
         padding: const EdgeInsets.symmetric(
           horizontal: NeuroSpacing.sm,
           vertical: NeuroSpacing.xs,

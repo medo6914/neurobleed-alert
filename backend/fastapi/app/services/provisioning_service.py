@@ -20,7 +20,9 @@ class ProvisioningService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def generate_key(self, data: ProvisioningKeyCreate, created_by_id: UUID | None = None) -> DeviceProvisioningKey:
+    async def generate_key(
+        self, data: ProvisioningKeyCreate, created_by_id: UUID | None = None
+    ) -> DeviceProvisioningKey:
         key = secrets.token_hex(16)
 
         provisioning_key = DeviceProvisioningKey(
@@ -40,7 +42,10 @@ class ProvisioningService:
 
         logger.info(
             "Provisioning key generated",
-            extra={"key_id": str(provisioning_key.id), "device_type": data.device_type.value},
+            extra={
+                "key_id": str(provisioning_key.id),
+                "device_type": data.device_type.value,
+            },
         )
         return provisioning_key
 
@@ -63,7 +68,9 @@ class ProvisioningService:
         status: ProvisioningKeyStatus | None = None,
         device_type=None,
     ) -> tuple[list[DeviceProvisioningKey], int]:
-        query = select(DeviceProvisioningKey).where(DeviceProvisioningKey.is_deleted == False)
+        query = select(DeviceProvisioningKey).where(
+            DeviceProvisioningKey.is_deleted == False
+        )
 
         if status:
             query = query.where(DeviceProvisioningKey.status == status)
@@ -168,5 +175,3 @@ class ProvisioningService:
                 "status": device.status.value,
             },
         }
-
-

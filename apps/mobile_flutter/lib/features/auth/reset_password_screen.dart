@@ -103,7 +103,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     keyboardType: TextInputType.emailAddress,
                     prefixIcon: const Icon(Icons.email_outlined),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'البريد الإلكتروني مطلوب';
+                      if (v == null || v.isEmpty)
+                        return 'البريد الإلكتروني مطلوب';
                       return null;
                     },
                   ),
@@ -137,7 +138,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return 'كلمة المرور مطلوبة';
-                      if (v.length < 8) return 'كلمة المرور يجب أن تكون 8 أحرف على الأقل';
+                      if (v.length < 8)
+                        return 'كلمة المرور يجب أن تكون 8 أحرف على الأقل';
                       return null;
                     },
                   ),

@@ -65,7 +65,8 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: NeuroColors.textPrimary),
+            icon: const Icon(Icons.arrow_back_ios,
+                color: NeuroColors.textPrimary),
             onPressed: () => context.pop(),
           ),
           Expanded(
@@ -90,7 +91,8 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.chip),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -130,7 +132,8 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
               children: [
                 Text(
                   'احتمالية النزيف',
-                  style: NeuroTypography.h3?.copyWith(color: NeuroColors.textSecondary),
+                  style: NeuroTypography.h3
+                      ?.copyWith(color: NeuroColors.textSecondary),
                 ),
                 const SizedBox(height: NeuroSpacing.sm),
                 Text(
@@ -152,13 +155,15 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
                   ),
                   child: Text(
                     'الحد الطبيعي أقل من 25%',
-                    style: NeuroTypography.caption?.copyWith(color: NeuroColors.low),
+                    style: NeuroTypography.caption
+                        ?.copyWith(color: NeuroColors.low),
                   ),
                 ),
                 const SizedBox(height: NeuroSpacing.xs),
                 Text(
                   'الحالة: منخفضة',
-                  style: NeuroTypography.h3?.copyWith(color: NeuroColors.textPrimary),
+                  style: NeuroTypography.h3
+                      ?.copyWith(color: NeuroColors.textPrimary),
                 ),
               ],
             ),
@@ -181,7 +186,8 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
               value: value,
               strokeWidth: 10,
               backgroundColor: NeuroColors.bgInput,
-              valueColor: const AlwaysStoppedAnimation<Color>(NeuroColors.critical),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(NeuroColors.critical),
             ),
           ),
           Center(
@@ -206,7 +212,8 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,7 +263,8 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,7 +298,8 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
               ),
             ),
             child: isCompleted
-                ? const Icon(Icons.check, color: NeuroColors.textPrimary, size: 16)
+                ? const Icon(Icons.check,
+                    color: NeuroColors.textPrimary, size: 16)
                 : null,
           ),
           const SizedBox(width: NeuroSpacing.md),
@@ -308,7 +317,8 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
       decoration: BoxDecoration(
         color: NeuroColors.bgCard,
         borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

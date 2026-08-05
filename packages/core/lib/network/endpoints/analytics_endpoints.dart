@@ -13,25 +13,29 @@ class AnalyticsApi {
   Future<Response> getOverview({String? hospitalId}) {
     final params = <String, dynamic>{};
     if (hospitalId != null) params['hospital_id'] = hospitalId;
-    return _client.get('${AnalyticsEndpoints.base}/overview', queryParameters: params);
+    return _client.get('${AnalyticsEndpoints.base}/overview',
+        queryParameters: params);
   }
 
   Future<Response> getPatientAnalytics({String? hospitalId}) {
     final params = <String, dynamic>{};
     if (hospitalId != null) params['hospital_id'] = hospitalId;
-    return _client.get('${AnalyticsEndpoints.base}/patients', queryParameters: params);
+    return _client.get('${AnalyticsEndpoints.base}/patients',
+        queryParameters: params);
   }
 
   Future<Response> getDeviceAnalytics({String? hospitalId}) {
     final params = <String, dynamic>{};
     if (hospitalId != null) params['hospital_id'] = hospitalId;
-    return _client.get('${AnalyticsEndpoints.base}/devices', queryParameters: params);
+    return _client.get('${AnalyticsEndpoints.base}/devices',
+        queryParameters: params);
   }
 
   Future<Response> getAlertAnalytics({String? hospitalId}) {
     final params = <String, dynamic>{};
     if (hospitalId != null) params['hospital_id'] = hospitalId;
-    return _client.get('${AnalyticsEndpoints.base}/alerts', queryParameters: params);
+    return _client.get('${AnalyticsEndpoints.base}/alerts',
+        queryParameters: params);
   }
 
   Future<Response> getHospitalOverview() =>
@@ -41,5 +45,6 @@ class AnalyticsApi {
       _client.get('${AnalyticsEndpoints.base}/system-health');
 
   Future<Response> getActivityFeed({int limit = 50}) =>
-      _client.get('${AnalyticsEndpoints.base}/activity-feed', queryParameters: {'limit': limit});
+      _client.get('${AnalyticsEndpoints.base}/activity-feed',
+          queryParameters: {'limit': limit});
 }

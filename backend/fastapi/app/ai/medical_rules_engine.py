@@ -19,7 +19,9 @@ class MedicalRulesEngine:
             return []
         with open(path) as f:
             data = yaml.safe_load(f)
-        return sorted(data.get("rules", []), key=lambda r: r.get("priority", 0), reverse=True)
+        return sorted(
+            data.get("rules", []), key=lambda r: r.get("priority", 0), reverse=True
+        )
 
     def evaluate(self, vitals: dict) -> list[MedicalRuleResult]:
         results = []
@@ -27,13 +29,15 @@ class MedicalRulesEngine:
             condition = rule["condition"]
             triggered = self._evaluate_condition(condition, vitals)
             if triggered:
-                results.append(MedicalRuleResult(
-                    rule_name=rule["name"],
-                    triggered=True,
-                    priority=rule.get("priority", 500),
-                    action=rule.get("action"),
-                    severity=rule.get("severity", "info"),
-                ))
+                results.append(
+                    MedicalRuleResult(
+                        rule_name=rule["name"],
+                        triggered=True,
+                        priority=rule.get("priority", 500),
+                        action=rule.get("action"),
+                        severity=rule.get("severity", "info"),
+                    )
+                )
         return results
 
     def _evaluate_condition(self, condition: str, vitals: dict) -> bool:
@@ -54,7 +58,10 @@ class MedicalRulesEngine:
 
         if " BETWEEN " in condition:
             import re
-            m = re.match(r"(\w+)\s+BETWEEN\s+(\d+(?:\.\d+)?)\s+AND\s+(\d+(?:\.\d+)?)", condition)
+
+            m = re.match(
+                r"(\w+)\s+BETWEEN\s+(\d+(?:\.\d+)?)\s+AND\s+(\d+(?:\.\d+)?)", condition
+            )
             if m:
                 key, lo, hi = m.group(1), float(m.group(2)), float(m.group(3))
                 val = vitals.get(key)
@@ -106,7 +113,9 @@ class MedicalRulesEngine:
                 )
         return None
 
-    def override_risk_if_needed(self, vitals: dict, risk_score: float, risk_level: str) -> tuple[float, str, list[str]]:
+    def override_risk_if_needed(
+        self, vitals: dict, risk_score: float, risk_level: str
+    ) -> tuple[float, str, list[str]]:
         triggered_rules = self.evaluate(vitals)
         rules_triggered = [r.rule_name for r in triggered_rules]
 

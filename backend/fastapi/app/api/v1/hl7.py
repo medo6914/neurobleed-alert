@@ -55,9 +55,7 @@ async def process_adt_message(
         mrn = parsed.get("mrn")
 
         if mrn:
-            existing = await db.execute(
-                select(Patient).where(Patient.mrn == mrn)
-            )
+            existing = await db.execute(select(Patient).where(Patient.mrn == mrn))
             patient = existing.scalar_one_or_none()
             if not patient:
                 patient = Patient(

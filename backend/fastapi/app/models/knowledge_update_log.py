@@ -17,7 +17,9 @@ class KnowledgeUpdateLog(TimestampMixin, Base):
     knowledge_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("knowledge_base.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    action: Mapped[KnowledgeUpdateAction] = mapped_column(SAEnum(KnowledgeUpdateAction), nullable=False)
+    action: Mapped[KnowledgeUpdateAction] = mapped_column(
+        SAEnum(KnowledgeUpdateAction), nullable=False
+    )
     source: Mapped[str | None] = mapped_column(String(255), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     performed_by: Mapped[uuid.UUID | None] = mapped_column(

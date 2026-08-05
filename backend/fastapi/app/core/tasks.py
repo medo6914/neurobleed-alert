@@ -42,14 +42,20 @@ async def dequeue_task(queue: str, timeout: int = 5) -> Optional[Dict[str, Any]]
 
 
 async def enqueue_email(to: str, subject: str, body: str) -> bool:
-    return await enqueue_task("email", {
-        "to": to,
-        "subject": subject,
-        "body": body,
-    })
+    return await enqueue_task(
+        "email",
+        {
+            "to": to,
+            "subject": subject,
+            "body": body,
+        },
+    )
 
 
 async def enqueue_alert_processing(alert_id: UUID) -> bool:
-    return await enqueue_task("alert_processing", {
-        "alert_id": str(alert_id),
-    })
+    return await enqueue_task(
+        "alert_processing",
+        {
+            "alert_id": str(alert_id),
+        },
+    )

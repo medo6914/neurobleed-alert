@@ -99,7 +99,8 @@ class Admission extends Equatable {
       admittingPhysician: admittingPhysician ?? this.admittingPhysician,
       admittingPhysicianId: admittingPhysicianId ?? this.admittingPhysicianId,
       dischargingPhysician: dischargingPhysician ?? this.dischargingPhysician,
-      dischargingPhysicianId: dischargingPhysicianId ?? this.dischargingPhysicianId,
+      dischargingPhysicianId:
+          dischargingPhysicianId ?? this.dischargingPhysicianId,
       primaryDiagnosis: primaryDiagnosis ?? this.primaryDiagnosis,
       admissionNotes: admissionNotes ?? this.admissionNotes,
       dischargeSummary: dischargeSummary ?? this.dischargeSummary,
@@ -126,7 +127,9 @@ class Admission extends Equatable {
           : AdmissionStatus.active,
       admissionType: json['admissionType'] as String?,
       admissionDate: DateTime.parse(json['admissionDate'] as String),
-      dischargeDate: json['dischargeDate'] != null ? DateTime.parse(json['dischargeDate'] as String) : null,
+      dischargeDate: json['dischargeDate'] != null
+          ? DateTime.parse(json['dischargeDate'] as String)
+          : null,
       admittingPhysician: json['admittingPhysician'] as String?,
       admittingPhysicianId: json['admittingPhysicianId'] as String?,
       dischargingPhysician: json['dischargingPhysician'] as String?,

@@ -11,8 +11,12 @@ from app.core.rbac import Permission
 from app.models.emergency import EmergencyContact, EmergencyEvent
 from app.models.user import User
 from app.schemas.emergency import (
-    EmergencyContactCreate, EmergencyContactUpdate, EmergencyContactResponse,
-    SOSRequest, SOSResponse, EmergencyEventResponse,
+    EmergencyContactCreate,
+    EmergencyContactUpdate,
+    EmergencyContactResponse,
+    SOSRequest,
+    SOSResponse,
+    EmergencyEventResponse,
 )
 from app.services.emergency_service import emergency_service
 
@@ -71,10 +75,14 @@ async def get_emergency_event(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.ALERT_VIEW)),
 ):
-    result = await db.execute(select(EmergencyEvent).where(EmergencyEvent.id == event_id))
+    result = await db.execute(
+        select(EmergencyEvent).where(EmergencyEvent.id == event_id)
+    )
     event = result.scalar_one_or_none()
     if not event:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Emergency event not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Emergency event not found"
+        )
     return event
 
 
@@ -95,7 +103,11 @@ async def resolve_emergency_event(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
-@router.post("/contacts", response_model=EmergencyContactResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/contacts",
+    response_model=EmergencyContactResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_emergency_contact(
     data: EmergencyContactCreate,
     db: AsyncSession = Depends(get_db),
@@ -140,11 +152,15 @@ async def get_emergency_contact(
     current_user: User = Depends(require_permission(Permission.PATIENT_VIEW)),
 ):
     result = await db.execute(
-        select(EmergencyContact).where(EmergencyContact.id == contact_id, EmergencyContact.is_deleted == False)
+        select(EmergencyContact).where(
+            EmergencyContact.id == contact_id, EmergencyContact.is_deleted == False
+        )
     )
     contact = result.scalar_one_or_none()
     if not contact:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Emergency contact not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Emergency contact not found"
+        )
     return contact
 
 
@@ -156,11 +172,15 @@ async def update_emergency_contact(
     current_user: User = Depends(require_permission(Permission.PATIENT_UPDATE)),
 ):
     result = await db.execute(
-        select(EmergencyContact).where(EmergencyContact.id == contact_id, EmergencyContact.is_deleted == False)
+        select(EmergencyContact).where(
+            EmergencyContact.id == contact_id, EmergencyContact.is_deleted == False
+        )
     )
     contact = result.scalar_one_or_none()
     if not contact:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Emergency contact not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Emergency contact not found"
+        )
 
     update_data = data.model_dump(exclude_unset=True)
     if "is_primary" in update_data and update_data["is_primary"]:
@@ -190,10 +210,14 @@ async def delete_emergency_contact(
     current_user: User = Depends(require_permission(Permission.PATIENT_DELETE)),
 ):
     result = await db.execute(
-        select(EmergencyContact).where(EmergencyContact.id == contact_id, EmergencyContact.is_deleted == False)
+        select(EmergencyContact).where(
+            EmergencyContact.id == contact_id, EmergencyContact.is_deleted == False
+        )
     )
     contact = result.scalar_one_or_none()
     if not contact:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Emergency contact not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Emergency contact not found"
+        )
     contact.is_deleted = True
     await db.commit()

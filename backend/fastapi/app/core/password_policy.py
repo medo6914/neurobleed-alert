@@ -6,9 +6,18 @@ MIN_LENGTH = 8
 MAX_LENGTH = 128
 
 _COMMON_PASSWORDS = {
-    "password123", "12345678", "qwerty123", "admin123",
-    "neurobleed", "neurobleed1", "password1", "123456789",
-    "abcdefgh", "iloveyou", "monkey123", "dragon123",
+    "password123",
+    "12345678",
+    "qwerty123",
+    "admin123",
+    "neurobleed",
+    "neurobleed1",
+    "password1",
+    "123456789",
+    "abcdefgh",
+    "iloveyou",
+    "monkey123",
+    "dragon123",
 }
 
 

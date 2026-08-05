@@ -17,7 +17,9 @@ class DeviceEventLog(TimestampMixin, Base):
     device_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("devices.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    event_type: Mapped[DeviceEventType] = mapped_column(SAEnum(DeviceEventType), nullable=False, index=True)
+    event_type: Mapped[DeviceEventType] = mapped_column(
+        SAEnum(DeviceEventType), nullable=False, index=True
+    )
     description: Mapped[str | None] = mapped_column(String(500), nullable=True)
     previous_value: Mapped[str | None] = mapped_column(String(255), nullable=True)
     new_value: Mapped[str | None] = mapped_column(String(255), nullable=True)

@@ -56,7 +56,8 @@ class _PatientSearchScreenState extends ConsumerState<PatientSearchScreen> {
 
     if (_riskFilter != 'all') {
       result = result
-          .where((p) => _normalizeRisk(p['risk_level'] as String?) == _riskFilter)
+          .where(
+              (p) => _normalizeRisk(p['risk_level'] as String?) == _riskFilter)
           .toList();
     }
     return result;
@@ -95,7 +96,8 @@ class _PatientSearchScreenState extends ConsumerState<PatientSearchScreen> {
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, color: NeuroColors.textBody),
+                        icon: const Icon(Icons.clear,
+                            color: NeuroColors.textBody),
                         onPressed: () => setState(_searchController.clear),
                       )
                     : null,
@@ -196,7 +198,8 @@ class _PatientSearchScreenState extends ConsumerState<PatientSearchScreen> {
                         padding: const EdgeInsets.only(bottom: NeuroSpacing.md),
                         child: _PatientListCard(
                           patient: patient,
-                          onTap: () => context.push('/patients/${patient['id']}'),
+                          onTap: () =>
+                              context.push('/patients/${patient['id']}'),
                         ),
                       );
                     },
@@ -236,12 +239,12 @@ class _FilterChip extends StatelessWidget {
             vertical: NeuroSpacing.sm,
           ),
           decoration: BoxDecoration(
-            color: selected
-                ? color.withValues(alpha: 0.2)
-                : NeuroColors.bgCard,
+            color: selected ? color.withValues(alpha: 0.2) : NeuroColors.bgCard,
             borderRadius: BorderRadius.circular(NeuroRadius.chip),
             border: Border.all(
-              color: selected ? color : NeuroColors.textPrimary.withValues(alpha: 0.08),
+              color: selected
+                  ? color
+                  : NeuroColors.textPrimary.withValues(alpha: 0.08),
             ),
           ),
           child: Text(
@@ -297,8 +300,8 @@ class _PatientListCard extends StatelessWidget {
     final mrn = patient['mrn'] ?? '—';
     final bed = patient['bed_number'];
     final isActive = patient['is_active'] != false;
-    final riskScore = ((patient['risk_score'] as num?)?.toDouble() ?? 0)
-        .clamp(0.0, 1.0);
+    final riskScore =
+        ((patient['risk_score'] as num?)?.toDouble() ?? 0).clamp(0.0, 1.0);
 
     return Material(
       color: Colors.transparent,
@@ -410,7 +413,8 @@ class _PatientListCard extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: riskScore,
                   minHeight: 4,
-                  backgroundColor: NeuroColors.textPrimary.withValues(alpha: 0.06),
+                  backgroundColor:
+                      NeuroColors.textPrimary.withValues(alpha: 0.06),
                   valueColor: AlwaysStoppedAnimation(_riskColor),
                 ),
               ),

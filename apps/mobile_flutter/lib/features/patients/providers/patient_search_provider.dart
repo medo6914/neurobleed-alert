@@ -65,7 +65,8 @@ class PatientSearchNotifier extends StateNotifier<PatientSearchState> {
   }
 }
 
-final patientSearchProvider = StateNotifierProvider<PatientSearchNotifier, PatientSearchState>((ref) {
+final patientSearchProvider =
+    StateNotifierProvider<PatientSearchNotifier, PatientSearchState>((ref) {
   final repository = ref.watch(patientRepositoryProvider);
   return PatientSearchNotifier(repository);
 });

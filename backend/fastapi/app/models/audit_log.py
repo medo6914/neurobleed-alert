@@ -19,11 +19,18 @@ class AuditLog(TimestampMixin, Base):
     details: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String(50), nullable=True)
     user_agent: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    correlation_id: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
+    correlation_id: Mapped[str | None] = mapped_column(
+        String(100), nullable=True, index=True
+    )
 
     def __repr__(self) -> str:
         return f"<AuditLog(id={self.id}, action='{self.action}', resource='{self.resource}')>"
 
 
-Index("ix_audit_logs_user_action", AuditLog.user_id, AuditLog.action, AuditLog.created_at.desc())
+Index(
+    "ix_audit_logs_user_action",
+    AuditLog.user_id,
+    AuditLog.action,
+    AuditLog.created_at.desc(),
+)
 Index("ix_audit_logs_resource", AuditLog.resource, AuditLog.created_at.desc())

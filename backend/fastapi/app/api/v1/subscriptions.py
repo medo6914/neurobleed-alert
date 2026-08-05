@@ -14,7 +14,9 @@ from app.models.hospital import Hospital
 from app.models.user import User
 from app.models.enums import SubscriptionTier, SubscriptionStatus
 from app.schemas.subscription import (
-    SubscriptionCreate, SubscriptionUpdate, SubscriptionResponse,
+    SubscriptionCreate,
+    SubscriptionUpdate,
+    SubscriptionResponse,
     InvoiceResponse,
 )
 
@@ -23,22 +25,36 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/billing", tags=["billing"])
 
 
-@router.post("/subscribe", response_model=SubscriptionResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/subscribe",
+    response_model=SubscriptionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_subscription(
     data: SubscriptionCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.ADMIN_ACCESS)),
 ):
-    hospital_result = await db.execute(select(Hospital).where(Hospital.id == data.hospital_id))
+    hospital_result = await db.execute(
+        select(Hospital).where(Hospital.id == data.hospital_id)
+    )
     hospital = hospital_result.scalar_one_or_none()
     if not hospital:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Hospital not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Hospital not found"
+        )
 
     existing = await db.execute(
-        select(Subscription).where(Subscription.hospital_id == data.hospital_id, Subscription.is_deleted == False)
+        select(Subscription).where(
+            Subscription.hospital_id == data.hospital_id,
+            Subscription.is_deleted == False,
+        )
     )
     if existing.scalar_one_or_none():
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Hospital already has a subscription")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Hospital already has a subscription",
+        )
 
     subscription = Subscription(
         hospital_id=data.hospital_id,
@@ -54,7 +70,10 @@ async def create_subscription(
     db.add(subscription)
     await db.commit()
     await db.refresh(subscription)
-    logger.info("Subscription created", extra={"hospital_id": str(data.hospital_id), "tier": data.tier})
+    logger.info(
+        "Subscription created",
+        extra={"hospital_id": str(data.hospital_id), "tier": data.tier},
+    )
     return subscription
 
 
@@ -79,11 +98,15 @@ async def get_subscription(
     current_user: User = Depends(require_permission(Permission.ADMIN_ACCESS)),
 ):
     result = await db.execute(
-        select(Subscription).where(Subscription.id == subscription_id, Subscription.is_deleted == False)
+        select(Subscription).where(
+            Subscription.id == subscription_id, Subscription.is_deleted == False
+        )
     )
     subscription = result.scalar_one_or_none()
     if not subscription:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found"
+        )
     return subscription
 
 
@@ -95,11 +118,15 @@ async def update_subscription(
     current_user: User = Depends(require_permission(Permission.ADMIN_ACCESS)),
 ):
     result = await db.execute(
-        select(Subscription).where(Subscription.id == subscription_id, Subscription.is_deleted == False)
+        select(Subscription).where(
+            Subscription.id == subscription_id, Subscription.is_deleted == False
+        )
     )
     subscription = result.scalar_one_or_none()
     if not subscription:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found"
+        )
 
     update_data = data.model_dump(exclude_unset=True)
     if "tier" in update_data and update_data["tier"]:
@@ -115,24 +142,32 @@ async def update_subscription(
     return subscription
 
 
-@router.post("/subscriptions/{subscription_id}/cancel", response_model=SubscriptionResponse)
+@router.post(
+    "/subscriptions/{subscription_id}/cancel", response_model=SubscriptionResponse
+)
 async def cancel_subscription(
     subscription_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.ADMIN_ACCESS)),
 ):
     result = await db.execute(
-        select(Subscription).where(Subscription.id == subscription_id, Subscription.is_deleted == False)
+        select(Subscription).where(
+            Subscription.id == subscription_id, Subscription.is_deleted == False
+        )
     )
     subscription = result.scalar_one_or_none()
     if not subscription:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found"
+        )
 
     subscription.status = SubscriptionStatus.CANCELED
     subscription.canceled_at = datetime.now(timezone.utc)
     await db.commit()
     await db.refresh(subscription)
-    logger.info("Subscription canceled", extra={"subscription_id": str(subscription_id)})
+    logger.info(
+        "Subscription canceled", extra={"subscription_id": str(subscription_id)}
+    )
     return subscription
 
 
@@ -160,8 +195,12 @@ async def get_invoice(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.ADMIN_ACCESS)),
 ):
-    result = await db.execute(select(Invoice).where(Invoice.id == invoice_id, Invoice.is_deleted == False))
+    result = await db.execute(
+        select(Invoice).where(Invoice.id == invoice_id, Invoice.is_deleted == False)
+    )
     invoice = result.scalar_one_or_none()
     if not invoice:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invoice not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Invoice not found"
+        )
     return invoice

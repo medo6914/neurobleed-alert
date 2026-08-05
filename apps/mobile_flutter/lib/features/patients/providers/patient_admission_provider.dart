@@ -34,7 +34,8 @@ class DischargePatient {
   }
 }
 
-final patientAdmissionsProvider = FutureProvider.family<List<Admission>, String>((ref, patientId) async {
+final patientAdmissionsProvider =
+    FutureProvider.family<List<Admission>, String>((ref, patientId) async {
   final repository = ref.watch(admissionRepositoryProvider);
   final result = await repository.getPatientAdmissions(patientId);
   return result.fold(

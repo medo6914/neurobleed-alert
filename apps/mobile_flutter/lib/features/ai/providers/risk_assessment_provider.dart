@@ -82,7 +82,8 @@ class RiskAssessmentNotifier extends StateNotifier<RiskAssessmentState> {
     try {
       final response = await _aiApi.getRiskHistory(patientId, limit: limit);
       final list = (response.data as List<dynamic>)
-          .map((e) => RiskAssessmentResponse.fromJson(e as Map<String, dynamic>))
+          .map(
+              (e) => RiskAssessmentResponse.fromJson(e as Map<String, dynamic>))
           .toList();
       state = state.copyWith(isLoadingHistory: false, history: list);
     } catch (e) {

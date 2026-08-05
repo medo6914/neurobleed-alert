@@ -43,8 +43,7 @@ class RegisterDevice {
     }
 
     if (firmwareVersion != null) {
-      final fwResult =
-          DeviceValidator.validateFirmwareVersion(firmwareVersion);
+      final fwResult = DeviceValidator.validateFirmwareVersion(firmwareVersion);
       if (fwResult.isLeft()) {
         return fwResult as Left<Failure, Device>;
       }

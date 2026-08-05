@@ -68,7 +68,9 @@ class MedicalService:
             logger.warning("RxNav XML parse failed: %s", e)
         return results
 
-    async def drug_interactions(self, names: list[str], limit: int = 5) -> list[dict[str, Any]]:
+    async def drug_interactions(
+        self, names: list[str], limit: int = 5
+    ) -> list[dict[str, Any]]:
         """Drug-drug interaction data from FDA labels (OpenFDA 'drug_interactions' section).
         Note: the NLM RxNav DDI endpoint was discontinued in 2024; OpenFDA is its free replacement."""
         if not names:
@@ -85,7 +87,9 @@ class MedicalService:
                     for section in result.get("drug_interactions", []):
                         interactions.append(
                             {
-                                "drug": result.get("openfda", {}).get("generic_name", [name])[0],
+                                "drug": result.get("openfda", {}).get(
+                                    "generic_name", [name]
+                                )[0],
                                 "section": section[:800],
                             }
                         )
@@ -141,7 +145,10 @@ class MedicalService:
             resp.raise_for_status()
             results = []
             for result in resp.json().get("results", []):
-                reactions = [r.get("reactionmeddrapt") for r in result.get("patient", {}).get("reaction", [])][:10]
+                reactions = [
+                    r.get("reactionmeddrapt")
+                    for r in result.get("patient", {}).get("reaction", [])
+                ][:10]
                 drugs = [
                     d.get("medicinalproduct")
                     for d in result.get("patient", {}).get("drug", [])

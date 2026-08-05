@@ -74,7 +74,9 @@ class HospitalAssignment extends Equatable {
       isPrimary: json['isPrimary'] as bool? ?? false,
       assignedAt: DateTime.parse(json['assignedAt'] as String),
       assignedBy: json['assignedBy'] as String?,
-      unassignedAt: json['unassignedAt'] != null ? DateTime.parse(json['unassignedAt'] as String) : null,
+      unassignedAt: json['unassignedAt'] != null
+          ? DateTime.parse(json['unassignedAt'] as String)
+          : null,
       reason: json['reason'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),

@@ -46,19 +46,34 @@ class AuditHistoryScreen extends ConsumerWidget {
                   child: ListTile(
                     leading: CircleAvatar(
                       backgroundColor: actionColor.withValues(alpha: 0.1),
-                      child: Icon(_actionIcon(record.action), color: actionColor, size: 20),
+                      child: Icon(_actionIcon(record.action),
+                          color: actionColor, size: 20),
                     ),
-                    title: Text(record.action.replaceAll('_', ' ').toUpperCase(), style: TextStyle(fontWeight: FontWeight.w600, color: actionColor)),
+                    title: Text(
+                        record.action.replaceAll('_', ' ').toUpperCase(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, color: actionColor)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${record.resourceType}${record.resourceId != null ? ' #${record.resourceId!.substring(0, 8)}' : ''}'),
-                        if (record.userName != null) Text('by ${record.userName} (${record.userRole ?? "N/A"})'),
-                        Text(record.timestamp.toLocal().toString().substring(0, 16), style: TextStyle(fontSize: 12, color: NeuroColors.textSecondary)),
+                        Text(
+                            '${record.resourceType}${record.resourceId != null ? ' #${record.resourceId!.substring(0, 8)}' : ''}'),
+                        if (record.userName != null)
+                          Text(
+                              'by ${record.userName} (${record.userRole ?? "N/A"})'),
+                        Text(
+                            record.timestamp
+                                .toLocal()
+                                .toString()
+                                .substring(0, 16),
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: NeuroColors.textSecondary)),
                       ],
                     ),
                     isThreeLine: true,
-                    trailing: record.changes != null && record.changes!.isNotEmpty
+                    trailing: record.changes != null &&
+                            record.changes!.isNotEmpty
                         ? Icon(Icons.change_circle, color: NeuroColors.warning)
                         : null,
                   ),
@@ -73,12 +88,18 @@ class AuditHistoryScreen extends ConsumerWidget {
 
   IconData _actionIcon(String action) {
     switch (action) {
-      case 'create': return Icons.add_circle;
-      case 'update': return Icons.edit;
-      case 'delete': return Icons.delete;
-      case 'view_sensitive': return Icons.visibility;
-      case 'export': return Icons.file_download;
-      default: return Icons.info;
+      case 'create':
+        return Icons.add_circle;
+      case 'update':
+        return Icons.edit;
+      case 'delete':
+        return Icons.delete;
+      case 'view_sensitive':
+        return Icons.visibility;
+      case 'export':
+        return Icons.file_download;
+      default:
+        return Icons.info;
     }
   }
 }

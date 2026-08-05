@@ -14,8 +14,12 @@ from app.models.alert import Alert
 from app.models.user import User
 from app.models.enums import Severity
 from app.schemas.alert import (
-    AlertResponse, AlertCreate, AlertUpdate, AlertAcknowledge,
-    AlertEscalateRequest, AlertListResponse,
+    AlertResponse,
+    AlertCreate,
+    AlertUpdate,
+    AlertAcknowledge,
+    AlertEscalateRequest,
+    AlertListResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -86,9 +90,12 @@ async def get_alerts(
     total_pages = max(1, (total + per_page - 1) // per_page)
     return AlertListResponse(
         items=[AlertResponse.model_validate(a) for a in alerts],
-        total=total, page=page, per_page=per_page,
+        total=total,
+        page=page,
+        per_page=per_page,
         total_pages=total_pages,
-        has_next=page < total_pages, has_prev=page > 1,
+        has_next=page < total_pages,
+        has_prev=page > 1,
     )
 
 
@@ -101,7 +108,9 @@ async def get_alert(
     result = await db.execute(select(Alert).where(Alert.id == alert_id))
     alert = result.scalar_one_or_none()
     if not alert:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Alert not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Alert not found"
+        )
     return alert
 
 
@@ -115,7 +124,9 @@ async def update_alert(
     result = await db.execute(select(Alert).where(Alert.id == alert_id))
     alert = result.scalar_one_or_none()
     if not alert:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Alert not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Alert not found"
+        )
 
     update_data = data.model_dump(exclude_unset=True)
     if update_data:
@@ -137,7 +148,9 @@ async def acknowledge_alert(
     result = await db.execute(select(Alert).where(Alert.id == alert_id))
     alert = result.scalar_one_or_none()
     if not alert:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Alert not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Alert not found"
+        )
 
     alert.is_acknowledged = data.is_acknowledged
     alert.acknowledged_by = current_user.id
@@ -145,7 +158,10 @@ async def acknowledge_alert(
 
     await db.commit()
     await db.refresh(alert)
-    logger.info("Alert acknowledged", extra={"alert_id": str(alert_id), "user_id": str(current_user.id)})
+    logger.info(
+        "Alert acknowledged",
+        extra={"alert_id": str(alert_id), "user_id": str(current_user.id)},
+    )
     return alert
 
 
@@ -159,7 +175,9 @@ async def escalate_alert(
     result = await db.execute(select(Alert).where(Alert.id == alert_id))
     alert = result.scalar_one_or_none()
     if not alert:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Alert not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Alert not found"
+        )
 
     alert.severity = Severity.CRITICAL
     alert.extra_data = {

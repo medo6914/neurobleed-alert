@@ -16,7 +16,8 @@ class BatchRiskResponse {
   factory BatchRiskResponse.fromJson(Map<String, dynamic> json) {
     return BatchRiskResponse(
       assessments: (json['assessments'] as List<dynamic>)
-          .map((e) => RiskAssessmentResponse.fromJson(e as Map<String, dynamic>))
+          .map(
+              (e) => RiskAssessmentResponse.fromJson(e as Map<String, dynamic>))
           .toList(),
       aggregateScore: (json['aggregate_score'] as num).toDouble(),
       aggregateLevel: json['aggregate_level'] as String,

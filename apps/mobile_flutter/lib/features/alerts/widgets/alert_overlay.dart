@@ -47,7 +47,8 @@ class _AlertOverlayState extends ConsumerState<AlertOverlay> {
       SnackBar(
         content: Row(
           children: [
-            Icon(Icons.warning_rounded, color: NeuroColors.textPrimary, size: 20),
+            Icon(Icons.warning_rounded,
+                color: NeuroColors.textPrimary, size: 20),
             const SizedBox(width: 12),
             Expanded(child: Text(message)),
           ],

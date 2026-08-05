@@ -73,9 +73,9 @@ class DeviceStatusIndicator extends StatelessWidget {
         Text(
           _statusLabel(),
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: color,
-            fontWeight: FontWeight.w600,
-          ),
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
         ),
       ],
     );

@@ -19,7 +19,13 @@ class BleTestDeviceCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final bars = device.rssi >= -50 ? 4 : device.rssi >= -70 ? 3 : device.rssi >= -85 ? 2 : 1;
+    final bars = device.rssi >= -50
+        ? 4
+        : device.rssi >= -70
+            ? 3
+            : device.rssi >= -85
+                ? 2
+                : 1;
 
     return AppCard(
       onTap: isConnecting ? null : onConnect,
@@ -33,10 +39,12 @@ class BleTestDeviceCard extends ConsumerWidget {
                 Container(
                   padding: EdgeInsets.all(NeuroSpacing.sm),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                    color: theme.colorScheme.primaryContainer
+                        .withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(NeuroRadius.md),
                   ),
-                  child: Icon(Icons.bluetooth, size: 22, color: theme.colorScheme.primary),
+                  child: Icon(Icons.bluetooth,
+                      size: 22, color: theme.colorScheme.primary),
                 ),
                 SizedBox(width: NeuroSpacing.sm),
                 Expanded(
@@ -45,7 +53,8 @@ class BleTestDeviceCard extends ConsumerWidget {
                     children: [
                       Text(
                         device.name,
-                        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                        style: theme.textTheme.titleSmall
+                            ?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       SizedBox(height: 2),
                       Text(
@@ -68,7 +77,8 @@ class BleTestDeviceCard extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: i < bars
                             ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
+                            : theme.colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(1),
                       ),
                     );
@@ -107,7 +117,8 @@ class BleTestDeviceCard extends ConsumerWidget {
                 alignment: Alignment.centerRight,
                 child: isConnecting
                     ? SizedBox(
-                        width: 20, height: 20,
+                        width: 20,
+                        height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : AppButton(
@@ -150,7 +161,9 @@ class ServiceExplorer extends ConsumerWidget {
       error: (e, _) => AppErrorState(title: 'Error', message: e.toString()),
       data: (services) {
         if (services.isEmpty) {
-          return Center(child: Text('No services discovered', style: theme.textTheme.bodySmall));
+          return Center(
+              child: Text('No services discovered',
+                  style: theme.textTheme.bodySmall));
         }
 
         return ListView.builder(
@@ -163,7 +176,8 @@ class ServiceExplorer extends ConsumerWidget {
                 initiallyExpanded: index < 2,
                 title: Text(
                   'Service 0x${service.uuid.toUpperCase()}',
-                  style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
                   '${service.characteristics.length} characteristic(s)',
@@ -190,10 +204,21 @@ class ServiceExplorer extends ConsumerWidget {
                               spacing: 4,
                               runSpacing: 2,
                               children: [
-                                if (ch.isReadable) _PropertyChip(label: 'Read', color: NeuroColors.chartBlue),
-                                if (ch.isWritable) _PropertyChip(label: 'Write', color: NeuroColors.low),
-                                if (ch.isNotifiable) _PropertyChip(label: 'Notify', color: NeuroColors.medium),
-                                if (ch.isIndicatable) _PropertyChip(label: 'Indicate', color: NeuroColors.temperature),
+                                if (ch.isReadable)
+                                  _PropertyChip(
+                                      label: 'Read',
+                                      color: NeuroColors.chartBlue),
+                                if (ch.isWritable)
+                                  _PropertyChip(
+                                      label: 'Write', color: NeuroColors.low),
+                                if (ch.isNotifiable)
+                                  _PropertyChip(
+                                      label: 'Notify',
+                                      color: NeuroColors.medium),
+                                if (ch.isIndicatable)
+                                  _PropertyChip(
+                                      label: 'Indicate',
+                                      color: NeuroColors.temperature),
                               ],
                             ),
                             if (ch.value != null && ch.value!.isNotEmpty) ...[
@@ -257,7 +282,8 @@ class BleTestLogViewer extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return logsAsync.when(
-      loading: () => Center(child: Text('Loading logs...', style: theme.textTheme.bodySmall)),
+      loading: () => Center(
+          child: Text('Loading logs...', style: theme.textTheme.bodySmall)),
       error: (e, _) => AppErrorState(title: 'Log Error', message: e.toString()),
       data: (logs) {
         if (logs.isEmpty) {
@@ -265,9 +291,13 @@ class BleTestLogViewer extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.history, size: 32, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4)),
+                Icon(Icons.history,
+                    size: 32,
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: 0.4)),
                 SizedBox(height: NeuroSpacing.sm),
-                Text('No operations logged yet', style: theme.textTheme.bodySmall),
+                Text('No operations logged yet',
+                    style: theme.textTheme.bodySmall),
               ],
             ),
           );
@@ -288,18 +318,23 @@ class BleTestLogViewer extends ConsumerWidget {
             };
 
             return Padding(
-              padding: EdgeInsets.symmetric(horizontal: NeuroSpacing.sm, vertical: 1),
+              padding: EdgeInsets.symmetric(
+                  horizontal: NeuroSpacing.sm, vertical: 1),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(ts, style: theme.textTheme.labelSmall?.copyWith(
-                    fontFamily: 'monospace',
-                    fontSize: 9,
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                  )),
+                  Text(ts,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontFamily: 'monospace',
+                        fontSize: 9,
+                        color: theme.colorScheme.onSurfaceVariant
+                            .withValues(alpha: 0.6),
+                      )),
                   SizedBox(width: 4),
                   Container(
-                    width: 6, height: 6, margin: EdgeInsets.only(top: 4),
+                    width: 6,
+                    height: 6,
+                    margin: EdgeInsets.only(top: 4),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: color,
@@ -365,20 +400,26 @@ class ConnectionPanel extends ConsumerWidget {
             Row(
               children: [
                 Container(
-                  width: 12, height: 12,
+                  width: 12,
+                  height: 12,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: stateColor,
                     boxShadow: info.state == BleTestConnectionState.connected
-                        ? [BoxShadow(color: stateColor.withValues(alpha: 0.5), blurRadius: 8)]
+                        ? [
+                            BoxShadow(
+                                color: stateColor.withValues(alpha: 0.5),
+                                blurRadius: 8)
+                          ]
                         : null,
                   ),
                 ),
                 SizedBox(width: NeuroSpacing.sm),
-                Text(stateLabel, style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: stateColor,
-                )),
+                Text(stateLabel,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: stateColor,
+                    )),
               ],
             ),
             if (info.name != null) ...[
@@ -419,9 +460,10 @@ class _InfoRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 60,
-            child: Text(label, style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            )),
+            child: Text(label,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                )),
           ),
           Expanded(
             child: Text(
@@ -448,9 +490,11 @@ class NotificationViewer extends ConsumerWidget {
 
     return notificationAsync.when(
       loading: () => Center(
-        child: Text('Waiting for notifications...', style: theme.textTheme.bodySmall),
+        child: Text('Waiting for notifications...',
+            style: theme.textTheme.bodySmall),
       ),
-      error: (e, _) => AppEmptyState(icon: Icons.error_outline, title: 'Error', message: e.toString()),
+      error: (e, _) => AppEmptyState(
+          icon: Icons.error_outline, title: 'Error', message: e.toString()),
       data: (notification) {
         return AppCard(
           child: Padding(
@@ -467,7 +511,9 @@ class NotificationViewer extends ConsumerWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  notification.data.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' '),
+                  notification.data
+                      .map((b) => b.toRadixString(16).padLeft(2, '0'))
+                      .join(' '),
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontFamily: 'monospace',
                     fontSize: 9,

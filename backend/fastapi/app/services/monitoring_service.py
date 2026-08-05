@@ -27,10 +27,16 @@ def _risk_to_severity(risk_level: str) -> Severity:
         RiskLevel.MEDIUM: Severity.MEDIUM,
         RiskLevel.LOW: Severity.LOW,
     }
-    return mapping.get(risk_level, Severity.MEDIUM) if isinstance(risk_level, str) else Severity.MEDIUM
+    return (
+        mapping.get(risk_level, Severity.MEDIUM)
+        if isinstance(risk_level, str)
+        else Severity.MEDIUM
+    )
 
 
-def _risk_to_alert_type(risk_score: float, heart_rate: float | None, spo2: float | None) -> AlertType:
+def _risk_to_alert_type(
+    risk_score: float, heart_rate: float | None, spo2: float | None
+) -> AlertType:
     if heart_rate is not None:
         if heart_rate < 60:
             return AlertType.BRADYCARDIA
@@ -109,55 +115,66 @@ async def handle_reading_created(event_type: str, data: dict):
                 await db.commit()
                 await db.refresh(alert)
 
-                await event_bus.publish("alert.created", {
-                    "alert_id": str(alert.id),
-                    "patient_id": str(patient_id),
-                    "device_id": str(data.get("device_id", "")),
-                    "alert_type": alert_type.value,
-                    "severity": severity.value,
-                    "risk_score": risk_result.risk_score,
-                    "message": message,
-                    "contributing_factors": risk_result.contributing_factors,
-                    "created_at": alert.created_at.isoformat() if alert.created_at else datetime.now(timezone.utc).isoformat(),
-                })
+                await event_bus.publish(
+                    "alert.created",
+                    {
+                        "alert_id": str(alert.id),
+                        "patient_id": str(patient_id),
+                        "device_id": str(data.get("device_id", "")),
+                        "alert_type": alert_type.value,
+                        "severity": severity.value,
+                        "risk_score": risk_result.risk_score,
+                        "message": message,
+                        "contributing_factors": risk_result.contributing_factors,
+                        "created_at": alert.created_at.isoformat()
+                        if alert.created_at
+                        else datetime.now(timezone.utc).isoformat(),
+                    },
+                )
 
             await db.commit()
 
-            await manager.broadcast_reading({
-                "type": "vitals_update",
-                "patient_id": str(patient_id),
-                "device_id": str(data.get("device_id", "")),
-                "reading_id": str(reading_id),
-                "heart_rate": reading.heart_rate,
-                "spo2": reading.spo2,
-                "rso2": reading.rso2,
-                "ir_value": reading.ir_value,
-                "red_value": reading.red_value,
-                "signal_quality": reading.signal_quality,
-                "motion_artifact": reading.motion_artifact,
-                "risk_score": risk_result.risk_score,
-                "risk_level": risk_result.risk_level,
-                "trend": risk_result.trend,
-                "timestamp": reading.timestamp.isoformat() if reading.timestamp else datetime.now(timezone.utc).isoformat(),
-            })
+            await manager.broadcast_reading(
+                {
+                    "type": "vitals_update",
+                    "patient_id": str(patient_id),
+                    "device_id": str(data.get("device_id", "")),
+                    "reading_id": str(reading_id),
+                    "heart_rate": reading.heart_rate,
+                    "spo2": reading.spo2,
+                    "rso2": reading.rso2,
+                    "ir_value": reading.ir_value,
+                    "red_value": reading.red_value,
+                    "signal_quality": reading.signal_quality,
+                    "motion_artifact": reading.motion_artifact,
+                    "risk_score": risk_result.risk_score,
+                    "risk_level": risk_result.risk_level,
+                    "trend": risk_result.trend,
+                    "timestamp": reading.timestamp.isoformat()
+                    if reading.timestamp
+                    else datetime.now(timezone.utc).isoformat(),
+                }
+            )
 
         except Exception as e:
             logger.error(f"Error processing reading {reading_id}: {e}", exc_info=True)
 
 
 async def handle_alert_created(event_type: str, data: dict):
-    await manager.broadcast_alert({
-        "type": "alert_created",
-        "alert_id": data.get("alert_id"),
-        "patient_id": data.get("patient_id"),
-        "device_id": data.get("device_id"),
-        "alert_type": data.get("alert_type"),
-        "severity": data.get("severity"),
-        "risk_score": data.get("risk_score"),
-        "message": data.get("message"),
-        "contributing_factors": data.get("contributing_factors", []),
-        "created_at": data.get("created_at"),
-    })
+    await manager.broadcast_alert(
+        {
+            "type": "alert_created",
+            "alert_id": data.get("alert_id"),
+            "patient_id": data.get("patient_id"),
+            "device_id": data.get("device_id"),
+            "alert_type": data.get("alert_type"),
+            "severity": data.get("severity"),
+            "risk_score": data.get("risk_score"),
+            "message": data.get("message"),
+            "contributing_factors": data.get("contributing_factors", []),
+            "created_at": data.get("created_at"),
+        }
+    )
 
 
 def register_handlers():

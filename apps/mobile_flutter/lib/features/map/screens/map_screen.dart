@@ -7,7 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:design_system/design_system.dart';
 import 'package:core/core.dart';
 
-final mapHospitalsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
+final mapHospitalsProvider =
+    FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final api = ref.read(apiClientProvider);
   final response = await api.get('/v1/analytics/hospitals');
   final data = response.data;
@@ -80,13 +81,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   Future<List<Map<String, dynamic>>> _nearbyHospitals(dynamic api) async {
     try {
-      final response = await api.get('/v1/maps/hospitals/nearby',
-          queryParameters: {
-            'lat': _userLocation.latitude,
-            'lng': _userLocation.longitude,
-            'radius_m': 10000,
-            'limit': 10,
-          });
+      final response =
+          await api.get('/v1/maps/hospitals/nearby', queryParameters: {
+        'lat': _userLocation.latitude,
+        'lng': _userLocation.longitude,
+        'radius_m': 10000,
+        'limit': 10,
+      });
       final data = response.data;
       if (data is List) return data.cast<Map<String, dynamic>>();
     } catch (_) {}
@@ -121,7 +122,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     if (q.isEmpty) return;
     try {
       final api = ref.read(apiClientProvider);
-      final response = await api.get('/v1/maps/geocode', queryParameters: {'q': q, 'limit': 1});
+      final response = await api
+          .get('/v1/maps/geocode', queryParameters: {'q': q, 'limit': 1});
       final data = response.data;
       if (data is List && data.isNotEmpty) {
         final place = data.first as Map<String, dynamic>;
@@ -157,7 +159,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       if (data is Map && data['geometry'] is Map) {
         final coords = (data['geometry'] as Map)['coordinates'] as List;
         final points = coords
-            .map((c) => LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
+            .map((c) =>
+                LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
             .toList();
         setState(() {
           _route = points;
@@ -173,8 +176,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     double best = double.infinity;
     Map<String, dynamic>? nearest;
     for (final h in _hospitals) {
-      final lat = (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
-      final lng = (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
+      final lat =
+          (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
+      final lng = (h['longitude'] as num?)?.toDouble() ??
+          (h['lng'] as num?)?.toDouble();
       if (lat == null || lng == null) continue;
       final d = const Distance().distance(_userLocation, LatLng(lat, lng));
       if (d < best) {
@@ -201,7 +206,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         title: const Text('الخريطة - أقرب المستشفيات'),
         actions: [
           IconButton(
-            icon: Icon(_locating ? Icons.my_location : Icons.location_searching),
+            icon:
+                Icon(_locating ? Icons.my_location : Icons.location_searching),
             tooltip: 'موقعي',
             onPressed: _locateUser,
           ),
@@ -227,13 +233,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 8),
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        icon: const Icon(Icons.directions, color: NeuroColors.success),
+                        icon: const Icon(Icons.directions,
+                            color: NeuroColors.success),
                         tooltip: 'الاتجاه إلى أقرب مستشفى',
                         onPressed: _routeToNearest,
                       ),
@@ -331,10 +339,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                   SizedBox(
                                     width: 14,
                                     height: 14,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
                                   ),
                                   SizedBox(width: 8),
-                                  Text('جاري تحديد الموقع...', style: TextStyle(fontSize: 12)),
+                                  Text('جاري تحديد الموقع...',
+                                      style: TextStyle(fontSize: 12)),
                                 ],
                               ),
                             ),
@@ -359,9 +369,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Widget _buildEtaBanner() {
     final durationS = _routeDurationS;
     final distanceM = _routeDistanceM;
-    final minutes = durationS != null
-        ? (durationS / 60).ceil()
-        : null;
+    final minutes = durationS != null ? (durationS / 60).ceil() : null;
     final distanceKm = distanceM != null
         ? distanceM >= 1000
             ? '${(distanceM / 1000).toStringAsFixed(1)} كم'
@@ -417,8 +425,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   LatLng? _hospitalLatLng(Map<String, dynamic> h) {
-    final lat = (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
-    final lng = (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
+    final lat =
+        (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
+    final lng =
+        (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
     if (lat == null || lng == null) return null;
     return LatLng(lat, lng);
   }
@@ -456,14 +466,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               const SizedBox(height: 8),
               Text(
                 h['address'] as String,
-                style: const TextStyle(color: NeuroColors.textBody, fontSize: 13),
+                style:
+                    const TextStyle(color: NeuroColors.textBody, fontSize: 13),
               ),
             ],
             if (h['phone'] != null) ...[
               const SizedBox(height: 4),
               Text(
                 h['phone'] as String,
-                style: const TextStyle(color: NeuroColors.textSecondary, fontSize: 12),
+                style: const TextStyle(
+                    color: NeuroColors.textSecondary, fontSize: 12),
               ),
             ],
             const SizedBox(height: 12),
@@ -482,8 +494,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Future<void> _routeToHospital(Map<String, dynamic> h) async {
-    final lat = (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
-    final lng = (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
+    final lat =
+        (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
+    final lng =
+        (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
     if (lat == null || lng == null) return;
     Navigator.of(context).pop();
     try {
@@ -499,7 +513,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         final coords = (data['geometry'] as Map)['coordinates'] as List;
         setState(() {
           _route = coords
-              .map((c) => LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
+              .map((c) =>
+                  LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
               .toList();
           _routeDistanceM = (data['distance_m'] as num?)?.toDouble();
           _routeDurationS = (data['duration_s'] as num?)?.toInt();
@@ -513,9 +528,21 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final hospitals = _hospitals;
     final display = hospitals.isEmpty
         ? const [
-            {'name': 'مستشفى جامعة القاهرة', 'latitude': 30.0286, 'longitude': 31.2278},
-            {'name': 'مستشفى المنيل التخصصي', 'latitude': 30.0339, 'longitude': 31.2304},
-            {'name': 'مستشفى الدمرداش', 'latitude': 30.0827, 'longitude': 31.2904},
+            {
+              'name': 'مستشفى جامعة القاهرة',
+              'latitude': 30.0286,
+              'longitude': 31.2278
+            },
+            {
+              'name': 'مستشفى المنيل التخصصي',
+              'latitude': 30.0339,
+              'longitude': 31.2304
+            },
+            {
+              'name': 'مستشفى الدمرداش',
+              'latitude': 30.0827,
+              'longitude': 31.2904
+            },
           ]
         : hospitals;
 
@@ -543,7 +570,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.map_outlined, color: NeuroColors.textPrimary),
+                icon: const Icon(Icons.map_outlined,
+                    color: NeuroColors.textPrimary),
                 tooltip: 'فتح OpenStreetMap',
                 onPressed: _openOSM,
               ),
@@ -564,8 +592,10 @@ class _HospitalRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = hospital['name'] as String? ?? 'مستشفى';
-    final lat = (hospital['latitude'] as num?)?.toDouble() ?? (hospital['lat'] as num?)?.toDouble();
-    final lng = (hospital['longitude'] as num?)?.toDouble() ?? (hospital['lng'] as num?)?.toDouble();
+    final lat = (hospital['latitude'] as num?)?.toDouble() ??
+        (hospital['lat'] as num?)?.toDouble();
+    final lng = (hospital['longitude'] as num?)?.toDouble() ??
+        (hospital['lng'] as num?)?.toDouble();
     final distance = (hospital['distance_km'] as num?)?.toDouble() ?? 2.0;
 
     return Container(

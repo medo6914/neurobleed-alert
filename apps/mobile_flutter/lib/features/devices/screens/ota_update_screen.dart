@@ -75,7 +75,6 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
                 ),
               ),
               SizedBox(height: NeuroSpacing.lg),
-
               AppCard(
                 child: Padding(
                   padding: EdgeInsets.all(NeuroSpacing.md),
@@ -84,7 +83,8 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.info, size: 20, color: theme.colorScheme.primary),
+                          Icon(Icons.info,
+                              size: 20, color: theme.colorScheme.primary),
                           SizedBox(width: NeuroSpacing.sm),
                           Text(
                             'Current Firmware',
@@ -98,9 +98,12 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
                       SizedBox(height: NeuroSpacing.md),
                       Container(
                         width: double.infinity,
-                        padding: EdgeInsets.symmetric(horizontal: NeuroSpacing.md, vertical: NeuroSpacing.md),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: NeuroSpacing.md,
+                            vertical: NeuroSpacing.md),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                          color: theme.colorScheme.primaryContainer
+                              .withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(NeuroRadius.md),
                         ),
                         child: Text(
@@ -117,7 +120,6 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
                 ),
               ),
               SizedBox(height: NeuroSpacing.lg),
-
               AppCard(
                 child: Padding(
                   padding: EdgeInsets.all(NeuroSpacing.md),
@@ -126,7 +128,8 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.system_update, size: 20, color: theme.colorScheme.primary),
+                          Icon(Icons.system_update,
+                              size: 20, color: theme.colorScheme.primary),
                           SizedBox(width: NeuroSpacing.sm),
                           Text(
                             'New Firmware Version',
@@ -143,8 +146,10 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
                         hint: 'e.g. 2.0.0',
                         controller: _firmwareController,
                         validator: (v) {
-                          if (v == null || v.isEmpty) return 'Firmware version is required';
-                          final result = DeviceValidator.validateFirmwareVersion(v);
+                          if (v == null || v.isEmpty)
+                            return 'Firmware version is required';
+                          final result =
+                              DeviceValidator.validateFirmwareVersion(v);
                           return result.fold((f) => f.message, (_) => null);
                         },
                       ),
@@ -153,7 +158,6 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
                 ),
               ),
               SizedBox(height: NeuroSpacing.lg),
-
               if (otaState.isUpdating) ...[
                 AppCard(
                   child: Padding(
@@ -164,7 +168,9 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
                           width: 60,
                           height: 60,
                           child: CircularProgressIndicator(
-                            value: otaState.progress > 0 ? otaState.progress / 100 : null,
+                            value: otaState.progress > 0
+                                ? otaState.progress / 100
+                                : null,
                             strokeWidth: 4,
                           ),
                         ),
@@ -183,7 +189,6 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
                 ),
                 SizedBox(height: NeuroSpacing.md),
               ],
-
               if (otaState.error != null)
                 Padding(
                   padding: EdgeInsets.only(bottom: NeuroSpacing.md),
@@ -193,22 +198,23 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
                     description: otaState.error,
                   ),
                 ),
-
               if (otaState.result != null)
                 Padding(
                   padding: EdgeInsets.only(bottom: NeuroSpacing.md),
                   child: AlertBanner(
                     severity: AlertSeverity.stable,
                     title: 'Update Initiated',
-                    description: 'OTA firmware update has been triggered successfully.',
+                    description:
+                        'OTA firmware update has been triggered successfully.',
                   ),
                 ),
-
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: AppButton(
-                  label: otaState.isUpdating ? 'Updating...' : 'Trigger OTA Update',
+                  label: otaState.isUpdating
+                      ? 'Updating...'
+                      : 'Trigger OTA Update',
                   icon: otaState.isUpdating ? null : Icons.system_update_alt,
                   isLoading: otaState.isUpdating,
                   onPressed: otaState.isUpdating ? null : _triggerOta,
@@ -233,7 +239,8 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
     final confirmed = await AppDialog.confirm(
       context,
       title: 'Confirm OTA Update',
-      message: 'Are you sure you want to update the firmware to ${_firmwareController.text.trim()}?',
+      message:
+          'Are you sure you want to update the firmware to ${_firmwareController.text.trim()}?',
       confirmLabel: 'Update',
       isDangerous: true,
     );
@@ -249,7 +256,9 @@ class _OtaUpdateScreenState extends ConsumerState<OtaUpdateScreen> {
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
+          SnackBar(
+              content: Text(failure.message),
+              backgroundColor: NeuroColors.critical),
         );
       },
       (_) {

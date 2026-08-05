@@ -30,18 +30,18 @@ class RiskAssessmentResponse {
       riskScore: (json['risk_score'] as num).toDouble(),
       riskLevel: json['risk_level'] as String,
       confidence: (json['confidence'] as num).toDouble(),
-      contributingFactors: (json['contributing_factors'] as List<dynamic>?)
-              ?.cast<String>() ??
-          [],
+      contributingFactors:
+          (json['contributing_factors'] as List<dynamic>?)?.cast<String>() ??
+              [],
       trend: json['trend'] as String?,
-      rulesTriggered: (json['rules_triggered'] as List<dynamic>?)?.cast<String>() ?? [],
+      rulesTriggered:
+          (json['rules_triggered'] as List<dynamic>?)?.cast<String>() ?? [],
       modelVersion: json['model_version'] as String?,
       inferenceTimeMs: (json['inference_time_ms'] as num?)?.toDouble() ?? 0.0,
       shapValues: (json['shap_values'] as List<dynamic>?)
           ?.map((e) => (e as num).toDouble())
           .toList(),
-      featureNames: (json['feature_names'] as List<dynamic>?)
-          ?.cast<String>(),
+      featureNames: (json['feature_names'] as List<dynamic>?)?.cast<String>(),
       explanation: json['explanation'] as Map<String, dynamic>?,
     );
   }

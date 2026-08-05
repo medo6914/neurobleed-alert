@@ -147,12 +147,9 @@ class _AppShimmerLoadingState extends State<AppShimmerLoading>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = isDark
-        ? NeuroColors.bgElevated
-        : NeuroColors.chartGrid;
-    final highlightColor = isDark
-        ? NeuroColors.primaryGlass
-        : NeuroColors.chartFill;
+    final baseColor = isDark ? NeuroColors.bgElevated : NeuroColors.chartGrid;
+    final highlightColor =
+        isDark ? NeuroColors.primaryGlass : NeuroColors.chartFill;
 
     return AnimatedBuilder(
       animation: _animation,
@@ -168,8 +165,7 @@ class _AppShimmerLoadingState extends State<AppShimmerLoading>
                 baseColor,
               ],
               stops: const [0.0, 0.5, 1.0],
-              transform:
-                  GradientSliding(_animation.value),
+              transform: GradientSliding(_animation.value),
             ).createShader(bounds);
           },
           blendMode: BlendMode.srcOver,
@@ -179,9 +175,8 @@ class _AppShimmerLoadingState extends State<AppShimmerLoading>
             itemCount: widget.itemCount,
             shrinkWrap: true,
             separatorBuilder: (_, __) => SizedBox(
-              height: widget.scrollDirection == Axis.vertical
-                  ? NeuroSpacing.sm
-                  : 0,
+              height:
+                  widget.scrollDirection == Axis.vertical ? NeuroSpacing.sm : 0,
               width: widget.scrollDirection == Axis.horizontal
                   ? NeuroSpacing.sm
                   : 0,

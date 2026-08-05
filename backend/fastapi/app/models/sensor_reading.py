@@ -20,7 +20,9 @@ class SensorReading(FHIRMixin, MedicalCodeMixin, Base):
     device_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("devices.id", ondelete="SET NULL"), nullable=True
     )
-    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True, nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), index=True, nullable=False
+    )
 
     ir_value: Mapped[float | None] = mapped_column(Float, nullable=True)
     red_value: Mapped[float | None] = mapped_column(Float, nullable=True)
@@ -32,10 +34,16 @@ class SensorReading(FHIRMixin, MedicalCodeMixin, Base):
     motion_artifact: Mapped[float] = mapped_column(Float, default=0.0)
 
     risk_score: Mapped[float] = mapped_column(Float, default=0.0)
-    risk_level: Mapped[RiskLevel] = mapped_column(SAEnum(RiskLevel), nullable=False, default=RiskLevel.UNKNOWN)
+    risk_level: Mapped[RiskLevel] = mapped_column(
+        SAEnum(RiskLevel), nullable=False, default=RiskLevel.UNKNOWN
+    )
 
-    processed_by_tinyml: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0")
-    processed_by_cloud: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0")
+    processed_by_tinyml: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="0"
+    )
+    processed_by_cloud: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="0"
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
@@ -44,6 +52,18 @@ class SensorReading(FHIRMixin, MedicalCodeMixin, Base):
     patient = relationship("Patient", back_populates="sensor_readings")
 
 
-Index("ix_sensor_readings_patient_timestamp", SensorReading.patient_id, SensorReading.timestamp.desc())
-Index("ix_sensor_readings_device_timestamp", SensorReading.device_id, SensorReading.timestamp.desc())
-Index("ix_sensor_readings_risk_level_timestamp", SensorReading.risk_level, SensorReading.timestamp.desc())
+Index(
+    "ix_sensor_readings_patient_timestamp",
+    SensorReading.patient_id,
+    SensorReading.timestamp.desc(),
+)
+Index(
+    "ix_sensor_readings_device_timestamp",
+    SensorReading.device_id,
+    SensorReading.timestamp.desc(),
+)
+Index(
+    "ix_sensor_readings_risk_level_timestamp",
+    SensorReading.risk_level,
+    SensorReading.timestamp.desc(),
+)

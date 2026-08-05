@@ -8,7 +8,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class RAGEngine:
-    def __init__(self, index_path: str = "data/faiss_index", vectorizer_path: str = "data/vectorizer.pkl"):
+    def __init__(
+        self,
+        index_path: str = "data/faiss_index",
+        vectorizer_path: str = "data/vectorizer.pkl",
+    ):
         self.index_path = index_path
         self.vectorizer_path = vectorizer_path
         self.index: faiss.IndexFlatL2 | None = None
@@ -22,7 +26,9 @@ class RAGEngine:
         os.makedirs(os.path.dirname(self.index_path) or ".", exist_ok=True)
 
     def build_index(self, documents: list[dict]):
-        texts = [d.get("content", "") + " " + (d.get("title", "") or "") for d in documents]
+        texts = [
+            d.get("content", "") + " " + (d.get("title", "") or "") for d in documents
+        ]
         self.documents = documents
         self.doc_ids = [str(d.get("id", i)) for i, d in enumerate(documents)]
 
@@ -33,7 +39,9 @@ class RAGEngine:
             self._loaded = True
             return
 
-        self.vectorizer = TfidfVectorizer(max_features=self.dimension, stop_words="english")
+        self.vectorizer = TfidfVectorizer(
+            max_features=self.dimension, stop_words="english"
+        )
         embeddings = self.vectorizer.fit_transform(texts).toarray().astype(np.float32)
 
         actual_dim = embeddings.shape[1]
@@ -53,7 +61,9 @@ class RAGEngine:
             self.build_index(documents)
             return
 
-        texts = [d.get("content", "") + " " + (d.get("title", "") or "") for d in documents]
+        texts = [
+            d.get("content", "") + " " + (d.get("title", "") or "") for d in documents
+        ]
         start_idx = len(self.documents)
         for i, d in enumerate(documents):
             self.documents.append(d)

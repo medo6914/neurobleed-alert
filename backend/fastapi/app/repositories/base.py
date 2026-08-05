@@ -182,7 +182,9 @@ class BaseRepository(Generic[ModelType]):
         await self.db.refresh(obj)
         return obj
 
-    async def delete(self, id: uuid.UUID, soft: bool = True, deleted_by: uuid.UUID | None = None) -> bool:
+    async def delete(
+        self, id: uuid.UUID, soft: bool = True, deleted_by: uuid.UUID | None = None
+    ) -> bool:
         obj = await self.get(id)
         if not obj:
             return False
@@ -258,7 +260,9 @@ class BaseRepository(Generic[ModelType]):
         stmt = self.apply_sorting(stmt, params.sort_by, params.sort_order)
 
         count_stmt = select(func.count()).select_from(stmt.subquery())
-        total_result = await self._timed_execute(count_stmt, "paginate_with_params.count")
+        total_result = await self._timed_execute(
+            count_stmt, "paginate_with_params.count"
+        )
         total = total_result.scalar() or 0
 
         stmt = stmt.offset((params.page - 1) * params.per_page).limit(params.per_page)
@@ -311,7 +315,9 @@ class BaseRepository(Generic[ModelType]):
                 json.dumps({"id": str(last_id)}).encode()
             ).decode()
 
-        return CursorPage(items=items, cursor=next_cursor, has_more=has_more, total=total)
+        return CursorPage(
+            items=items, cursor=next_cursor, has_more=has_more, total=total
+        )
 
     async def cursor_paginate_with_params(
         self,

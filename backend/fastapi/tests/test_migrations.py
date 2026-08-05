@@ -24,7 +24,9 @@ class TestMigrationUpgrade:
             current_rev = mc.get_current_revision()
             assert current_rev is None
 
-    @pytest.mark.skip(reason="PostgreSQL-specific ALTER CONSTRAINT not supported on SQLite")
+    @pytest.mark.skip(
+        reason="PostgreSQL-specific ALTER CONSTRAINT not supported on SQLite"
+    )
     async def test_upgrade_creates_tables(self):
         from alembic.config import Config
         from alembic import command
@@ -42,7 +44,9 @@ class TestMigrationUpgrade:
         missing = essential - set(tables)
         assert not missing, f"Migration missing tables: {missing}"
 
-    @pytest.mark.skip(reason="PostgreSQL-specific ALTER CONSTRAINT not supported on SQLite")
+    @pytest.mark.skip(
+        reason="PostgreSQL-specific ALTER CONSTRAINT not supported on SQLite"
+    )
     async def test_downgrade_removes_tables(self):
         from alembic.config import Config
         from alembic import command
@@ -58,7 +62,9 @@ class TestMigrationUpgrade:
         inspector = inspect(engine)
         inspector.get_table_names()
 
-    @pytest.mark.skip(reason="PostgreSQL-specific ALTER CONSTRAINT not supported on SQLite")
+    @pytest.mark.skip(
+        reason="PostgreSQL-specific ALTER CONSTRAINT not supported on SQLite"
+    )
     async def test_upgrade_is_idempotent(self):
         from alembic.config import Config
         from alembic import command
@@ -74,7 +80,9 @@ class TestMigrationUpgrade:
         tables_after = set(inspect(engine).get_table_names())
         assert tables_before == tables_after, "Upgrade is not idempotent"
 
-    @pytest.mark.skip(reason="PostgreSQL-specific ALTER CONSTRAINT not supported on SQLite")
+    @pytest.mark.skip(
+        reason="PostgreSQL-specific ALTER CONSTRAINT not supported on SQLite"
+    )
     async def test_downgrade_all_the_way(self):
         from alembic.config import Config
         from alembic import command
@@ -87,6 +95,7 @@ class TestMigrationUpgrade:
         command.upgrade(alembic_cfg, "head")
 
         from alembic.script import ScriptDirectory
+
         script = ScriptDirectory.from_config(alembic_cfg)
         revisions = list(script.walk_revisions("base", "heads"))
         for _ in revisions:

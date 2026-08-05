@@ -51,7 +51,8 @@ class _AdmissionScreenState extends ConsumerState<AdmissionScreen> {
           message: e.toString(),
         ),
         data: (patient) {
-          if (_primaryDiagnosisController.text.isEmpty && patient.primaryDiagnosis != null) {
+          if (_primaryDiagnosisController.text.isEmpty &&
+              patient.primaryDiagnosis != null) {
             _primaryDiagnosisController.text = patient.primaryDiagnosis!;
           }
 
@@ -66,76 +67,87 @@ class _AdmissionScreenState extends ConsumerState<AdmissionScreen> {
                     child: Row(
                       children: [
                         CircleAvatar(
-                          child: Text('${patient.firstName[0]}${patient.lastName[0]}'),
+                          child: Text(
+                              '${patient.firstName[0]}${patient.lastName[0]}'),
                         ),
                         SizedBox(width: NeuroSpacing.md),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('${patient.firstName} ${patient.lastName}', style: Theme.of(context).textTheme.titleMedium),
-                            Text('MRN: ${patient.mrn}', style: Theme.of(context).textTheme.bodySmall),
+                            Text('${patient.firstName} ${patient.lastName}',
+                                style: Theme.of(context).textTheme.titleMedium),
+                            Text('MRN: ${patient.mrn}',
+                                style: Theme.of(context).textTheme.bodySmall),
                           ],
                         ),
                       ],
                     ),
                   ),
                   SizedBox(height: NeuroSpacing.lg),
-
-                  Text(localizations.t('admissionDetails'), style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary,
-                  )),
+                  Text(localizations.t('admissionDetails'),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
+                          )),
                   SizedBox(height: NeuroSpacing.sm),
-
                   DropdownButtonFormField<String>(
                     value: _admissionType,
                     decoration: InputDecoration(
                       labelText: localizations.t('admissionType'),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(NeuroRadius.md)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(NeuroRadius.md)),
                     ),
-                    items: ['emergency', 'elective', 'urgent'].map((t) => DropdownMenuItem(
-                      value: t, child: Text(t),
-                    )).toList(),
+                    items: ['emergency', 'elective', 'urgent']
+                        .map((t) => DropdownMenuItem(
+                              value: t,
+                              child: Text(t),
+                            ))
+                        .toList(),
                     onChanged: (v) => setState(() => _admissionType = v!),
                   ),
                   SizedBox(height: NeuroSpacing.sm),
-
                   AppInput(
                     controller: _admittingPhysicianController,
                     label: localizations.t('admittingPhysician'),
                   ),
                   SizedBox(height: NeuroSpacing.sm),
-
                   Row(
                     children: [
-                      Expanded(child: AppInput(controller: _wardController, label: localizations.t('ward'))),
+                      Expanded(
+                          child: AppInput(
+                              controller: _wardController,
+                              label: localizations.t('ward'))),
                       SizedBox(width: NeuroSpacing.sm),
-                      Expanded(child: AppInput(controller: _bedNumberController, label: localizations.t('bedNumber'))),
+                      Expanded(
+                          child: AppInput(
+                              controller: _bedNumberController,
+                              label: localizations.t('bedNumber'))),
                     ],
                   ),
                   SizedBox(height: NeuroSpacing.sm),
-
                   AppInput(
                     controller: _primaryDiagnosisController,
                     label: localizations.t('primaryDiagnosis'),
                   ),
                   SizedBox(height: NeuroSpacing.sm),
-
                   TextField(
                     controller: _admissionNotesController,
                     maxLines: 4,
                     decoration: InputDecoration(
                       labelText: localizations.t('notes'),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(NeuroRadius.md)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(NeuroRadius.md)),
                       alignLabelWithHint: true,
                     ),
                   ),
                   SizedBox(height: NeuroSpacing.xxl),
-
                   SizedBox(
                     width: double.infinity,
                     height: 48,
                     child: AppButton(
-                      label: _isSubmitting ? localizations.t('admitting') : localizations.t('admitPatient'),
+                      label: _isSubmitting
+                          ? localizations.t('admitting')
+                          : localizations.t('admitPatient'),
                       icon: _isSubmitting ? null : Icons.local_hospital,
                       isLoading: _isSubmitting,
                       onPressed: _isSubmitting ? null : () => _submit(patient),
@@ -163,10 +175,18 @@ class _AdmissionScreenState extends ConsumerState<AdmissionScreen> {
       status: AdmissionStatus.active,
       admissionType: _admissionType,
       admittingPhysician: _admittingPhysicianController.text.trim(),
-      ward: _wardController.text.trim().isEmpty ? null : _wardController.text.trim(),
-      bedNumber: _bedNumberController.text.trim().isEmpty ? null : _bedNumberController.text.trim(),
-      primaryDiagnosis: _primaryDiagnosisController.text.trim().isEmpty ? null : _primaryDiagnosisController.text.trim(),
-      admissionNotes: _admissionNotesController.text.trim().isEmpty ? null : _admissionNotesController.text.trim(),
+      ward: _wardController.text.trim().isEmpty
+          ? null
+          : _wardController.text.trim(),
+      bedNumber: _bedNumberController.text.trim().isEmpty
+          ? null
+          : _bedNumberController.text.trim(),
+      primaryDiagnosis: _primaryDiagnosisController.text.trim().isEmpty
+          ? null
+          : _primaryDiagnosisController.text.trim(),
+      admissionNotes: _admissionNotesController.text.trim().isEmpty
+          ? null
+          : _admissionNotesController.text.trim(),
       admissionDate: now,
       createdAt: now,
       updatedAt: now,
@@ -180,7 +200,9 @@ class _AdmissionScreenState extends ConsumerState<AdmissionScreen> {
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
+          SnackBar(
+              content: Text(failure.message),
+              backgroundColor: NeuroColors.critical),
         );
       },
       (_) {

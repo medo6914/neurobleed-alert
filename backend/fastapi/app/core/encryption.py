@@ -17,7 +17,9 @@ _SALT = b"neurobleed_encryption_salt_v1"
 
 
 def _derive_fernet_key(secret_key: str, salt: bytes = _SALT) -> bytes:
-    kdf = PBKDF2HMAC(algorithm=hashes.SHA256(), length=32, salt=salt, iterations=600_000)
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(), length=32, salt=salt, iterations=600_000
+    )
     return base64.urlsafe_b64encode(kdf.derive(secret_key.encode("utf-8")))
 
 
@@ -58,5 +60,7 @@ def decrypt_json(cipher_text: str | None) -> dict[str, Any] | None:
 def hash_for_indexing(value: str | None) -> str | None:
     if value is None:
         return None
-    raw = hashlib.sha256((value.lower().strip() + _SALT.decode()).encode("utf-8")).hexdigest()
+    raw = hashlib.sha256(
+        (value.lower().strip() + _SALT.decode()).encode("utf-8")
+    ).hexdigest()
     return raw

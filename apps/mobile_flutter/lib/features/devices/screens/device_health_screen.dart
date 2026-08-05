@@ -37,7 +37,8 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
   @override
   Widget build(BuildContext context) {
     final deviceAsync = ref.watch(deviceDetailProvider(widget.deviceId));
-    final diagnosticsAsync = ref.watch(deviceDiagnosticsProvider(widget.deviceId));
+    final diagnosticsAsync =
+        ref.watch(deviceDiagnosticsProvider(widget.deviceId));
 
     return Scaffold(
       appBar: AppBar(
@@ -71,7 +72,8 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
     );
   }
 
-  Widget _buildHealthContent(BuildContext context, Device device, DeviceDiagnostics? diag) {
+  Widget _buildHealthContent(
+      BuildContext context, Device device, DeviceDiagnostics? diag) {
     final theme = Theme.of(context);
 
     return SingleChildScrollView(
@@ -150,7 +152,6 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
             ),
           ),
           SizedBox(height: NeuroSpacing.xl),
-
           Row(
             children: [
               Expanded(
@@ -207,7 +208,6 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
             ],
           ),
           SizedBox(height: NeuroSpacing.lg),
-
           AppCard(
             child: Padding(
               padding: EdgeInsets.all(NeuroSpacing.md),
@@ -217,7 +217,10 @@ class _DeviceHealthScreenState extends ConsumerState<DeviceHealthScreen> {
                     icon: Icons.access_time,
                     label: 'Last Heartbeat',
                     value: _relativeTime(device.lastHeartbeat),
-                    valueColor: DateTime.now().difference(device.lastHeartbeat).inMinutes > 5
+                    valueColor: DateTime.now()
+                                .difference(device.lastHeartbeat)
+                                .inMinutes >
+                            5
                         ? NeuroColors.critical
                         : null,
                   ),

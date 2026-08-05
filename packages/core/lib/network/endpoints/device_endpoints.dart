@@ -79,8 +79,7 @@ class DeviceApi {
   Future<Response> triggerOta(String id, Map<String, dynamic> data) =>
       _client.post(DeviceEndpoints.ota(id), data: data);
 
-  Future<Response> registerCertificate(
-          String id, Map<String, dynamic> data) =>
+  Future<Response> registerCertificate(String id, Map<String, dynamic> data) =>
       _client.post(DeviceEndpoints.certificate(id), data: data);
 
   Future<Response> getHistory(
@@ -103,7 +102,8 @@ class DeviceApi {
     final params = <String, dynamic>{'page': page, 'limit': limit};
     if (status != null) params['status'] = status;
     if (deviceType != null) params['device_type'] = deviceType;
-    return _client.get('${DeviceEndpoints.base}/provisioning/keys', queryParameters: params);
+    return _client.get('${DeviceEndpoints.base}/provisioning/keys',
+        queryParameters: params);
   }
 
   Future<Response> getProvisioningKey(String keyId) =>
@@ -118,12 +118,16 @@ class DeviceApi {
   Future<Response> logDiagnostics(String id, Map<String, dynamic> data) =>
       _client.post('${DeviceEndpoints.base}/$id/diagnostics/log', data: data);
 
-  Future<Response> listDiagnosticsLogs(String id, {int page = 1, int limit = 50}) =>
-      _client.get('${DeviceEndpoints.base}/$id/diagnostics/logs', queryParameters: {'page': page, 'limit': limit});
+  Future<Response> listDiagnosticsLogs(String id,
+          {int page = 1, int limit = 50}) =>
+      _client.get('${DeviceEndpoints.base}/$id/diagnostics/logs',
+          queryParameters: {'page': page, 'limit': limit});
 
-  Future<Response> listDeviceEvents(String id, {String? eventType, int limit = 50}) {
+  Future<Response> listDeviceEvents(String id,
+      {String? eventType, int limit = 50}) {
     final params = <String, dynamic>{'limit': limit};
     if (eventType != null) params['event_type'] = eventType;
-    return _client.get('${DeviceEndpoints.base}/$id/events', queryParameters: params);
+    return _client.get('${DeviceEndpoints.base}/$id/events',
+        queryParameters: params);
   }
 }

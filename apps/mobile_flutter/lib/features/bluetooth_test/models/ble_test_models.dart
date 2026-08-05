@@ -33,7 +33,9 @@ class BleTestCharacteristic {
   });
 
   bool get isReadable => properties.contains('read');
-  bool get isWritable => properties.contains('write') || properties.contains('writeWithoutResponse');
+  bool get isWritable =>
+      properties.contains('write') ||
+      properties.contains('writeWithoutResponse');
   bool get isNotifiable => properties.contains('notify');
   bool get isIndicatable => properties.contains('indicate');
 }

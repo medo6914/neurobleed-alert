@@ -36,11 +36,10 @@ class DeviceRepository {
       DeviceCreateRequest request) async {
     try {
       final response = await _deviceApi.registerDevice(request.toJson());
-      final dto =
-          DeviceDto.fromJson(response.data as Map<String, dynamic>);
+      final dto = DeviceDto.fromJson(response.data as Map<String, dynamic>);
       final device = DeviceMapper.toEntity(dto);
-      await _cache?.put('device_${device.id}',
-          DeviceCollection.fromEntity(device).toJson());
+      await _cache?.put(
+          'device_${device.id}', DeviceCollection.fromEntity(device).toJson());
       return Right(device);
     } catch (e) {
       final sq = _syncQueue;
@@ -60,18 +59,16 @@ class DeviceRepository {
   Future<Either<Failure, Device>> getDevice(String id) async {
     try {
       final response = await _deviceApi.getDevice(id);
-      final dto =
-          DeviceDto.fromJson(response.data as Map<String, dynamic>);
+      final dto = DeviceDto.fromJson(response.data as Map<String, dynamic>);
       final device = DeviceMapper.toEntity(dto);
-      await _cache?.put('device_$id',
-          DeviceCollection.fromEntity(device).toJson());
+      await _cache?.put(
+          'device_$id', DeviceCollection.fromEntity(device).toJson());
       return Right(device);
     } catch (e) {
       try {
         final cached = await _cache?.get<Device>(
           'device_$id',
-          fromJson: (json) =>
-              DeviceCollection.fromJson(json).toEntity(),
+          fromJson: (json) => DeviceCollection.fromJson(json).toEntity(),
         );
         if (cached != null) return Right(cached);
       } catch (_) {}
@@ -116,13 +113,11 @@ class DeviceRepository {
   Future<Either<Failure, Device>> updateDevice(
       String id, DeviceUpdateRequest request) async {
     try {
-      final response =
-          await _deviceApi.updateDevice(id, request.toJson());
-      final dto =
-          DeviceDto.fromJson(response.data as Map<String, dynamic>);
+      final response = await _deviceApi.updateDevice(id, request.toJson());
+      final dto = DeviceDto.fromJson(response.data as Map<String, dynamic>);
       final device = DeviceMapper.toEntity(dto);
-      await _cache?.put('device_$id',
-          DeviceCollection.fromEntity(device).toJson());
+      await _cache?.put(
+          'device_$id', DeviceCollection.fromEntity(device).toJson());
       return Right(device);
     } catch (e) {
       final sq = _syncQueue;
@@ -152,13 +147,11 @@ class DeviceRepository {
   Future<Either<Failure, Device>> updateStatus(
       String id, DeviceStatusUpdate statusUpdate) async {
     try {
-      final response =
-          await _deviceApi.updateStatus(id, statusUpdate.toJson());
-      final dto =
-          DeviceDto.fromJson(response.data as Map<String, dynamic>);
+      final response = await _deviceApi.updateStatus(id, statusUpdate.toJson());
+      final dto = DeviceDto.fromJson(response.data as Map<String, dynamic>);
       final device = DeviceMapper.toEntity(dto);
-      await _cache?.put('device_$id',
-          DeviceCollection.fromEntity(device).toJson());
+      await _cache?.put(
+          'device_$id', DeviceCollection.fromEntity(device).toJson());
       return Right(device);
     } catch (e) {
       return Left(_errorHandler.handle(e));
@@ -168,13 +161,11 @@ class DeviceRepository {
   Future<Either<Failure, Device>> assignDevice(
       String id, DeviceAssignRequest request) async {
     try {
-      final response =
-          await _deviceApi.assignDevice(id, request.toJson());
-      final dto =
-          DeviceDto.fromJson(response.data as Map<String, dynamic>);
+      final response = await _deviceApi.assignDevice(id, request.toJson());
+      final dto = DeviceDto.fromJson(response.data as Map<String, dynamic>);
       final device = DeviceMapper.toEntity(dto);
-      await _cache?.put('device_$id',
-          DeviceCollection.fromEntity(device).toJson());
+      await _cache?.put(
+          'device_$id', DeviceCollection.fromEntity(device).toJson());
       return Right(device);
     } catch (e) {
       return Left(_errorHandler.handle(e));
@@ -184,11 +175,10 @@ class DeviceRepository {
   Future<Either<Failure, Device>> unassignDevice(String id) async {
     try {
       final response = await _deviceApi.unassignDevice(id);
-      final dto =
-          DeviceDto.fromJson(response.data as Map<String, dynamic>);
+      final dto = DeviceDto.fromJson(response.data as Map<String, dynamic>);
       final device = DeviceMapper.toEntity(dto);
-      await _cache?.put('device_$id',
-          DeviceCollection.fromEntity(device).toJson());
+      await _cache?.put(
+          'device_$id', DeviceCollection.fromEntity(device).toJson());
       return Right(device);
     } catch (e) {
       return Left(_errorHandler.handle(e));
@@ -198,25 +188,22 @@ class DeviceRepository {
   Future<Either<Failure, Device>> heartbeat(
       String id, DeviceHeartbeatRequest request) async {
     try {
-      final response =
-          await _deviceApi.heartbeat(id, request.toJson());
-      final dto =
-          DeviceDto.fromJson(response.data as Map<String, dynamic>);
+      final response = await _deviceApi.heartbeat(id, request.toJson());
+      final dto = DeviceDto.fromJson(response.data as Map<String, dynamic>);
       final device = DeviceMapper.toEntity(dto);
-      await _cache?.put('device_$id',
-          DeviceCollection.fromEntity(device).toJson());
+      await _cache?.put(
+          'device_$id', DeviceCollection.fromEntity(device).toJson());
       return Right(device);
     } catch (e) {
       return Left(_errorHandler.handle(e));
     }
   }
 
-  Future<Either<Failure, DeviceDiagnostics>> getDiagnostics(
-      String id) async {
+  Future<Either<Failure, DeviceDiagnostics>> getDiagnostics(String id) async {
     try {
       final response = await _deviceApi.getDiagnostics(id);
-      return Right(DeviceDiagnostics.fromJson(
-          response.data as Map<String, dynamic>));
+      return Right(
+          DeviceDiagnostics.fromJson(response.data as Map<String, dynamic>));
     } catch (e) {
       return Left(_errorHandler.handle(e));
     }
@@ -276,7 +263,8 @@ class DeviceRepository {
     int limit = 20,
   }) async {
     try {
-      final response = await _deviceApi.getHistory(id, page: page, limit: limit);
+      final response =
+          await _deviceApi.getHistory(id, page: page, limit: limit);
       final data = response.data['data'] as List<dynamic>? ?? [];
       return Right(data);
     } catch (e) {

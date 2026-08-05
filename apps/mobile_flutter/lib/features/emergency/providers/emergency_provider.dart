@@ -78,7 +78,8 @@ class EmergencyNotifier extends StateNotifier<EmergencySosState> {
     try {
       final params = <String, dynamic>{};
       if (patientId != null) params['patient_id'] = patientId;
-      final response = await _apiClient.get('/v1/emergency/events', queryParameters: params);
+      final response =
+          await _apiClient.get('/v1/emergency/events', queryParameters: params);
       state = state.copyWith(
         isLoading: false,
         events: (response.data as List).cast<Map<String, dynamic>>(),
@@ -102,7 +103,8 @@ class EmergencyNotifier extends StateNotifier<EmergencySosState> {
     try {
       final params = <String, dynamic>{};
       if (patientId != null) params['patient_id'] = patientId;
-      final response = await _apiClient.get('/v1/emergency/contacts', queryParameters: params);
+      final response = await _apiClient.get('/v1/emergency/contacts',
+          queryParameters: params);
       state = state.copyWith(
         isLoading: false,
         contacts: (response.data as List).cast<Map<String, dynamic>>(),
@@ -135,7 +137,8 @@ class EmergencyNotifier extends StateNotifier<EmergencySosState> {
   }
 }
 
-final emergencyProvider = StateNotifierProvider<EmergencyNotifier, EmergencySosState>((ref) {
+final emergencyProvider =
+    StateNotifierProvider<EmergencyNotifier, EmergencySosState>((ref) {
   final apiClient = ref.watch(apiClientProvider);
   return EmergencyNotifier(apiClient);
 });

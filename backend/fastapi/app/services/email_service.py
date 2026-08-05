@@ -28,10 +28,14 @@ class EmailService:
         if provider == "resend" and settings.RESEND_API_KEY:
             return await self._send_resend(recipients, subject, html_body, sender)
         if provider == "sendgrid" and settings.SENDGRID_API_KEY:
-            return await self._send_sendgrid(recipients, subject, html_body, sender, text_body)
+            return await self._send_sendgrid(
+                recipients, subject, html_body, sender, text_body
+            )
         return await self._send_smtp(recipients, subject, html_body, sender)
 
-    async def _send_smtp(self, recipients: list[str], subject: str, html_body: str, sender: str) -> bool:
+    async def _send_smtp(
+        self, recipients: list[str], subject: str, html_body: str, sender: str
+    ) -> bool:
         if not settings.SMTP_HOST or not settings.SMTP_USER:
             logger.warning("SMTP not configured, skipping email to %s", recipients)
             return False
@@ -41,7 +45,9 @@ class EmailService:
             msg["From"] = sender
             msg["To"] = ", ".join(recipients)
             msg.attach(MIMEText(html_body, "html"))
-            with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=20) as server:
+            with smtplib.SMTP(
+                settings.SMTP_HOST, settings.SMTP_PORT, timeout=20
+            ) as server:
                 server.starttls()
                 server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
                 server.sendmail(sender, recipients, msg.as_string())
@@ -51,13 +57,20 @@ class EmailService:
             logger.warning("SMTP send failed: %s", e)
             return False
 
-    async def _send_resend(self, recipients: list[str], subject: str, html_body: str, sender: str) -> bool:
+    async def _send_resend(
+        self, recipients: list[str], subject: str, html_body: str, sender: str
+    ) -> bool:
         try:
             async with httpx.AsyncClient(timeout=20) as client:
                 resp = await client.post(
                     "https://api.resend.com/emails",
                     headers={"Authorization": f"Bearer {settings.RESEND_API_KEY}"},
-                    json={"from": sender, "to": recipients, "subject": subject, "html": html_body},
+                    json={
+                        "from": sender,
+                        "to": recipients,
+                        "subject": subject,
+                        "html": html_body,
+                    },
                 )
                 resp.raise_for_status()
             logger.info("Resend email sent to %s", recipients)
@@ -66,7 +79,14 @@ class EmailService:
             logger.warning("Resend send failed: %s", e)
             return False
 
-    async def _send_sendgrid(self, recipients: list[str], subject: str, html_body: str, sender: str, text_body: str | None) -> bool:
+    async def _send_sendgrid(
+        self,
+        recipients: list[str],
+        subject: str,
+        html_body: str,
+        sender: str,
+        text_body: str | None,
+    ) -> bool:
         try:
             from_email = settings.SENDGRID_FROM_EMAIL or sender
             async with httpx.AsyncClient(timeout=20) as client:
@@ -74,7 +94,9 @@ class EmailService:
                     "https://api.sendgrid.com/v3/mail/send",
                     headers={"Authorization": f"Bearer {settings.SENDGRID_API_KEY}"},
                     json={
-                        "personalizations": [{"to": [{"email": r} for r in recipients]}],
+                        "personalizations": [
+                            {"to": [{"email": r} for r in recipients]}
+                        ],
                         "from": {"email": from_email},
                         "subject": subject,
                         "content": [{"type": "text/plain", "value": text_body or ""}],

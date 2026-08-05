@@ -5,7 +5,8 @@ import 'package:design_system/design_system.dart';
 import 'package:core/core.dart';
 import '../providers/device_repository_providers.dart';
 
-final provisionFormProvider = StateNotifierProvider<ProvisionFormNotifier, ProvisionFormState>((ref) {
+final provisionFormProvider =
+    StateNotifierProvider<ProvisionFormNotifier, ProvisionFormState>((ref) {
   return ProvisionFormNotifier(ref.read(deviceRepositoryProvider));
 });
 
@@ -75,7 +76,8 @@ class ProvisionDeviceScreen extends ConsumerStatefulWidget {
   const ProvisionDeviceScreen({super.key});
 
   @override
-  ConsumerState<ProvisionDeviceScreen> createState() => _ProvisionDeviceScreenState();
+  ConsumerState<ProvisionDeviceScreen> createState() =>
+      _ProvisionDeviceScreenState();
 }
 
 class _ProvisionDeviceScreenState extends ConsumerState<ProvisionDeviceScreen> {
@@ -121,7 +123,8 @@ class _ProvisionDeviceScreenState extends ConsumerState<ProvisionDeviceScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.vpn_key, size: 20, color: theme.colorScheme.primary),
+                          Icon(Icons.vpn_key,
+                              size: 20, color: theme.colorScheme.primary),
                           SizedBox(width: NeuroSpacing.sm),
                           Text(
                             'Provisioning Key',
@@ -145,7 +148,8 @@ class _ProvisionDeviceScreenState extends ConsumerState<ProvisionDeviceScreen> {
                         hint: 'e.g. a1b2c3d4e5f6g7h8',
                         controller: _keyController,
                         validator: (v) {
-                          if (v == null || v.length < 8) return 'Key must be at least 8 characters';
+                          if (v == null || v.length < 8)
+                            return 'Key must be at least 8 characters';
                           return null;
                         },
                       ),
@@ -162,7 +166,8 @@ class _ProvisionDeviceScreenState extends ConsumerState<ProvisionDeviceScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.devices, size: 20, color: theme.colorScheme.primary),
+                          Icon(Icons.devices,
+                              size: 20, color: theme.colorScheme.primary),
                           SizedBox(width: NeuroSpacing.sm),
                           Text(
                             'Device Information',
@@ -179,7 +184,8 @@ class _ProvisionDeviceScreenState extends ConsumerState<ProvisionDeviceScreen> {
                         hint: 'Enter device serial number',
                         controller: _serialController,
                         validator: (v) {
-                          if (v == null || v.length < 3) return 'Serial number must be at least 3 characters';
+                          if (v == null || v.length < 3)
+                            return 'Serial number must be at least 3 characters';
                           return null;
                         },
                       ),
@@ -207,7 +213,8 @@ class _ProvisionDeviceScreenState extends ConsumerState<ProvisionDeviceScreen> {
                 width: double.infinity,
                 height: 48,
                 child: AppButton(
-                  label: state.isLoading ? 'Claiming Device...' : 'Claim Device',
+                  label:
+                      state.isLoading ? 'Claiming Device...' : 'Claim Device',
                   icon: state.isLoading ? null : Icons.check_circle,
                   isLoading: state.isLoading,
                   onPressed: state.isLoading ? null : _submitClaim,
@@ -231,13 +238,16 @@ class _ProvisionDeviceScreenState extends ConsumerState<ProvisionDeviceScreen> {
   void _submitClaim() {
     if (!_formKey.currentState!.validate()) return;
     ref.read(provisionFormProvider.notifier).submitClaim(
-      provisioningKey: _keyController.text.trim(),
-      serialNumber: _serialController.text.trim(),
-      deviceName: _nameController.text.trim().isEmpty ? null : _nameController.text.trim(),
-    );
+          provisioningKey: _keyController.text.trim(),
+          serialNumber: _serialController.text.trim(),
+          deviceName: _nameController.text.trim().isEmpty
+              ? null
+              : _nameController.text.trim(),
+        );
   }
 
-  Widget _buildSuccessScreen(BuildContext context, ProvisioningClaimResponse response, ThemeData theme) {
+  Widget _buildSuccessScreen(BuildContext context,
+      ProvisioningClaimResponse response, ThemeData theme) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Device Provisioned'),
@@ -256,12 +266,14 @@ class _ProvisionDeviceScreenState extends ConsumerState<ProvisionDeviceScreen> {
                   shape: BoxShape.circle,
                   color: NeuroColors.success.withValues(alpha: 0.1),
                 ),
-                child: const Icon(Icons.check_circle, size: 60, color: NeuroColors.success),
+                child: const Icon(Icons.check_circle,
+                    size: 60, color: NeuroColors.success),
               ),
               SizedBox(height: NeuroSpacing.xl),
               Text(
                 'Device Claimed Successfully',
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: NeuroSpacing.md),
               Text(
@@ -278,11 +290,17 @@ class _ProvisionDeviceScreenState extends ConsumerState<ProvisionDeviceScreen> {
                     padding: EdgeInsets.all(NeuroSpacing.md),
                     child: Column(
                       children: [
-                        _infoRow(theme, 'Serial Number', response.device!['serial_number'] as String? ?? '-'),
+                        _infoRow(
+                            theme,
+                            'Serial Number',
+                            response.device!['serial_number'] as String? ??
+                                '-'),
                         SizedBox(height: NeuroSpacing.sm),
-                        _infoRow(theme, 'Device Name', response.device!['device_name'] as String? ?? '-'),
+                        _infoRow(theme, 'Device Name',
+                            response.device!['device_name'] as String? ?? '-'),
                         SizedBox(height: NeuroSpacing.sm),
-                        _infoRow(theme, 'Device ID', response.device!['id'] as String? ?? '-'),
+                        _infoRow(theme, 'Device ID',
+                            response.device!['id'] as String? ?? '-'),
                       ],
                     ),
                   ),
@@ -326,14 +344,16 @@ class _ProvisionDeviceScreenState extends ConsumerState<ProvisionDeviceScreen> {
       children: [
         SizedBox(
           width: 120,
-          child: Text(label, style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          )),
+          child: Text(label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              )),
         ),
         Expanded(
-          child: Text(value, style: theme.textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-          )),
+          child: Text(value,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              )),
         ),
       ],
     );

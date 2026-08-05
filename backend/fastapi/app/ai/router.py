@@ -42,7 +42,8 @@ async def ai_health():
         "status": "ok",
         "service": "ai-gateway",
         "model_version": ai_service.risk_engine.MODEL_VERSION,
-        "rules_loaded": hasattr(ai_service.rules_engine, "rules") and len(ai_service.rules_engine.rules) > 0,
+        "rules_loaded": hasattr(ai_service.rules_engine, "rules")
+        and len(ai_service.rules_engine.rules) > 0,
         "risk_engine_ready": True,
         "model_trained": ai_service.risk_engine.is_trained(),
         "rag_loaded": ai_service.rag_engine.get_stats()["loaded"],
@@ -154,7 +155,9 @@ async def export_model(
     elif data.format == "tflite":
         path = ai_service.model_manager.export_tflite()
     else:
-        raise HTTPException(status_code=400, detail=f"Unsupported format: {data.format}")
+        raise HTTPException(
+            status_code=400, detail=f"Unsupported format: {data.format}"
+        )
 
     if not path:
         raise HTTPException(status_code=400, detail="Model not trained yet")
@@ -190,7 +193,10 @@ async def llm_providers(
     }
 
 
-@router.post("/chat", summary="Chat with the medical LLM assistant (Ollama/OpenAI/Gemini/HuggingFace)")
+@router.post(
+    "/chat",
+    summary="Chat with the medical LLM assistant (Ollama/OpenAI/Gemini/HuggingFace)",
+)
 async def chat(
     data: ChatRequest,
     current_user: User = Depends(get_current_user),

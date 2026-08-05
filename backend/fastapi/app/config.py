@@ -2,7 +2,9 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql+asyncpg://neurobleed:neurobleed_dev@localhost:5432/neurobleed"
+    DATABASE_URL: str = (
+        "postgresql+asyncpg://neurobleed:neurobleed_dev@localhost:5432/neurobleed"
+    )
     REDIS_URL: str = "redis://localhost:6379/0"
     SECRET_KEY: str = ""
     ALGORITHM: str = "HS256"

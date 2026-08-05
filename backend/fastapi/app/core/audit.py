@@ -96,20 +96,28 @@ def audit_log(action: str, resource: str):
 
 
 async def audit_middleware(request: Request, call_next):
-    correlation_id = request.headers.get("X-Correlation-ID") or generate_correlation_id()
+    correlation_id = (
+        request.headers.get("X-Correlation-ID") or generate_correlation_id()
+    )
     request.state.correlation_id = correlation_id
 
     response = await call_next(request)
 
     response.headers["X-Correlation-ID"] = correlation_id
 
-    if request.url.path.startswith("/api/v1/") and request.method not in ("GET", "HEAD", "OPTIONS"):
+    if request.url.path.startswith("/api/v1/") and request.method not in (
+        "GET",
+        "HEAD",
+        "OPTIONS",
+    ):
         await log_action(
             user_id=getattr(request.state, "user_id", None),
             action=request.method,
             resource=request.url.path,
             resource_id=request.path_params.get("id"),
-            details={"query_params": dict(request.query_params)} if request.query_params else None,
+            details={"query_params": dict(request.query_params)}
+            if request.query_params
+            else None,
             ip_address=request.client.host if request.client else None,
             user_agent=request.headers.get("user-agent"),
             correlation_id=correlation_id,

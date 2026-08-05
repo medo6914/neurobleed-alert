@@ -95,7 +95,9 @@ def apply_pagination(
     query = apply_sorting(query, model, params.sort_by, params.sort_order)
 
     count_query = select_count(query)
-    page_query = query.offset((params.page - 1) * params.per_page).limit(params.per_page)
+    page_query = query.offset((params.page - 1) * params.per_page).limit(
+        params.per_page
+    )
     return page_query, count_query
 
 
@@ -170,4 +172,6 @@ def _get_pk_name(model: type[DeclarativeBase]) -> str:
 
 
 def select_count(query: Select) -> Select:
-    return query.with_only_columns(func.count(), maintain_column_order=False).order_by(None)
+    return query.with_only_columns(func.count(), maintain_column_order=False).order_by(
+        None
+    )

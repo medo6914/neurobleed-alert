@@ -94,7 +94,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                     keyboardType: TextInputType.emailAddress,
                     prefixIcon: const Icon(Icons.email_outlined),
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'البريد الإلكتروني مطلوب';
+                      if (v == null || v.isEmpty)
+                        return 'البريد الإلكتروني مطلوب';
                       if (!v.contains('@')) return 'البريد الإلكتروني غير صحيح';
                       return null;
                     },

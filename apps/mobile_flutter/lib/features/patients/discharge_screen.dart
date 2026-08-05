@@ -31,7 +31,8 @@ class _DischargeScreenState extends ConsumerState<DischargeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final admissionsAsync = ref.watch(patientAdmissionsProvider(widget.patientId));
+    final admissionsAsync =
+        ref.watch(patientAdmissionsProvider(widget.patientId));
     final localizations = AppLocalizations.of(context);
 
     return Scaffold(
@@ -46,7 +47,9 @@ class _DischargeScreenState extends ConsumerState<DischargeScreen> {
           message: e.toString(),
         ),
         data: (admissions) {
-          final activeAdmissions = admissions.where((a) => a.status == AdmissionStatus.active).toList();
+          final activeAdmissions = admissions
+              .where((a) => a.status == AdmissionStatus.active)
+              .toList();
 
           if (activeAdmissions.isEmpty) {
             return AppEmptyState(
@@ -63,50 +66,74 @@ class _DischargeScreenState extends ConsumerState<DischargeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(localizations.t('selectAdmission'), style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary,
-                  )),
+                  Text(localizations.t('selectAdmission'),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: Theme.of(context).colorScheme.primary,
+                          )),
                   SizedBox(height: NeuroSpacing.sm),
                   ...activeAdmissions.map((admission) => Padding(
-                    padding: EdgeInsets.only(bottom: NeuroSpacing.sm),
-                    child: AppCard(
-                      onTap: () => setState(() => _selectedAdmissionId = admission.id),
-                      child: Row(
-                        children: [
-                          Radio<String>(
-                            value: admission.id,
-                            groupValue: _selectedAdmissionId,
-                            onChanged: (v) => setState(() => _selectedAdmissionId = v),
+                        padding: EdgeInsets.only(bottom: NeuroSpacing.sm),
+                        child: AppCard(
+                          onTap: () => setState(
+                              () => _selectedAdmissionId = admission.id),
+                          child: Row(
+                            children: [
+                              Radio<String>(
+                                value: admission.id,
+                                groupValue: _selectedAdmissionId,
+                                onChanged: (v) =>
+                                    setState(() => _selectedAdmissionId = v),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        '${admission.admissionType ?? "N/A"} - ${admission.admissionDate.toLocal().toString().substring(0, 10)}'),
+                                    Text(
+                                        '${admission.ward ?? "N/A"} / Bed ${admission.bedNumber ?? "N/A"}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('${admission.admissionType ?? "N/A"} - ${admission.admissionDate.toLocal().toString().substring(0, 10)}'),
-                                Text('${admission.ward ?? "N/A"} / Bed ${admission.bedNumber ?? "N/A"}', style: Theme.of(context).textTheme.bodySmall),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )),
+                        ),
+                      )),
                   if (_selectedAdmissionId != null) ...[
                     SizedBox(height: NeuroSpacing.lg),
-                    Text(localizations.t('dischargeDetails'), style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary,
-                    )),
+                    Text(localizations.t('dischargeDetails'),
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.primary,
+                            )),
                     SizedBox(height: NeuroSpacing.sm),
-                    AppInput(controller: _physicianController, label: localizations.t('dischargingPhysician')),
+                    AppInput(
+                        controller: _physicianController,
+                        label: localizations.t('dischargingPhysician')),
                     SizedBox(height: NeuroSpacing.sm),
                     DropdownButtonFormField<String>(
                       value: _disposition,
                       decoration: InputDecoration(
                         labelText: localizations.t('dischargeDisposition'),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(NeuroRadius.md)),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(NeuroRadius.md)),
                       ),
-                      items: ['home', 'rehabilitation', 'nursing_home', 'transfer', 'against_medical_advice', 'deceased']
-                          .map((d) => DropdownMenuItem(value: d, child: Text(d.replaceAll('_', ' ')))).toList(),
+                      items: [
+                        'home',
+                        'rehabilitation',
+                        'nursing_home',
+                        'transfer',
+                        'against_medical_advice',
+                        'deceased'
+                      ]
+                          .map((d) => DropdownMenuItem(
+                              value: d, child: Text(d.replaceAll('_', ' '))))
+                          .toList(),
                       onChanged: (v) => setState(() => _disposition = v!),
                     ),
                     SizedBox(height: NeuroSpacing.sm),
@@ -115,7 +142,9 @@ class _DischargeScreenState extends ConsumerState<DischargeScreen> {
                       maxLines: 6,
                       decoration: InputDecoration(
                         labelText: localizations.t('dischargeSummary'),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(NeuroRadius.md)),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.circular(NeuroRadius.md)),
                         alignLabelWithHint: true,
                       ),
                     ),
@@ -124,7 +153,9 @@ class _DischargeScreenState extends ConsumerState<DischargeScreen> {
                       width: double.infinity,
                       height: 48,
                       child: AppButton(
-                        label: _isSubmitting ? localizations.t('discharging') : localizations.t('dischargePatient'),
+                        label: _isSubmitting
+                            ? localizations.t('discharging')
+                            : localizations.t('dischargePatient'),
                         icon: _isSubmitting ? null : Icons.exit_to_app,
                         isLoading: _isSubmitting,
                         onPressed: _isSubmitting ? null : _submit,
@@ -141,7 +172,8 @@ class _DischargeScreenState extends ConsumerState<DischargeScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate() || _selectedAdmissionId == null) return;
+    if (!_formKey.currentState!.validate() || _selectedAdmissionId == null)
+      return;
     setState(() => _isSubmitting = true);
 
     final useCase = ref.read(dischargePatientProvider);
@@ -149,7 +181,9 @@ class _DischargeScreenState extends ConsumerState<DischargeScreen> {
       _selectedAdmissionId!,
       dischargeSummary: _summaryController.text.trim(),
       dischargeDisposition: _disposition,
-      dischargingPhysician: _physicianController.text.trim().isEmpty ? null : _physicianController.text.trim(),
+      dischargingPhysician: _physicianController.text.trim().isEmpty
+          ? null
+          : _physicianController.text.trim(),
     );
 
     setState(() => _isSubmitting = false);
@@ -157,7 +191,9 @@ class _DischargeScreenState extends ConsumerState<DischargeScreen> {
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
+          SnackBar(
+              content: Text(failure.message),
+              backgroundColor: NeuroColors.critical),
         );
       },
       (_) {

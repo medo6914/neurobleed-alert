@@ -102,10 +102,10 @@ class ReportGenerator:
         vitals_section = self._vitals_section(vitals, language)
         alerts_section = self._alerts_section(alerts, language)
         ai_section = self._ai_section(ai_reports, include_shap, language)
-        vitals_trend = self._vitals_trend_chart(vitals, language) if include_trends else ""
-        footer = (
-            f'<div class="footer">Generated: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")}</div>'
+        vitals_trend = (
+            self._vitals_trend_chart(vitals, language) if include_trends else ""
         )
+        footer = f'<div class="footer">Generated: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")}</div>'
 
         return f"""<!DOCTYPE html>
 <html lang="{language}">
@@ -146,22 +146,22 @@ th {{ background: #f5f5f5; }}
 <h2>معلومات المريض</h2>
 <table>
 <tr><td>الاسم</td><td>{patient.full_name}</td></tr>
-<tr><td>MRN</td><td>{patient.mrn or '-'}</td></tr>
+<tr><td>MRN</td><td>{patient.mrn or "-"}</td></tr>
 <tr><td>تاريخ الميلاد</td><td>{patient.date_of_birth}</td></tr>
-<tr><td>الجنس</td><td>{patient.gender.value if hasattr(patient.gender, 'value') else patient.gender}</td></tr>
-<tr><td>فصيلة الدم</td><td>{patient.blood_type.value if hasattr(patient.blood_type, 'value') else (patient.blood_type or '-')}</td></tr>
-<tr><td>السرير</td><td>{patient.bed_number or '-'}</td></tr>
+<tr><td>الجنس</td><td>{patient.gender.value if hasattr(patient.gender, "value") else patient.gender}</td></tr>
+<tr><td>فصيلة الدم</td><td>{patient.blood_type.value if hasattr(patient.blood_type, "value") else (patient.blood_type or "-")}</td></tr>
+<tr><td>السرير</td><td>{patient.bed_number or "-"}</td></tr>
 </table>
 </div>"""
         return f"""<div class="section">
 <h2>Patient Information</h2>
 <table>
 <tr><td>Name</td><td>{patient.full_name}</td></tr>
-<tr><td>MRN</td><td>{patient.mrn or '-'}</td></tr>
+<tr><td>MRN</td><td>{patient.mrn or "-"}</td></tr>
 <tr><td>Date of Birth</td><td>{patient.date_of_birth}</td></tr>
-<tr><td>Gender</td><td>{patient.gender.value if hasattr(patient.gender, 'value') else patient.gender}</td></tr>
-<tr><td>Blood Type</td><td>{patient.blood_type.value if hasattr(patient.blood_type, 'value') else (patient.blood_type or '-')}</td></tr>
-<tr><td>Bed</td><td>{patient.bed_number or '-'}</td></tr>
+<tr><td>Gender</td><td>{patient.gender.value if hasattr(patient.gender, "value") else patient.gender}</td></tr>
+<tr><td>Blood Type</td><td>{patient.blood_type.value if hasattr(patient.blood_type, "value") else (patient.blood_type or "-")}</td></tr>
+<tr><td>Bed</td><td>{patient.bed_number or "-"}</td></tr>
 </table>
 </div>"""
 
@@ -177,7 +177,11 @@ th {{ background: #f5f5f5; }}
 
         hr = f"{latest.heart_rate:.0f}" if latest.heart_rate else "-"
         spo2 = f"{latest.oxygen_saturation:.0f}%" if latest.oxygen_saturation else "-"
-        bp = f"{latest.systolic_bp:.0f}/{latest.diastolic_bp:.0f}" if latest.systolic_bp else "-"
+        bp = (
+            f"{latest.systolic_bp:.0f}/{latest.diastolic_bp:.0f}"
+            if latest.systolic_bp
+            else "-"
+        )
         temp = f"{latest.temperature:.1f}°C" if latest.temperature else "-"
 
         return f"""<div class="section">
@@ -216,8 +220,14 @@ th {{ background: #f5f5f5; }}
         title = "التنبيهات" if language == "ar" else "Alerts"
         rows = ""
         for a in alerts[:20]:
-            badge_class = "badge-critical" if a.severity.name == "CRITICAL" else "badge-warning" if a.severity.name in ("HIGH", "MEDIUM") else "badge-stable"
-            sev = a.severity.value if hasattr(a.severity, 'value') else str(a.severity)
+            badge_class = (
+                "badge-critical"
+                if a.severity.name == "CRITICAL"
+                else "badge-warning"
+                if a.severity.name in ("HIGH", "MEDIUM")
+                else "badge-stable"
+            )
+            sev = a.severity.value if hasattr(a.severity, "value") else str(a.severity)
             rows += f"""<tr>
 <td>{a.created_at.strftime("%Y-%m-%d %H:%M") if a.created_at else "-"}</td>
 <td>{a.message[:80]}</td>
@@ -234,7 +244,11 @@ th {{ background: #f5f5f5; }}
     def _ai_section(self, ai_reports: list, include_shap: bool, language: str) -> str:
         if not ai_reports:
             return ""
-        title = "تقييم الذكاء الاصطناعي للمخاطر" if language == "ar" else "AI Risk Assessment"
+        title = (
+            "تقييم الذكاء الاصطناعي للمخاطر"
+            if language == "ar"
+            else "AI Risk Assessment"
+        )
         latest = ai_reports[0]
         risk = f"{latest.risk_score:.2f}" if latest.risk_score else "N/A"
         bleeding = latest.bleeding_type or "N/A"
@@ -243,12 +257,14 @@ th {{ background: #f5f5f5; }}
 
         shap_section = ""
         if include_shap and latest.shap_values:
-            shap_section = "<h3>SHAP Explanation</h3><pre>" + str(latest.shap_values) + "</pre>"
+            shap_section = (
+                "<h3>SHAP Explanation</h3><pre>" + str(latest.shap_values) + "</pre>"
+            )
 
         return f"""<div class="section">
 <h2>{title}</h2>
 <table>
-<tr><td>Risk Score</td><td class="{'critical' if (latest.risk_score or 0) > 0.7 else 'warning' if (latest.risk_score or 0) > 0.4 else 'stable'}">{risk}</td></tr>
+<tr><td>Risk Score</td><td class="{"critical" if (latest.risk_score or 0) > 0.7 else "warning" if (latest.risk_score or 0) > 0.4 else "stable"}">{risk}</td></tr>
 <tr><td>Bleeding Type</td><td>{bleeding}</td></tr>
 <tr><td>ICP Risk</td><td>{icp}</td></tr>
 <tr><td>Herniation Risk</td><td>{herniation}</td></tr>

@@ -58,7 +58,8 @@ class PatientNotesScreen extends ConsumerWidget {
                         Row(
                           children: [
                             Chip(
-                              label: Text(note.type.name, style: const TextStyle(fontSize: 10)),
+                              label: Text(note.type.name,
+                                  style: const TextStyle(fontSize: 10)),
                               visualDensity: VisualDensity.compact,
                             ),
                             SizedBox(width: NeuroSpacing.sm),
@@ -66,34 +67,51 @@ class PatientNotesScreen extends ConsumerWidget {
                               const Icon(Icons.lock, size: 14),
                             const Spacer(),
                             Text(
-                              note.createdAt.toLocal().toString().substring(0, 10),
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
+                              note.createdAt
+                                  .toLocal()
+                                  .toString()
+                                  .substring(0, 10),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                             ),
                           ],
                         ),
                         SizedBox(height: NeuroSpacing.sm),
                         Text(
                           note.title,
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         SizedBox(height: NeuroSpacing.xs),
                         Text(
                           note.content,
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                         if (note.authorName != null) ...[
                           SizedBox(height: NeuroSpacing.sm),
                           Text(
                             'by ${note.authorName}',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
                           ),
                         ],
                       ],
@@ -157,7 +175,8 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
         children: [
           Center(
             child: Container(
-              width: 40, height: 4,
+              width: 40,
+              height: 4,
               decoration: BoxDecoration(
                 color: NeuroColors.textPrimary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(2),
@@ -165,17 +184,22 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
             ),
           ),
           SizedBox(height: NeuroSpacing.md),
-          Text(localizations.t('addNote'), style: Theme.of(context).textTheme.titleLarge),
+          Text(localizations.t('addNote'),
+              style: Theme.of(context).textTheme.titleLarge),
           SizedBox(height: NeuroSpacing.md),
           DropdownButtonFormField<NoteType>(
             value: _type,
             decoration: InputDecoration(
               labelText: localizations.t('type'),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(NeuroRadius.md)),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(NeuroRadius.md)),
             ),
-            items: NoteType.values.map((t) => DropdownMenuItem(
-              value: t, child: Text(t.name),
-            )).toList(),
+            items: NoteType.values
+                .map((t) => DropdownMenuItem(
+                      value: t,
+                      child: Text(t.name),
+                    ))
+                .toList(),
             onChanged: (v) => setState(() => _type = v!),
           ),
           SizedBox(height: NeuroSpacing.sm),
@@ -183,7 +207,8 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
             controller: _titleController,
             decoration: InputDecoration(
               labelText: localizations.t('title'),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(NeuroRadius.md)),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(NeuroRadius.md)),
             ),
           ),
           SizedBox(height: NeuroSpacing.sm),
@@ -192,7 +217,8 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
             maxLines: 5,
             decoration: InputDecoration(
               labelText: localizations.t('content'),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(NeuroRadius.md)),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(NeuroRadius.md)),
               alignLabelWithHint: true,
             ),
           ),
@@ -207,7 +233,9 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
           SizedBox(
             width: double.infinity,
             child: AppButton(
-              label: _isSubmitting ? localizations.t('saving') : localizations.t('save'),
+              label: _isSubmitting
+                  ? localizations.t('saving')
+                  : localizations.t('save'),
               isLoading: _isSubmitting,
               onPressed: _isSubmitting ? null : _submit,
             ),
@@ -218,7 +246,8 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
   }
 
   Future<void> _submit() async {
-    if (_titleController.text.isEmpty || _contentController.text.isEmpty) return;
+    if (_titleController.text.isEmpty || _contentController.text.isEmpty)
+      return;
     setState(() => _isSubmitting = true);
 
     final now = DateTime.now();
@@ -241,7 +270,9 @@ class _AddNoteSheetState extends ConsumerState<_AddNoteSheet> {
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
+          SnackBar(
+              content: Text(failure.message),
+              backgroundColor: NeuroColors.critical),
         );
       },
       (_) {

@@ -71,8 +71,7 @@ class AppInput extends StatelessWidget {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(NeuroRadius.md),
-              borderSide:
-                  const BorderSide(color: NeuroColors.error, width: 2),
+              borderSide: const BorderSide(color: NeuroColors.error, width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: NeuroSpacing.lg,

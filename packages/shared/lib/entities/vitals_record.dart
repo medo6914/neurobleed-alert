@@ -103,7 +103,8 @@ class VitalsRecord extends Equatable {
       weight: weight ?? this.weight,
       height: height ?? this.height,
       bmi: bmi ?? this.bmi,
-      bloodPressurePosition: bloodPressurePosition ?? this.bloodPressurePosition,
+      bloodPressurePosition:
+          bloodPressurePosition ?? this.bloodPressurePosition,
       motionArtifact: motionArtifact ?? this.motionArtifact,
       signalQuality: signalQuality ?? this.signalQuality,
       riskScore: riskScore ?? this.riskScore,

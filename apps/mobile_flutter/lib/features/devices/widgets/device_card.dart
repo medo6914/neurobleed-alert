@@ -54,7 +54,8 @@ class DeviceCard extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(NeuroSpacing.sm),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                      color: theme.colorScheme.primaryContainer
+                          .withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(NeuroRadius.md),
                     ),
                     child: Icon(
@@ -85,7 +86,8 @@ class DeviceCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Icon(Icons.chevron_right, color: theme.colorScheme.onSurfaceVariant),
+                  Icon(Icons.chevron_right,
+                      color: theme.colorScheme.onSurfaceVariant),
                 ],
               ),
               SizedBox(height: NeuroSpacing.sm),
@@ -107,7 +109,8 @@ class DeviceCard extends StatelessWidget {
               SizedBox(height: NeuroSpacing.xs),
               Row(
                 children: [
-                  Icon(Icons.access_time, size: 12, color: theme.colorScheme.onSurfaceVariant),
+                  Icon(Icons.access_time,
+                      size: 12, color: theme.colorScheme.onSurfaceVariant),
                   SizedBox(width: 4),
                   Text(
                     'Last seen: ${_relativeTime(device.lastHeartbeat)}',

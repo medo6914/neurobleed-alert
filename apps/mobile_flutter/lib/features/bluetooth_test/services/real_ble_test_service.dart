@@ -115,7 +115,8 @@ class RealBleTestService {
     }
   }
 
-  Future<void> startScan({Duration timeout = const Duration(seconds: 15)}) async {
+  Future<void> startScan(
+      {Duration timeout = const Duration(seconds: 15)}) async {
     if (_isScanning) return;
     if (!_bleEnabled) {
       _addLog('Cannot scan: Bluetooth is off', level: LogLevel.error);
@@ -226,8 +227,7 @@ class RealBleTestService {
       final device = BluetoothDevice.fromId(deviceId);
 
       _connectionStateSub?.cancel();
-      _connectionStateSub =
-          device.connectionState.listen((state) {
+      _connectionStateSub = device.connectionState.listen((state) {
         _handleConnectionStateChange(state, deviceId, deviceName);
       });
 
@@ -280,7 +280,8 @@ class RealBleTestService {
 
     _connectionState = BleTestConnectionState.disconnecting;
     _connectionController.add(_connectionState);
-    _addLog('Disconnecting from $_connectedDeviceName...', level: LogLevel.info);
+    _addLog('Disconnecting from $_connectedDeviceName...',
+        level: LogLevel.info);
 
     try {
       await _connectedDevice?.disconnect();
@@ -368,8 +369,7 @@ class RealBleTestService {
     }
   }
 
-  BluetoothCharacteristic? _findCharacteristic(
-      String characteristicUuid) {
+  BluetoothCharacteristic? _findCharacteristic(String characteristicUuid) {
     final device = _connectedDevice;
     if (device == null) return null;
 
@@ -416,8 +416,8 @@ class RealBleTestService {
     }
   }
 
-  Future<bool> writeCharacteristic(String serviceUuid,
-      String characteristicUuid, Uint8List data,
+  Future<bool> writeCharacteristic(
+      String serviceUuid, String characteristicUuid, Uint8List data,
       {bool withResponse = true}) async {
     if (_connectionState != BleTestConnectionState.connected) {
       _addLog('Cannot write: not connected', level: LogLevel.error);
@@ -432,26 +432,26 @@ class RealBleTestService {
     }
 
     if (withResponse && !ch.properties.write) {
-      _addLog('Characteristic $characteristicUuid does not support write with response',
+      _addLog(
+          'Characteristic $characteristicUuid does not support write with response',
           level: LogLevel.warning);
       return false;
     }
     if (!withResponse && !ch.properties.writeWithoutResponse) {
-      _addLog('Characteristic $characteristicUuid does not support write without response',
+      _addLog(
+          'Characteristic $characteristicUuid does not support write without response',
           level: LogLevel.warning);
       return false;
     }
 
-    final hex =
-        data.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ');
+    final hex = data.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ');
     final ascii = utf8.decode(data, allowMalformed: true);
     _addLog(
         'Writing to $characteristicUuid: HEX=[$hex] ASCII=[$ascii]${withResponse ? "" : " (no response)"}',
         level: LogLevel.info);
 
     try {
-      await ch.write(data.toList(),
-          withoutResponse: !withResponse);
+      await ch.write(data.toList(), withoutResponse: !withResponse);
       _addLog('Write successful', level: LogLevel.success);
       return true;
     } catch (e) {
@@ -476,7 +476,8 @@ class RealBleTestService {
     }
 
     if (!ch.properties.notify && !ch.properties.indicate) {
-      _addLog('Characteristic $characteristicUuid does not support notify/indicate',
+      _addLog(
+          'Characteristic $characteristicUuid does not support notify/indicate',
           level: LogLevel.warning);
       return false;
     }
@@ -492,8 +493,7 @@ class RealBleTestService {
           timestamp: DateTime.now(),
         );
         _notificationController.add(notification);
-        _addLog(
-            'Notification from $characteristicUuid: ${value.length} bytes',
+        _addLog('Notification from $characteristicUuid: ${value.length} bytes',
             level: LogLevel.success);
       });
       _deviceSubscriptions.add(sub);

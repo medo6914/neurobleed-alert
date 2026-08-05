@@ -31,7 +31,8 @@ class MedicalTimelineScreen extends ConsumerWidget {
             itemCount: entries.length,
             itemBuilder: (context, index) {
               final entry = entries[index];
-              return _TimelineEntryWidget(entry: entry, isLast: index == entries.length - 1);
+              return _TimelineEntryWidget(
+                  entry: entry, isLast: index == entries.length - 1);
             },
           );
         },
@@ -60,13 +61,15 @@ class _TimelineEntryWidget extends StatelessWidget {
             child: Column(
               children: [
                 Container(
-                  width: 32, height: 32,
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
                     color: iconColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                     border: Border.all(color: iconColor, width: 2),
                   ),
-                  child: Icon(_eventIcon(entry.eventType), size: 16, color: iconColor),
+                  child: Icon(_eventIcon(entry.eventType),
+                      size: 16, color: iconColor),
                 ),
                 if (!isLast)
                   Expanded(
@@ -90,23 +93,31 @@ class _TimelineEntryWidget extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(entry.title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                          Text(entry.title,
+                              style: theme.textTheme.titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.w600)),
                           const Spacer(),
                           Text(
-                            entry.timestamp.toLocal().toString().substring(0, 16),
-                            style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                            entry.timestamp
+                                .toLocal()
+                                .toString()
+                                .substring(0, 16),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant),
                           ),
                         ],
                       ),
                       if (entry.description.isNotEmpty) ...[
                         SizedBox(height: NeuroSpacing.xs),
-                        Text(entry.description, style: theme.textTheme.bodyMedium),
+                        Text(entry.description,
+                            style: theme.textTheme.bodyMedium),
                       ],
                       if (entry.createdByName != null) ...[
                         SizedBox(height: NeuroSpacing.xs),
-                        Text('by ${entry.createdByName}', style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        )),
+                        Text('by ${entry.createdByName}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            )),
                       ],
                     ],
                   ),
@@ -121,27 +132,43 @@ class _TimelineEntryWidget extends StatelessWidget {
 
   Color _eventColor(TimelineEventType type) {
     switch (type) {
-      case TimelineEventType.admission: return NeuroColors.primary;
-      case TimelineEventType.discharge: return NeuroColors.stable;
-      case TimelineEventType.surgery: return NeuroColors.critical;
-      case TimelineEventType.alertTriggered: return NeuroColors.warning;
-      case TimelineEventType.diagnosis: return NeuroColors.info;
-      case TimelineEventType.medicationChange: return NeuroColors.primary;
-      case TimelineEventType.vitalsAbnormal: return NeuroColors.critical;
-      default: return NeuroColors.textSecondary;
+      case TimelineEventType.admission:
+        return NeuroColors.primary;
+      case TimelineEventType.discharge:
+        return NeuroColors.stable;
+      case TimelineEventType.surgery:
+        return NeuroColors.critical;
+      case TimelineEventType.alertTriggered:
+        return NeuroColors.warning;
+      case TimelineEventType.diagnosis:
+        return NeuroColors.info;
+      case TimelineEventType.medicationChange:
+        return NeuroColors.primary;
+      case TimelineEventType.vitalsAbnormal:
+        return NeuroColors.critical;
+      default:
+        return NeuroColors.textSecondary;
     }
   }
 
   IconData _eventIcon(TimelineEventType type) {
     switch (type) {
-      case TimelineEventType.admission: return Icons.local_hospital;
-      case TimelineEventType.discharge: return Icons.exit_to_app;
-      case TimelineEventType.surgery: return Icons.biotech;
-      case TimelineEventType.alertTriggered: return Icons.warning;
-      case TimelineEventType.diagnosis: return Icons.medical_services;
-      case TimelineEventType.medicationChange: return Icons.medication;
-      case TimelineEventType.vitalsAbnormal: return Icons.monitor_heart;
-      default: return Icons.circle;
+      case TimelineEventType.admission:
+        return Icons.local_hospital;
+      case TimelineEventType.discharge:
+        return Icons.exit_to_app;
+      case TimelineEventType.surgery:
+        return Icons.biotech;
+      case TimelineEventType.alertTriggered:
+        return Icons.warning;
+      case TimelineEventType.diagnosis:
+        return Icons.medical_services;
+      case TimelineEventType.medicationChange:
+        return Icons.medication;
+      case TimelineEventType.vitalsAbnormal:
+        return Icons.monitor_heart;
+      default:
+        return Icons.circle;
     }
   }
 }

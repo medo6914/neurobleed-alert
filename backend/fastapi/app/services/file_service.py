@@ -17,14 +17,22 @@ class FileService:
         self.local_dir = Path("uploads")
 
     def cloudinary_configured(self) -> bool:
-        return bool(settings.CLOUDINARY_CLOUD_NAME and settings.CLOUDINARY_API_KEY and settings.CLOUDINARY_API_SECRET)
+        return bool(
+            settings.CLOUDINARY_CLOUD_NAME
+            and settings.CLOUDINARY_API_KEY
+            and settings.CLOUDINARY_API_SECRET
+        )
 
-    async def upload(self, filename: str, content: bytes, folder: str = "neurobleed") -> dict[str, Any]:
+    async def upload(
+        self, filename: str, content: bytes, folder: str = "neurobleed"
+    ) -> dict[str, Any]:
         if self.cloudinary_configured():
             return await self._upload_cloudinary(filename, content, folder)
         return self._upload_local(filename, content, folder)
 
-    async def _upload_cloudinary(self, filename: str, content: bytes, folder: str) -> dict[str, Any]:
+    async def _upload_cloudinary(
+        self, filename: str, content: bytes, folder: str
+    ) -> dict[str, Any]:
         try:
             cloud = settings.CLOUDINARY_CLOUD_NAME
             url = f"https://api.cloudinary.com/v1_1/{cloud}/auto/upload"
@@ -53,7 +61,9 @@ class FileService:
             logger.warning("Cloudinary upload error: %s", e)
             return self._upload_local(filename, content, folder)
 
-    def _upload_local(self, filename: str, content: bytes, folder: str) -> dict[str, Any]:
+    def _upload_local(
+        self, filename: str, content: bytes, folder: str
+    ) -> dict[str, Any]:
         target = self.local_dir / folder
         target.mkdir(parents=True, exist_ok=True)
         safe_name = Path(filename).name

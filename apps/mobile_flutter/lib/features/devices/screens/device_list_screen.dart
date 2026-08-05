@@ -33,7 +33,8 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       ref.read(deviceListProvider.notifier).loadMore();
     }
   }
@@ -56,7 +57,8 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.fromLTRB(NeuroSpacing.md, NeuroSpacing.md, NeuroSpacing.md, 0),
+            padding: EdgeInsets.fromLTRB(
+                NeuroSpacing.md, NeuroSpacing.md, NeuroSpacing.md, 0),
             child: AppInput(
               label: '',
               hint: 'Search by serial number or name...',
@@ -104,33 +106,45 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
           _FilterChip(
             label: 'Online',
             selected: state.statusFilter == DeviceStatus.online,
-            onSelected: () => ref.read(deviceListProvider.notifier).filterByStatus(
-              state.statusFilter == DeviceStatus.online ? null : DeviceStatus.online,
-            ),
+            onSelected: () =>
+                ref.read(deviceListProvider.notifier).filterByStatus(
+                      state.statusFilter == DeviceStatus.online
+                          ? null
+                          : DeviceStatus.online,
+                    ),
           ),
           SizedBox(width: NeuroSpacing.xs),
           _FilterChip(
             label: 'Offline',
             selected: state.statusFilter == DeviceStatus.offline,
-            onSelected: () => ref.read(deviceListProvider.notifier).filterByStatus(
-              state.statusFilter == DeviceStatus.offline ? null : DeviceStatus.offline,
-            ),
+            onSelected: () =>
+                ref.read(deviceListProvider.notifier).filterByStatus(
+                      state.statusFilter == DeviceStatus.offline
+                          ? null
+                          : DeviceStatus.offline,
+                    ),
           ),
           SizedBox(width: NeuroSpacing.xs),
           _FilterChip(
             label: 'Error',
             selected: state.statusFilter == DeviceStatus.error,
-            onSelected: () => ref.read(deviceListProvider.notifier).filterByStatus(
-              state.statusFilter == DeviceStatus.error ? null : DeviceStatus.error,
-            ),
+            onSelected: () =>
+                ref.read(deviceListProvider.notifier).filterByStatus(
+                      state.statusFilter == DeviceStatus.error
+                          ? null
+                          : DeviceStatus.error,
+                    ),
           ),
           SizedBox(width: NeuroSpacing.xs),
           _FilterChip(
             label: 'Maintenance',
             selected: state.statusFilter == DeviceStatus.maintenance,
-            onSelected: () => ref.read(deviceListProvider.notifier).filterByStatus(
-              state.statusFilter == DeviceStatus.maintenance ? null : DeviceStatus.maintenance,
-            ),
+            onSelected: () =>
+                ref.read(deviceListProvider.notifier).filterByStatus(
+                      state.statusFilter == DeviceStatus.maintenance
+                          ? null
+                          : DeviceStatus.maintenance,
+                    ),
           ),
         ],
       ),
@@ -214,7 +228,9 @@ class _FilterChip extends StatelessWidget {
         selectedColor: theme.colorScheme.primary.withValues(alpha: 0.15),
         checkmarkColor: theme.colorScheme.primary,
         labelStyle: TextStyle(
-          color: selected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+          color: selected
+              ? theme.colorScheme.primary
+              : theme.colorScheme.onSurfaceVariant,
           fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
         ),
         visualDensity: VisualDensity.compact,

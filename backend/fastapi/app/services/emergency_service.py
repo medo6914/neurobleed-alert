@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 class EmergencyService:
-
     async def trigger_sos(
         self,
         patient_id: str,
@@ -44,18 +43,29 @@ class EmergencyService:
 
         contacts_result = await db.execute(
             select(EmergencyContact)
-            .where(EmergencyContact.patient_id == patient_id, EmergencyContact.is_deleted == False)
+            .where(
+                EmergencyContact.patient_id == patient_id,
+                EmergencyContact.is_deleted == False,
+            )
             .order_by(EmergencyContact.priority)
         )
         contacts = contacts_result.scalars().all()
 
-        patient_result = await db.execute(select(Patient).where(Patient.id == patient_id))
+        patient_result = await db.execute(
+            select(Patient).where(Patient.id == patient_id)
+        )
         patient = patient_result.scalar_one_or_none()
 
         notification_log = []
         for contact in contacts:
             sent = await self._notify_contact(contact, patient, event, db)
-            notification_log.append({"contact_id": str(contact.id), "contact_name": contact.full_name, "sent": sent})
+            notification_log.append(
+                {
+                    "contact_id": str(contact.id),
+                    "contact_name": contact.full_name,
+                    "sent": sent,
+                }
+            )
 
         event.status = EmergencyEventStatus.CONTACTING
         event.notification_log = notification_log
@@ -74,7 +84,9 @@ class EmergencyService:
         resolved_by: str,
         db: AsyncSession,
     ) -> EmergencyEvent:
-        result = await db.execute(select(EmergencyEvent).where(EmergencyEvent.id == event_id))
+        result = await db.execute(
+            select(EmergencyEvent).where(EmergencyEvent.id == event_id)
+        )
         event = result.scalar_one_or_none()
         if not event:
             raise ValueError(f"Emergency event {event_id} not found")
@@ -100,7 +112,11 @@ class EmergencyService:
                 f"Patient: {patient_name}\n"
                 f"Event: {event.sos_type}\n"
                 f"Status: {event.status.value}\n"
-                + (f"Location: https://www.openstreetmap.org/?mlat={event.location_lat}&mlon={event.location_lng}#map=15/{event.location_lat}/{event.location_lng}\n" if event.location_lat and event.location_lng else "")
+                + (
+                    f"Location: https://www.openstreetmap.org/?mlat={event.location_lat}&mlon={event.location_lng}#map=15/{event.location_lat}/{event.location_lng}\n"
+                    if event.location_lat and event.location_lng
+                    else ""
+                )
                 + "Please respond immediately."
             )
             results = await notification_dispatcher.dispatch_emergency(
@@ -120,7 +136,8 @@ class EmergencyService:
             if not delivered:
                 logger.info(
                     "No notification channels configured. Would send to %s: %s",
-                    contact.phone, message,
+                    contact.phone,
+                    message,
                 )
             return delivered
         except Exception as e:

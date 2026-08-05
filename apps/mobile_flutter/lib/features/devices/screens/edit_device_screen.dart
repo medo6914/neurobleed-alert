@@ -84,23 +84,28 @@ class _EditDeviceScreenState extends ConsumerState<EditDeviceScreen> {
                       children: [
                         Text(
                           'Serial Number: ${device.serialNumber}',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                         SizedBox(height: NeuroSpacing.sm),
                         Text(
                           'Type: ${device.type.name}',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                       ],
                     ),
                   ),
                 ),
                 SizedBox(height: NeuroSpacing.lg),
-
                 _SectionTitle(title: 'Editable Fields'),
                 SizedBox(height: NeuroSpacing.sm),
                 AppCard(
@@ -121,7 +126,8 @@ class _EditDeviceScreenState extends ConsumerState<EditDeviceScreen> {
                           controller: _firmwareVersionController,
                           validator: (v) {
                             if (v != null && v.isNotEmpty) {
-                              final result = DeviceValidator.validateFirmwareVersion(v);
+                              final result =
+                                  DeviceValidator.validateFirmwareVersion(v);
                               return result.fold((f) => f.message, (_) => null);
                             }
                             return null;
@@ -144,7 +150,6 @@ class _EditDeviceScreenState extends ConsumerState<EditDeviceScreen> {
                   ),
                 ),
                 SizedBox(height: NeuroSpacing.xxl),
-
                 if (state.error != null)
                   Padding(
                     padding: EdgeInsets.only(bottom: NeuroSpacing.md),
@@ -154,7 +159,6 @@ class _EditDeviceScreenState extends ConsumerState<EditDeviceScreen> {
                       description: state.error,
                     ),
                   ),
-
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -162,7 +166,9 @@ class _EditDeviceScreenState extends ConsumerState<EditDeviceScreen> {
                     label: state.isSubmitting ? 'Saving...' : 'Save Changes',
                     icon: state.isSubmitting ? null : Icons.save,
                     isLoading: state.isSubmitting,
-                    onPressed: state.isSubmitting ? null : () => _submitForm(device.id),
+                    onPressed: state.isSubmitting
+                        ? null
+                        : () => _submitForm(device.id),
                   ),
                 ),
                 SizedBox(height: NeuroSpacing.xxl),
@@ -178,10 +184,18 @@ class _EditDeviceScreenState extends ConsumerState<EditDeviceScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final request = DeviceUpdateRequest(
-      deviceName: _deviceNameController.text.trim().isEmpty ? null : _deviceNameController.text.trim(),
-      firmwareVersion: _firmwareVersionController.text.trim().isEmpty ? null : _firmwareVersionController.text.trim(),
-      hospitalId: _hospitalIdController.text.trim().isEmpty ? null : _hospitalIdController.text.trim(),
-      department: _departmentController.text.trim().isEmpty ? null : _departmentController.text.trim(),
+      deviceName: _deviceNameController.text.trim().isEmpty
+          ? null
+          : _deviceNameController.text.trim(),
+      firmwareVersion: _firmwareVersionController.text.trim().isEmpty
+          ? null
+          : _firmwareVersionController.text.trim(),
+      hospitalId: _hospitalIdController.text.trim().isEmpty
+          ? null
+          : _hospitalIdController.text.trim(),
+      department: _departmentController.text.trim().isEmpty
+          ? null
+          : _departmentController.text.trim(),
     );
 
     final notifier = ref.read(updateDeviceProvider.notifier);
@@ -190,7 +204,9 @@ class _EditDeviceScreenState extends ConsumerState<EditDeviceScreen> {
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
+          SnackBar(
+              content: Text(failure.message),
+              backgroundColor: NeuroColors.critical),
         );
       },
       (_) {
@@ -213,9 +229,9 @@ class _SectionTitle extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-        fontWeight: FontWeight.w600,
-        color: Theme.of(context).colorScheme.primary,
-      ),
+            fontWeight: FontWeight.w600,
+            color: Theme.of(context).colorScheme.primary,
+          ),
     );
   }
 }

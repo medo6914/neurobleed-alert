@@ -59,6 +59,7 @@ class AIService:
             feature_names = result.feature_names
 
         import json
+
         report = AIReport(
             patient_id=data.patient_id,
             report_type=ReportType.RISK_ASSESSMENT,
@@ -109,7 +110,13 @@ class AIService:
             aggregate_level = "low"
 
         if len(scores) >= 2:
-            trend = "worsening" if scores[-1] - scores[0] > 0.1 else "improving" if scores[-1] - scores[0] < -0.1 else "stable"
+            trend = (
+                "worsening"
+                if scores[-1] - scores[0] > 0.1
+                else "improving"
+                if scores[-1] - scores[0] < -0.1
+                else "stable"
+            )
         else:
             trend = "stable"
 
@@ -133,16 +140,21 @@ class AIService:
             .limit(limit)
         )
         reports = result.scalars().all()
-        return [r.to_dict() if hasattr(r, "to_dict") else {
-            "id": str(r.id),
-            "report_type": r.report_type.value if r.report_type else None,
-            "risk_score": r.risk_score,
-            "confidence": r.confidence,
-            "created_at": r.created_at.isoformat() if r.created_at else None,
-            "summary": r.summary,
-            "explanation": r.explanation,
-            "shap_values": r.shap_values,
-        } for r in reports]
+        return [
+            r.to_dict()
+            if hasattr(r, "to_dict")
+            else {
+                "id": str(r.id),
+                "report_type": r.report_type.value if r.report_type else None,
+                "risk_score": r.risk_score,
+                "confidence": r.confidence,
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+                "summary": r.summary,
+                "explanation": r.explanation,
+                "shap_values": r.shap_values,
+            }
+            for r in reports
+        ]
 
     async def search_knowledge(
         self,
@@ -150,6 +162,7 @@ class AIService:
         db: AsyncSession,
     ) -> KnowledgeSearchResponse:
         import time
+
         start = time.perf_counter()
 
         query = select(KnowledgeBase).where(KnowledgeBase.is_published == True)
@@ -162,16 +175,22 @@ class AIService:
 
         if data.query:
             query_lower = data.query.lower()
-            rows = [r for r in rows if (
-                query_lower in (r.title or "").lower()
-                or query_lower in (r.content or "").lower()
-                or (query_lower in " ".join(r.tags) if r.tags else False)
-            )][:data.limit]
+            rows = [
+                r
+                for r in rows
+                if (
+                    query_lower in (r.title or "").lower()
+                    or query_lower in (r.content or "").lower()
+                    or (query_lower in " ".join(r.tags) if r.tags else False)
+                )
+            ][: data.limit]
 
         semantic_results = []
         if data.query and self.rag_engine._loaded:
             try:
-                rag_results = self.rag_engine.similarity_search(data.query, k=data.limit)
+                rag_results = self.rag_engine.similarity_search(
+                    data.query, k=data.limit
+                )
                 semantic_results = [
                     {
                         "id": r.get("id", ""),
@@ -191,14 +210,17 @@ class AIService:
         elapsed = (time.perf_counter() - start) * 1000
 
         return KnowledgeSearchResponse(
-            results=[{
-                "id": str(r.id),
-                "title": r.title,
-                "content": r.content[:500] if r.content else "",
-                "source": r.source,
-                "category": r.category,
-                "tags": r.tags or [],
-            } for r in rows],
+            results=[
+                {
+                    "id": str(r.id),
+                    "title": r.title,
+                    "content": r.content[:500] if r.content else "",
+                    "source": r.source,
+                    "category": r.category,
+                    "tags": r.tags or [],
+                }
+                for r in rows
+            ],
             total=len(rows),
             query_time_ms=round(elapsed, 2),
             semantic_results=semantic_results,
@@ -224,10 +246,15 @@ class AIService:
             count += 1
 
         elif data.source == "pubmed" and data.query:
-            articles = self.pubmed_client.search_and_format(data.query, data.max_results)
+            articles = self.pubmed_client.search_and_format(
+                data.query, data.max_results
+            )
             for article in articles:
                 existing = await db.execute(
-                    select(KnowledgeBase).where(KnowledgeBase.source == f"PubMed/{article.get('source', '')}")
+                    select(KnowledgeBase)
+                    .where(
+                        KnowledgeBase.source == f"PubMed/{article.get('source', '')}"
+                    )
                     .where(KnowledgeBase.title == article["title"])
                 )
                 if existing.scalar_one_or_none():
@@ -307,20 +334,22 @@ class AIService:
         )
         alerts_by_severity = {}
         for row in alerts_severity_result:
-            sev = row[0].value if hasattr(row[0], 'value') else str(row[0])
+            sev = row[0].value if hasattr(row[0], "value") else str(row[0])
             alerts_by_severity[sev] = row[1]
 
         recent = await db.execute(
-            select(AIReport)
-            .order_by(desc(AIReport.created_at))
-            .limit(10)
+            select(AIReport).order_by(desc(AIReport.created_at)).limit(10)
         )
         recent_activity = [
             {
                 "id": str(r.id),
                 "patient_id": str(r.patient_id),
                 "risk_score": r.risk_score,
-                "risk_level": "high" if (r.risk_score or 0) >= 0.6 else "medium" if (r.risk_score or 0) >= 0.3 else "low",
+                "risk_level": "high"
+                if (r.risk_score or 0) >= 0.6
+                else "medium"
+                if (r.risk_score or 0) >= 0.3
+                else "low",
                 "created_at": r.created_at.isoformat() if r.created_at else None,
             }
             for r in recent.scalars().all()

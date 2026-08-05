@@ -79,7 +79,8 @@ final getPatientHistoryProvider = Provider<GetPatientHistory>((ref) {
   );
 });
 
-final patientHistoryProvider = FutureProvider.family<PatientHistoryData, String>((ref, patientId) async {
+final patientHistoryProvider =
+    FutureProvider.family<PatientHistoryData, String>((ref, patientId) async {
   final useCase = ref.watch(getPatientHistoryProvider);
   final result = await useCase(patientId);
   return result.fold(

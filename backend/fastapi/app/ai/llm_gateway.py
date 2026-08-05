@@ -38,7 +38,9 @@ class LLMGateway:
             providers.append("huggingface")
         return providers
 
-    async def chat(self, system_prompt: str, user_message: str, provider: str | None = None) -> dict[str, Any]:
+    async def chat(
+        self, system_prompt: str, user_message: str, provider: str | None = None
+    ) -> dict[str, Any]:
         order = [provider] if provider else self.providers_available()
         order = [p for p in order if p]
         if not order:
@@ -66,7 +68,9 @@ class LLMGateway:
             "provider": None,
         }
 
-    async def _call_provider(self, name: str, system_prompt: str, user_message: str) -> dict[str, Any]:
+    async def _call_provider(
+        self, name: str, system_prompt: str, user_message: str
+    ) -> dict[str, Any]:
         if name == "ollama":
             return await self._ollama(system_prompt, user_message)
         if name == "openai":
@@ -94,7 +98,11 @@ class LLMGateway:
             resp.raise_for_status()
             data = resp.json()
             content = data.get("message", {}).get("content", "")
-            return {"ok": True, "content": content, "model": f"ollama/{settings.OLLAMA_MODEL}"}
+            return {
+                "ok": True,
+                "content": content,
+                "model": f"ollama/{settings.OLLAMA_MODEL}",
+            }
         except Exception as e:
             return {"ok": False, "message": f"Ollama not reachable at {base}: {e}"}
 
@@ -112,7 +120,11 @@ class LLMGateway:
         )
         resp.raise_for_status()
         data = resp.json()
-        return {"ok": True, "content": data["choices"][0]["message"]["content"], "model": settings.OPENAI_MODEL}
+        return {
+            "ok": True,
+            "content": data["choices"][0]["message"]["content"],
+            "model": settings.OPENAI_MODEL,
+        }
 
     async def _gemini(self, system_prompt: str, user_message: str) -> dict[str, Any]:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.GEMINI_MODEL}:generateContent"
@@ -129,7 +141,9 @@ class LLMGateway:
         content = data["candidates"][0]["content"]["parts"][0]["text"]
         return {"ok": True, "content": content, "model": settings.GEMINI_MODEL}
 
-    async def _huggingface(self, system_prompt: str, user_message: str) -> dict[str, Any]:
+    async def _huggingface(
+        self, system_prompt: str, user_message: str
+    ) -> dict[str, Any]:
         prompt = f"{system_prompt}\n\nUser: {user_message}\nAssistant:"
         resp = await self.client.post(
             f"https://api-inference.huggingface.co/models/{settings.HUGGINGFACE_MODEL}",
@@ -140,7 +154,7 @@ class LLMGateway:
         data = resp.json()
         if isinstance(data, list) and data:
             content = data[0].get("generated_text", "")
-            content = content[len(prompt):].strip()
+            content = content[len(prompt) :].strip()
             return {"ok": True, "content": content, "model": settings.HUGGINGFACE_MODEL}
         return {"ok": False, "message": "Unexpected HuggingFace response"}
 

@@ -12,7 +12,8 @@ class BleDiagnosticScreen extends ConsumerStatefulWidget {
   const BleDiagnosticScreen({super.key});
 
   @override
-  ConsumerState<BleDiagnosticScreen> createState() => _BleDiagnosticScreenState();
+  ConsumerState<BleDiagnosticScreen> createState() =>
+      _BleDiagnosticScreenState();
 }
 
 class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
@@ -89,7 +90,8 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
       _connectingDeviceId = device.id;
     });
     final service = ref.read(bleTestServiceProvider);
-    final success = await service.connectToDevice(device.id, deviceName: device.name);
+    final success =
+        await service.connectToDevice(device.id, deviceName: device.name);
     if (!mounted) return;
     setState(() {
       _connectingDeviceId = null;
@@ -156,7 +158,8 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
       data,
     );
     if (!mounted) return;
-    _showSnack(success ? 'Write successful' : 'Write failed', isError: !success);
+    _showSnack(success ? 'Write successful' : 'Write failed',
+        isError: !success);
   }
 
   Future<void> _enableNotifications() async {
@@ -170,7 +173,8 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
       _selectedUuidCharacteristic,
     );
     if (!mounted) return;
-    _showSnack(success ? 'Notifications enabled' : 'Failed to enable', isError: !success);
+    _showSnack(success ? 'Notifications enabled' : 'Failed to enable',
+        isError: !success);
   }
 
   Future<void> _disableNotifications() async {
@@ -234,40 +238,69 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
     );
   }
 
-  Widget _buildStatusTab(ThemeData theme, ({
-    bool initialized,
-    bool bleEnabled,
-    bool locationPermission,
-    bool nearbyPermission,
-    bool scanning,
-  }) status, AsyncValue<BleTestConnectionState> connectionState) {
+  Widget _buildStatusTab(
+      ThemeData theme,
+      ({
+        bool initialized,
+        bool bleEnabled,
+        bool locationPermission,
+        bool nearbyPermission,
+        bool scanning,
+      }) status,
+      AsyncValue<BleTestConnectionState> connectionState) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(NeuroSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('System Status', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text('System Status',
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold)),
           SizedBox(height: NeuroSpacing.sm),
-          _StatusRow(icon: Icons.bluetooth, label: 'Bluetooth', value: status.bleEnabled, theme: theme),
-          _StatusRow(icon: Icons.location_on, label: 'Location Permission', value: status.locationPermission, theme: theme),
-          _StatusRow(icon: Icons.near_me, label: 'Nearby Devices Permission', value: status.nearbyPermission, theme: theme),
-          _StatusRow(icon: Icons.bluetooth_searching, label: 'Scan Status', value: status.scanning, theme: theme),
-          _StatusRow(icon: Icons.check_circle, label: 'Service Initialized', value: status.initialized, theme: theme),
+          _StatusRow(
+              icon: Icons.bluetooth,
+              label: 'Bluetooth',
+              value: status.bleEnabled,
+              theme: theme),
+          _StatusRow(
+              icon: Icons.location_on,
+              label: 'Location Permission',
+              value: status.locationPermission,
+              theme: theme),
+          _StatusRow(
+              icon: Icons.near_me,
+              label: 'Nearby Devices Permission',
+              value: status.nearbyPermission,
+              theme: theme),
+          _StatusRow(
+              icon: Icons.bluetooth_searching,
+              label: 'Scan Status',
+              value: status.scanning,
+              theme: theme),
+          _StatusRow(
+              icon: Icons.check_circle,
+              label: 'Service Initialized',
+              value: status.initialized,
+              theme: theme),
           SizedBox(height: NeuroSpacing.lg),
-          Text('Connection', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text('Connection',
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold)),
           SizedBox(height: NeuroSpacing.sm),
           SizedBox(height: 220, child: ConnectionPanel()),
           connectionState.when(
             loading: () => SizedBox.shrink(),
             error: (e, _) => SizedBox.shrink(),
             data: (state) {
-              final connectionInfo = ref.watch(bleTestConnectedDeviceInfoProvider);
+              final connectionInfo =
+                  ref.watch(bleTestConnectedDeviceInfoProvider);
               if (connectionInfo.state == BleTestConnectionState.connected) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: NeuroSpacing.sm),
-                    Text('Services: ${ref.watch(bleTestServicesProvider).valueOrNull?.length ?? 0}'),
+                    Text(
+                        'Services: ${ref.watch(bleTestServicesProvider).valueOrNull?.length ?? 0}'),
                     SizedBox(height: NeuroSpacing.md),
                     Row(
                       children: [
@@ -296,7 +329,9 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
             },
           ),
           SizedBox(height: NeuroSpacing.lg),
-          Text('Quick Actions', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text('Quick Actions',
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold)),
           SizedBox(height: NeuroSpacing.sm),
           Wrap(
             spacing: 8,
@@ -349,18 +384,24 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: theme.colorScheme.primary.withValues(
-                        alpha: isScanning ? 0.3 - (_scanAnimation.value * 0.2) : 0.1,
+                        alpha: isScanning
+                            ? 0.3 - (_scanAnimation.value * 0.2)
+                            : 0.1,
                       ),
                       border: Border.all(
                         color: theme.colorScheme.primary.withValues(
-                          alpha: isScanning ? 0.6 - (_scanAnimation.value * 0.4) : 0.3,
+                          alpha: isScanning
+                              ? 0.6 - (_scanAnimation.value * 0.4)
+                              : 0.3,
                         ),
                         width: 2,
                       ),
                     ),
                     child: Center(
                       child: Icon(
-                        isScanning ? Icons.bluetooth_searching : Icons.bluetooth,
+                        isScanning
+                            ? Icons.bluetooth_searching
+                            : Icons.bluetooth,
                         size: 28,
                         color: theme.colorScheme.primary,
                       ),
@@ -370,7 +411,9 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
               ),
               SizedBox(height: NeuroSpacing.sm),
               Text(
-                isScanning ? 'Scanning for devices...' : 'Tap Scan to discover devices',
+                isScanning
+                    ? 'Scanning for devices...'
+                    : 'Tap Scan to discover devices',
                 style: theme.textTheme.bodySmall,
               ),
               SizedBox(height: NeuroSpacing.sm),
@@ -404,8 +447,12 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
         Divider(height: 1),
         Expanded(
           child: devicesAsync.when(
-            loading: () => Center(child: CircularProgressIndicator(strokeWidth: 2)),
-            error: (e, _) => AppErrorState(title: 'Scan Error', message: e.toString(), onRetry: _startScan),
+            loading: () =>
+                Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            error: (e, _) => AppErrorState(
+                title: 'Scan Error',
+                message: e.toString(),
+                onRetry: _startScan),
             data: (devices) {
               if (!isScanning && devices.isEmpty) {
                 return AppEmptyState(
@@ -436,7 +483,8 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
                     child: BleTestDeviceCard(
                       device: device,
                       isConnecting: _connectingDeviceId == device.id,
-                      onConnect: service.connectionState == BleTestConnectionState.connected
+                      onConnect: service.connectionState ==
+                              BleTestConnectionState.connected
                           ? null
                           : () => _connect(device),
                     ),
@@ -455,14 +503,16 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
     final connectionState = ref.watch(bleTestConnectionStateProvider);
 
     return connectionState.when(
-      loading: () => Center(child: Text('Loading...', style: theme.textTheme.bodySmall)),
+      loading: () =>
+          Center(child: Text('Loading...', style: theme.textTheme.bodySmall)),
       error: (e, _) => AppErrorState(title: 'Error', message: e.toString()),
       data: (state) {
         if (state != BleTestConnectionState.connected) {
           return AppEmptyState(
             icon: Icons.bluetooth_disabled,
             title: 'Not Connected',
-            message: 'Connect to a device to browse services and characteristics.',
+            message:
+                'Connect to a device to browse services and characteristics.',
             actionLabel: 'Go to Scan',
             onAction: () => _tabController.animateTo(1),
           );
@@ -472,7 +522,8 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
         if (_selectedUuidService.isEmpty && services.isNotEmpty) {
           _selectedUuidService = services.first.uuid;
           if (services.first.characteristics.isNotEmpty) {
-            _selectedUuidCharacteristic = services.first.characteristics.first.uuid;
+            _selectedUuidCharacteristic =
+                services.first.characteristics.first.uuid;
           }
         }
 
@@ -503,14 +554,17 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
             ),
             Expanded(
               child: servicesAsync.when(
-                loading: () => Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                error: (e, _) => AppErrorState(title: 'Error', message: e.toString()),
+                loading: () =>
+                    Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                error: (e, _) =>
+                    AppErrorState(title: 'Error', message: e.toString()),
                 data: (services) {
                   if (services.isEmpty) {
                     return AppEmptyState(
                       icon: Icons.list_alt,
                       title: 'No Services',
-                      message: 'Tap "Discover Services" to load the GATT profile.',
+                      message:
+                          'Tap "Discover Services" to load the GATT profile.',
                     );
                   }
 
@@ -536,7 +590,8 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
     );
   }
 
-  Widget _buildCharacteristicActions(ThemeData theme, List<BleTestServiceInfo> services) {
+  Widget _buildCharacteristicActions(
+      ThemeData theme, List<BleTestServiceInfo> services) {
     final serviceUuids = services.map((s) => s.uuid).toList();
     final characteristics = services.expand((s) => s.characteristics).toList();
 
@@ -545,30 +600,41 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Characteristic Actions', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+          Text('Characteristic Actions',
+              style: theme.textTheme.titleSmall
+                  ?.copyWith(fontWeight: FontWeight.bold)),
           SizedBox(height: NeuroSpacing.sm),
           Row(
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  initialValue: serviceUuids.contains(_selectedUuidService) ? _selectedUuidService : null,
+                  initialValue: serviceUuids.contains(_selectedUuidService)
+                      ? _selectedUuidService
+                      : null,
                   decoration: InputDecoration(
                     labelText: 'Service',
                     isDense: true,
                     border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                   ),
-                  items: serviceUuids.map((uuid) => DropdownMenuItem(
-                    value: uuid,
-                    child: Text('0x${uuid.toUpperCase()}', style: const TextStyle(fontFamily: 'monospace', fontSize: 12)),
-                  )).toList(),
+                  items: serviceUuids
+                      .map((uuid) => DropdownMenuItem(
+                            value: uuid,
+                            child: Text('0x${uuid.toUpperCase()}',
+                                style: const TextStyle(
+                                    fontFamily: 'monospace', fontSize: 12)),
+                          ))
+                      .toList(),
                   onChanged: (v) {
                     if (v != null) {
                       setState(() {
                         _selectedUuidService = v;
-                        final svc = services.where((s) => s.uuid == v).firstOrNull;
+                        final svc =
+                            services.where((s) => s.uuid == v).firstOrNull;
                         if (svc != null && svc.characteristics.isNotEmpty) {
-                          _selectedUuidCharacteristic = svc.characteristics.first.uuid;
+                          _selectedUuidCharacteristic =
+                              svc.characteristics.first.uuid;
                         }
                       });
                     }
@@ -578,21 +644,28 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
               SizedBox(width: NeuroSpacing.sm),
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  initialValue: characteristics.any((c) => c.uuid == _selectedUuidCharacteristic)
+                  initialValue: characteristics
+                          .any((c) => c.uuid == _selectedUuidCharacteristic)
                       ? _selectedUuidCharacteristic
                       : null,
                   decoration: InputDecoration(
                     labelText: 'Characteristic',
                     isDense: true,
                     border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                   ),
-                  items: characteristics.map((ch) => DropdownMenuItem(
-                    value: ch.uuid,
-                    child: Text('0x${ch.uuid.toUpperCase()}', style: const TextStyle(fontFamily: 'monospace', fontSize: 12)),
-                  )).toList(),
+                  items: characteristics
+                      .map((ch) => DropdownMenuItem(
+                            value: ch.uuid,
+                            child: Text('0x${ch.uuid.toUpperCase()}',
+                                style: const TextStyle(
+                                    fontFamily: 'monospace', fontSize: 12)),
+                          ))
+                      .toList(),
                   onChanged: (v) {
-                    if (v != null) setState(() => _selectedUuidCharacteristic = v);
+                    if (v != null)
+                      setState(() => _selectedUuidCharacteristic = v);
                   },
                 ),
               ),
@@ -634,14 +707,17 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
                     hintText: 'Enter text to write...',
                     isDense: true,
                     border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                   ),
                 ),
               ),
               SizedBox(width: NeuroSpacing.sm),
               PopupMenuButton<String>(
                 onSelected: (v) => _writeController.text = v,
-                itemBuilder: (_) => _testPayloads.map((p) => PopupMenuItem(value: p, child: Text(p))).toList(),
+                itemBuilder: (_) => _testPayloads
+                    .map((p) => PopupMenuItem(value: p, child: Text(p)))
+                    .toList(),
                 child: Icon(Icons.history),
               ),
               SizedBox(width: NeuroSpacing.sm),
@@ -663,16 +739,28 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
                   children: [
                     Row(
                       children: [
-                        Text('Read Value', style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        Text('Read Value',
+                            style: theme.textTheme.labelMedium
+                                ?.copyWith(fontWeight: FontWeight.bold)),
                         Spacer(),
                         SegmentedButton<String>(
                           segments: const [
-                            ButtonSegment(value: 'HEX', label: Text('HEX', style: TextStyle(fontSize: 10))),
-                            ButtonSegment(value: 'ASCII', label: Text('ASCII', style: TextStyle(fontSize: 10))),
-                            ButtonSegment(value: 'UTF8', label: Text('UTF8', style: TextStyle(fontSize: 10))),
+                            ButtonSegment(
+                                value: 'HEX',
+                                label: Text('HEX',
+                                    style: TextStyle(fontSize: 10))),
+                            ButtonSegment(
+                                value: 'ASCII',
+                                label: Text('ASCII',
+                                    style: TextStyle(fontSize: 10))),
+                            ButtonSegment(
+                                value: 'UTF8',
+                                label: Text('UTF8',
+                                    style: TextStyle(fontSize: 10))),
                           ],
                           selected: {_readDisplayFormat},
-                          onSelectionChanged: (v) => setState(() => _readDisplayFormat = v.first),
+                          onSelectionChanged: (v) =>
+                              setState(() => _readDisplayFormat = v.first),
                           style: ButtonStyle(
                             visualDensity: VisualDensity.compact,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -717,7 +805,9 @@ class _BleDiagnosticScreenState extends ConsumerState<BleDiagnosticScreen>
           child: Row(
             children: [
               Expanded(
-                child: Text('Operation Log', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                child: Text('Operation Log',
+                    style: theme.textTheme.titleSmall
+                        ?.copyWith(fontWeight: FontWeight.bold)),
               ),
               ActionChip(
                 avatar: Icon(Icons.copy, size: 14),
@@ -761,10 +851,13 @@ class _StatusRow extends StatelessWidget {
       padding: EdgeInsets.only(bottom: NeuroSpacing.xs),
       child: AppCard(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: NeuroSpacing.md, vertical: NeuroSpacing.sm),
+          padding: EdgeInsets.symmetric(
+              horizontal: NeuroSpacing.md, vertical: NeuroSpacing.sm),
           child: Row(
             children: [
-              Icon(icon, size: 18, color: value ? NeuroColors.low : NeuroColors.critical),
+              Icon(icon,
+                  size: 18,
+                  color: value ? NeuroColors.low : NeuroColors.critical),
               SizedBox(width: NeuroSpacing.sm),
               Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
               Container(

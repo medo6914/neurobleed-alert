@@ -28,72 +28,93 @@ class PatientHistoryScreen extends ConsumerWidget {
         data: (data) => ListView(
           padding: EdgeInsets.all(NeuroSpacing.md),
           children: [
-            Text(localizations.t('admissions'), style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary,
-            )),
+            Text(localizations.t('admissions'),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.primary,
+                    )),
             SizedBox(height: NeuroSpacing.sm),
             if (data.admissions.isEmpty)
-              AppCard(child: Padding(
+              AppCard(
+                  child: Padding(
                 padding: EdgeInsets.all(NeuroSpacing.md),
                 child: Text(localizations.t('noData')),
               ))
-            else ...data.admissions.map((a) => _HistoryCard(
-              title: '${a.admissionType ?? "N/A"} - ${a.admissionDate.toLocal().toString().substring(0, 10)}',
-              subtitle: '${a.ward ?? "N/A"} / Bed ${a.bedNumber ?? "N/A"}',
-              trailing: a.status.name,
-              statusColor: a.status == AdmissionStatus.active ? NeuroColors.stable : NeuroColors.textSecondary,
-            )),
+            else
+              ...data.admissions.map((a) => _HistoryCard(
+                    title:
+                        '${a.admissionType ?? "N/A"} - ${a.admissionDate.toLocal().toString().substring(0, 10)}',
+                    subtitle:
+                        '${a.ward ?? "N/A"} / Bed ${a.bedNumber ?? "N/A"}',
+                    trailing: a.status.name,
+                    statusColor: a.status == AdmissionStatus.active
+                        ? NeuroColors.stable
+                        : NeuroColors.textSecondary,
+                  )),
             SizedBox(height: NeuroSpacing.lg),
-
-            Text(localizations.t('notes'), style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary,
-            )),
+            Text(localizations.t('notes'),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.primary,
+                    )),
             SizedBox(height: NeuroSpacing.sm),
             if (data.notes.isEmpty)
-              AppCard(child: Padding(
+              AppCard(
+                  child: Padding(
                 padding: EdgeInsets.all(NeuroSpacing.md),
                 child: Text(localizations.t('noData')),
               ))
-            else ...data.notes.map((n) => _HistoryCard(
-              title: n.title,
-              subtitle: n.createdAt.toLocal().toString().substring(0, 16),
-              trailing: n.type.name,
-              statusColor: NeuroColors.info,
-            )),
+            else
+              ...data.notes.map((n) => _HistoryCard(
+                    title: n.title,
+                    subtitle: n.createdAt.toLocal().toString().substring(0, 16),
+                    trailing: n.type.name,
+                    statusColor: NeuroColors.info,
+                  )),
             SizedBox(height: NeuroSpacing.lg),
-
-            Text(localizations.t('vitals'), style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary,
-            )),
+            Text(localizations.t('vitals'),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.primary,
+                    )),
             SizedBox(height: NeuroSpacing.sm),
             if (data.vitals.isEmpty)
-              AppCard(child: Padding(
+              AppCard(
+                  child: Padding(
                 padding: EdgeInsets.all(NeuroSpacing.md),
                 child: Text(localizations.t('noData')),
               ))
-            else ...data.vitals.map((v) => _HistoryCard(
-              title: 'HR: ${v.heartRate?.toStringAsFixed(0) ?? "-"} | BP: ${v.systolicBP?.toInt() ?? "-"}/${v.diastolicBP?.toInt() ?? "-"}',
-              subtitle: v.timestamp.toLocal().toString().substring(0, 16),
-              trailing: 'SpO2: ${v.oxygenSaturation?.toStringAsFixed(0) ?? "-"}%',
-              statusColor: NeuroColors.primary,
-            )),
+            else
+              ...data.vitals.map((v) => _HistoryCard(
+                    title:
+                        'HR: ${v.heartRate?.toStringAsFixed(0) ?? "-"} | BP: ${v.systolicBP?.toInt() ?? "-"}/${v.diastolicBP?.toInt() ?? "-"}',
+                    subtitle: v.timestamp.toLocal().toString().substring(0, 16),
+                    trailing:
+                        'SpO2: ${v.oxygenSaturation?.toStringAsFixed(0) ?? "-"}%',
+                    statusColor: NeuroColors.primary,
+                  )),
             SizedBox(height: NeuroSpacing.lg),
-
-            Text(localizations.t('alerts'), style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary,
-            )),
+            Text(localizations.t('alerts'),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.primary,
+                    )),
             SizedBox(height: NeuroSpacing.sm),
             if (data.alerts.isEmpty)
-              AppCard(child: Padding(
+              AppCard(
+                  child: Padding(
                 padding: EdgeInsets.all(NeuroSpacing.md),
                 child: Text(localizations.t('noData')),
               ))
-            else ...data.alerts.map((a) => _HistoryCard(
-              title: a.title,
-              subtitle: a.createdAt.toLocal().toString().substring(0, 16),
-              trailing: a.level,
-              statusColor: a.level == 'critical' ? NeuroColors.critical : NeuroColors.warning,
-            )),
+            else
+              ...data.alerts.map((a) => _HistoryCard(
+                    title: a.title,
+                    subtitle: a.createdAt.toLocal().toString().substring(0, 16),
+                    trailing: a.level,
+                    statusColor: a.level == 'critical'
+                        ? NeuroColors.critical
+                        : NeuroColors.warning,
+                  )),
           ],
         ),
       ),
@@ -108,8 +129,10 @@ class _HistoryCard extends StatelessWidget {
   final Color statusColor;
 
   const _HistoryCard({
-    required this.title, required this.subtitle,
-    required this.trailing, required this.statusColor,
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+    required this.statusColor,
   });
 
   @override

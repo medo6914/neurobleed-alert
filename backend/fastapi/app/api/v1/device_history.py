@@ -34,8 +34,12 @@ async def get_device_events(
         raise HTTPException(404, "Device not found")
 
     resource_pattern = f"/v1/devices/{device_id}"
-    count_query = select(func.count()).select_from(AuditLog).where(
-        AuditLog.resource.like(f"%{resource_pattern}%"),
+    count_query = (
+        select(func.count())
+        .select_from(AuditLog)
+        .where(
+            AuditLog.resource.like(f"%{resource_pattern}%"),
+        )
     )
     total = (await db.execute(count_query)).scalar() or 0
 
@@ -91,9 +95,13 @@ async def get_device_status_changes(
         AuditLog.resource == f"/v1/devices/{device_id}/heartbeat",
         AuditLog.action == "PATCH",
     )
-    count_query = select(func.count()).select_from(AuditLog).where(
-        AuditLog.resource.like(f"%{resource_pattern}%"),
-        status_filter,
+    count_query = (
+        select(func.count())
+        .select_from(AuditLog)
+        .where(
+            AuditLog.resource.like(f"%{resource_pattern}%"),
+            status_filter,
+        )
     )
     total = (await db.execute(count_query)).scalar() or 0
 

@@ -62,7 +62,8 @@ class _EventTile extends StatelessWidget {
     final theme = Theme.of(context);
     final type = event['event_type'] as String? ?? 'unknown';
     final timestamp = event['timestamp'] as String? ?? '';
-    final details = event['details'] as String? ?? event['message'] as String? ?? '';
+    final details =
+        event['details'] as String? ?? event['message'] as String? ?? '';
     final metadata = event['metadata'] as Map<String, dynamic>?;
 
     IconData icon;
@@ -120,7 +121,8 @@ class _EventTile extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: iconColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
@@ -136,7 +138,9 @@ class _EventTile extends StatelessWidget {
                         ),
                         Spacer(),
                         Text(
-                          timestamp.isNotEmpty ? timestamp.substring(0, 16) : '',
+                          timestamp.isNotEmpty
+                              ? timestamp.substring(0, 16)
+                              : '',
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                             fontSize: 10,
@@ -151,26 +155,26 @@ class _EventTile extends StatelessWidget {
                     if (metadata != null && metadata.isNotEmpty) ...[
                       SizedBox(height: NeuroSpacing.xs),
                       ...metadata.entries.map((e) => Padding(
-                        padding: EdgeInsets.only(top: 2),
-                        child: Row(
-                          children: [
-                            Text(
-                              '${e.key}: ',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                                fontSize: 10,
-                              ),
+                            padding: EdgeInsets.only(top: 2),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '${e.key}: ',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                                Text(
+                                  '${e.value}',
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 10,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '${e.value}',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
+                          )),
                     ],
                   ],
                 ),

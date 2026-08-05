@@ -25,9 +25,8 @@ class PatientMonitorCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(NeuroRadius.lg),
-        border: hasAlert
-            ? Border.all(color: NeuroColors.error, width: 2)
-            : null,
+        border:
+            hasAlert ? Border.all(color: NeuroColors.error, width: 2) : null,
       ),
       child: AppCard(
         onTap: onTap,
@@ -41,12 +40,14 @@ class PatientMonitorCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       patientName,
-                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                      style: theme.textTheme.titleSmall
+                          ?.copyWith(fontWeight: FontWeight.w600),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (hasAlert)
-                    const Icon(Icons.warning_rounded, color: NeuroColors.error, size: 20),
+                    const Icon(Icons.warning_rounded,
+                        color: NeuroColors.error, size: 20),
                 ],
               ),
               SizedBox(height: NeuroSpacing.md),
@@ -120,7 +121,8 @@ class PatientMonitorCard extends StatelessWidget {
       ),
       child: Text(
         riskLevel?.toUpperCase() ?? '--',
-        style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
+        style:
+            TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -143,7 +145,8 @@ class PatientMonitorCard extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           trend?.toUpperCase() ?? '--',
-          style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w500),
+          style: TextStyle(
+              fontSize: 11, color: color, fontWeight: FontWeight.w500),
         ),
       ],
     );

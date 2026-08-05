@@ -45,12 +45,26 @@ async def init_db():
             )
         elif _url and _url.startswith("sqlite"):
             for table, column, ddl in (
-                ("hospitals", "latitude", "ALTER TABLE hospitals ADD COLUMN latitude REAL"),
-                ("hospitals", "longitude", "ALTER TABLE hospitals ADD COLUMN longitude REAL"),
-                ("devices", "fcm_token", "ALTER TABLE devices ADD COLUMN fcm_token TEXT"),
+                (
+                    "hospitals",
+                    "latitude",
+                    "ALTER TABLE hospitals ADD COLUMN latitude REAL",
+                ),
+                (
+                    "hospitals",
+                    "longitude",
+                    "ALTER TABLE hospitals ADD COLUMN longitude REAL",
+                ),
+                (
+                    "devices",
+                    "fcm_token",
+                    "ALTER TABLE devices ADD COLUMN fcm_token TEXT",
+                ),
             ):
                 has = await conn.execute(
-                    text(f"SELECT COUNT(*) FROM pragma_table_info('{table}') WHERE name = '{column}'")
+                    text(
+                        f"SELECT COUNT(*) FROM pragma_table_info('{table}') WHERE name = '{column}'"
+                    )
                 )
                 if has.scalar() == 0:
                     await conn.execute(text(ddl))

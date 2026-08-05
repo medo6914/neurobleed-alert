@@ -11,8 +11,12 @@ from sqlalchemy import Select
 
 logger = logging.getLogger(__name__)
 
-_query_timing_enabled: ContextVar[bool] = ContextVar("_query_timing_enabled", default=False)
-_n1_detection_enabled: ContextVar[bool] = ContextVar("_n1_detection_enabled", default=False)
+_query_timing_enabled: ContextVar[bool] = ContextVar(
+    "_query_timing_enabled", default=False
+)
+_n1_detection_enabled: ContextVar[bool] = ContextVar(
+    "_n1_detection_enabled", default=False
+)
 
 
 def enable_query_timing():
@@ -45,7 +49,9 @@ def track_query_time(threshold_ms: float = 100):
                 if elapsed > threshold_ms:
                     logger.warning(
                         "Slow query detected: %s took %.2fms (threshold: %.2fms)",
-                        func.__qualname__, elapsed, threshold_ms
+                        func.__qualname__,
+                        elapsed,
+                        threshold_ms,
                     )
 
         @wraps(func)
@@ -60,7 +66,9 @@ def track_query_time(threshold_ms: float = 100):
                 if elapsed > threshold_ms:
                     logger.warning(
                         "Slow query detected: %s took %.2fms (threshold: %.2fms)",
-                        func.__qualname__, elapsed, threshold_ms
+                        func.__qualname__,
+                        elapsed,
+                        threshold_ms,
                     )
 
         if asyncio.iscoroutinefunction(func):
@@ -85,7 +93,7 @@ class NPlusOneDetector:
 
     def _normalize(self, sql: str) -> str:
         normalized = re.sub(r"'[^']*'", "'?'", sql)
-        normalized = re.sub(r'\b\d+\b', '?', normalized)
+        normalized = re.sub(r"\b\d+\b", "?", normalized)
         return normalized
 
     def check(self) -> list[dict]:
@@ -107,7 +115,8 @@ class NPlusOneDetector:
         if suspects:
             logger.warning(
                 "N+1 query detected: %d query patterns executed %d+ times",
-                len(suspects), self.threshold
+                len(suspects),
+                self.threshold,
             )
             for s in suspects:
                 logger.warning("  Pattern (x%d): %s", s["count"], s["sql"])

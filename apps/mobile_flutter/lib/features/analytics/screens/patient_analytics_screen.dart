@@ -4,7 +4,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:design_system/design_system.dart';
 import 'package:core/core.dart';
 
-final patientAnalyticsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+final patientAnalyticsProvider =
+    FutureProvider<Map<String, dynamic>>((ref) async {
   final api = ref.read(apiClientProvider);
   final response = await api.get('/v1/analytics/patients');
   final data = response.data;
@@ -103,7 +104,8 @@ class PatientAnalyticsScreen extends ConsumerWidget {
                   child: _DemographicTile(
                     icon: Icons.cake,
                     label: 'متوسط العمر',
-                    value: '${_asDouble(data['average_age']).toStringAsFixed(1)}',
+                    value:
+                        '${_asDouble(data['average_age']).toStringAsFixed(1)}',
                     color: NeuroColors.temperature,
                   ),
                 ),
@@ -238,9 +240,8 @@ class PatientAnalyticsScreen extends ConsumerWidget {
           0.0;
       return c;
     }).toList();
-    final avg = counts.isEmpty
-        ? 0.0
-        : counts.reduce((a, b) => a + b) / counts.length;
+    final avg =
+        counts.isEmpty ? 0.0 : counts.reduce((a, b) => a + b) / counts.length;
     final high = counts.isEmpty ? 0.0 : counts.reduce((a, b) => a > b ? a : b);
     final low = counts.isEmpty ? 0.0 : counts.reduce((a, b) => a < b ? a : b);
 
@@ -321,8 +322,7 @@ class PatientAnalyticsScreen extends ConsumerWidget {
       return const SizedBox.shrink();
     }
     final values = admissions
-        .map((m) =>
-            (m is Map ? ((m['count'] as num?)?.toDouble() ?? 0) : 0.0))
+        .map((m) => (m is Map ? ((m['count'] as num?)?.toDouble() ?? 0) : 0.0))
         .toList();
     final last = values[values.length - 1];
     final prev = values[values.length - 2];
@@ -343,12 +343,8 @@ class PatientAnalyticsScreen extends ConsumerWidget {
             child: Row(
               children: [
                 Icon(
-                  change >= 0
-                      ? Icons.trending_up
-                      : Icons.trending_down,
-                  color: change >= 0
-                      ? NeuroColors.critical
-                      : NeuroColors.low,
+                  change >= 0 ? Icons.trending_up : Icons.trending_down,
+                  color: change >= 0 ? NeuroColors.critical : NeuroColors.low,
                   size: 32,
                 ),
                 const SizedBox(width: NeuroSpacing.md),
@@ -364,8 +360,8 @@ class PatientAnalyticsScreen extends ConsumerWidget {
                       Text(
                         'اتجاه ${change >= 0 ? 'تصاعدي' : 'تنازلي'} '
                         '(${change.abs().toStringAsFixed(1)}% مقارنة بالشهر السابق)',
-                        style: theme.textTheme.bodySmall
-                            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -384,7 +380,8 @@ class _StatCard extends StatelessWidget {
   final String value;
   final Color color;
 
-  const _StatCard({required this.label, required this.value, required this.color});
+  const _StatCard(
+      {required this.label, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {

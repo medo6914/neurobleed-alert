@@ -34,14 +34,20 @@ class PaymentService:
 
     # ---------------- Stripe ----------------
 
-    async def stripe_create_payment_intent(self, amount_cents: int, currency: str = "usd") -> dict[str, Any] | None:
+    async def stripe_create_payment_intent(
+        self, amount_cents: int, currency: str = "usd"
+    ) -> dict[str, Any] | None:
         if not settings.STRIPE_SECRET_KEY:
             return None
         try:
             resp = await self.client.post(
                 "https://api.stripe.com/v1/payment_intents",
                 auth=(settings.STRIPE_SECRET_KEY, ""),
-                data={"amount": amount_cents, "currency": currency, "automatic_payment_methods[enabled]": "true"},
+                data={
+                    "amount": amount_cents,
+                    "currency": currency,
+                    "automatic_payment_methods[enabled]": "true",
+                },
             )
             resp.raise_for_status()
             data = resp.json()
@@ -52,7 +58,9 @@ class PaymentService:
 
     # ---------------- Paymob ----------------
 
-    async def paymob_create_payment(self, amount_cents: int, currency: str = "EGP", order_id: str | None = None) -> dict[str, Any] | None:
+    async def paymob_create_payment(
+        self, amount_cents: int, currency: str = "EGP", order_id: str | None = None
+    ) -> dict[str, Any] | None:
         if not settings.PAYMOB_API_KEY:
             return None
         try:
@@ -88,7 +96,10 @@ class PaymentService:
                     },
                 )
                 key_resp.raise_for_status()
-                return {"payment_key": key_resp.json()["token"], "order_id": order["id"]}
+                return {
+                    "payment_key": key_resp.json()["token"],
+                    "order_id": order["id"],
+                }
             return {"order_id": order["id"]}
         except Exception as e:
             logger.warning("Paymob payment failed: %s", e)
@@ -121,12 +132,22 @@ class PaymentService:
                 headers={"Authorization": f"Bearer {token}"},
                 json={
                     "intent": "CAPTURE",
-                    "purchase_units": [{"amount": {"currency_code": "USD", "value": f"{amount_usd:.2f}"}}],
+                    "purchase_units": [
+                        {
+                            "amount": {
+                                "currency_code": "USD",
+                                "value": f"{amount_usd:.2f}",
+                            }
+                        }
+                    ],
                 },
             )
             resp.raise_for_status()
             data = resp.json()
-            approve_link = next((l["href"] for l in data.get("links", []) if l.get("rel") == "approve"), None)
+            approve_link = next(
+                (l["href"] for l in data.get("links", []) if l.get("rel") == "approve"),
+                None,
+            )
             return {"order_id": data["id"], "approve_link": approve_link}
         except Exception as e:
             logger.warning("PayPal order failed: %s", e)

@@ -113,9 +113,13 @@ class AlertRecord extends Equatable {
           : AlertStatus.active,
       triggeredBy: json['triggeredBy'] as String?,
       acknowledgedBy: json['acknowledgedBy'] as String?,
-      acknowledgedAt: json['acknowledgedAt'] != null ? DateTime.parse(json['acknowledgedAt'] as String) : null,
+      acknowledgedAt: json['acknowledgedAt'] != null
+          ? DateTime.parse(json['acknowledgedAt'] as String)
+          : null,
       resolvedBy: json['resolvedBy'] as String?,
-      resolvedAt: json['resolvedAt'] != null ? DateTime.parse(json['resolvedAt'] as String) : null,
+      resolvedAt: json['resolvedAt'] != null
+          ? DateTime.parse(json['resolvedAt'] as String)
+          : null,
       escalationLevel: json['escalationLevel'] as String?,
       escalationNotes: json['escalationNotes'] as String?,
       metadata: json['metadata'] as Map<String, dynamic>?,

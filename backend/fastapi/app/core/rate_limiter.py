@@ -91,7 +91,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         matched_path = None
         for limit_path, (max_req, window) in PRODUCTION_LIMITS.items():
-            if path == limit_path or path.startswith(limit_path + "/") or path.startswith(limit_path + "?"):
+            if (
+                path == limit_path
+                or path.startswith(limit_path + "/")
+                or path.startswith(limit_path + "?")
+            ):
                 matched_path = limit_path
                 break
             path_parts = path.rstrip("/").split("/")

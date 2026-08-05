@@ -42,7 +42,8 @@ class EmergencyApi {
   Future<Response> listContacts({String? patientId}) {
     final params = <String, dynamic>{};
     if (patientId != null) params['patient_id'] = patientId;
-    return _client.get(EmergencyEndpoints.baseContacts, queryParameters: params);
+    return _client.get(EmergencyEndpoints.baseContacts,
+        queryParameters: params);
   }
 
   Future<Response> getContact(String id) =>

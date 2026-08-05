@@ -41,10 +41,13 @@ class PubMedClient:
         path = self._cache_path(key)
         try:
             with open(path, "w") as f:
-                json.dump({
-                    "_cached_at": datetime.now().isoformat(),
-                    "results": results,
-                }, f)
+                json.dump(
+                    {
+                        "_cached_at": datetime.now().isoformat(),
+                        "results": results,
+                    },
+                    f,
+                )
         except Exception:
             pass
 
@@ -103,9 +106,22 @@ class PubMedClient:
                     result = {
                         "pubmed_id": str(medline["PMID"]),
                         "title": str(article_data.get("ArticleTitle", "")),
-                        "abstract": str(article_data.get("Abstract", {}).get("AbstractText", [""])[0]) if isinstance(article_data.get("Abstract", {}).get("AbstractText", [""]), list) else str(article_data.get("Abstract", {}).get("AbstractText", "")),
+                        "abstract": str(
+                            article_data.get("Abstract", {}).get("AbstractText", [""])[
+                                0
+                            ]
+                        )
+                        if isinstance(
+                            article_data.get("Abstract", {}).get("AbstractText", [""]),
+                            list,
+                        )
+                        else str(
+                            article_data.get("Abstract", {}).get("AbstractText", "")
+                        ),
                         "authors": [],
-                        "journal": str(article_data.get("Journal", {}).get("Title", "")),
+                        "journal": str(
+                            article_data.get("Journal", {}).get("Title", "")
+                        ),
                         "pub_date": "",
                         "source": "PubMed",
                     }
@@ -114,10 +130,18 @@ class PubMedClient:
                     if author_list:
                         result["authors"] = [
                             f"{a.get('LastName', '')} {a.get('Initials', '')}".strip()
-                            for a in author_list if isinstance(a, dict)
+                            for a in author_list
+                            if isinstance(a, dict)
                         ][:5]
 
-                    result["pub_date"] = str(article_data.get("ArticleDate", [{}])[0] if isinstance(article_data.get("ArticleDate", []), list) and article_data.get("ArticleDate") else article_data.get("Journal", {}).get("JournalIssue", {}).get("PubDate", {}))
+                    result["pub_date"] = str(
+                        article_data.get("ArticleDate", [{}])[0]
+                        if isinstance(article_data.get("ArticleDate", []), list)
+                        and article_data.get("ArticleDate")
+                        else article_data.get("Journal", {})
+                        .get("JournalIssue", {})
+                        .get("PubDate", {})
+                    )
 
                     results.append(result)
                 except Exception:
@@ -133,14 +157,19 @@ class PubMedClient:
         articles = self.search(query, max_results)
         formatted = []
         for art in articles:
-            formatted.append({
-                "id": art.get("pubmed_id"),
-                "title": art.get("title", ""),
-                "content": art.get("abstract", ""),
-                "source": f"PubMed/{art.get('journal', '')}",
-                "category": "pubmed",
-                "tags": ["pubmed", art.get("journal", "").lower().replace(" ", "_")],
-                "authors": art.get("authors", []),
-                "pub_date": art.get("pub_date", ""),
-            })
+            formatted.append(
+                {
+                    "id": art.get("pubmed_id"),
+                    "title": art.get("title", ""),
+                    "content": art.get("abstract", ""),
+                    "source": f"PubMed/{art.get('journal', '')}",
+                    "category": "pubmed",
+                    "tags": [
+                        "pubmed",
+                        art.get("journal", "").lower().replace(" ", "_"),
+                    ],
+                    "authors": art.get("authors", []),
+                    "pub_date": art.get("pub_date", ""),
+                }
+            )
         return formatted

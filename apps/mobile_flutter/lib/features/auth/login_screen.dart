@@ -182,7 +182,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined,
                 ),
-                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                onPressed: () =>
+                    setState(() => _obscurePassword = !_obscurePassword),
               ),
               validator: (v) {
                 if (v == null || v.isEmpty) return 'كلمة المرور مطلوبة';
@@ -225,7 +226,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               children: [
                 const Expanded(child: Divider()),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: NeuroSpacing.md),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: NeuroSpacing.md),
                   child: Text('أو', style: NeuroTypography.caption),
                 ),
                 const Expanded(child: Divider()),
@@ -255,7 +257,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           decoration: BoxDecoration(
             color: NeuroColors.bgInput,
             borderRadius: BorderRadius.circular(NeuroRadius.md),
-            border: Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.1)),
+            border: Border.all(
+                color: NeuroColors.textPrimary.withValues(alpha: 0.1)),
           ),
           child: Icon(icon, color: NeuroColors.textSecondary, size: 30),
         ),

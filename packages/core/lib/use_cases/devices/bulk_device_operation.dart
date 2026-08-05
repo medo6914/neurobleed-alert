@@ -22,7 +22,9 @@ class BulkDeviceOperation {
       return Left(ValidationFailure(
         message: 'At least one device ID is required',
         code: 'VALIDATION_ERROR',
-        errors: {'deviceIds': ['At least one device ID is required']},
+        errors: {
+          'deviceIds': ['At least one device ID is required']
+        },
       ));
     }
 
@@ -30,7 +32,9 @@ class BulkDeviceOperation {
       return Left(ValidationFailure(
         message: 'Operation is required',
         code: 'VALIDATION_ERROR',
-        errors: {'operation': ['Operation is required']},
+        errors: {
+          'operation': ['Operation is required']
+        },
       ));
     }
 

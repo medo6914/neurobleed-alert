@@ -31,103 +31,192 @@ class HospitalAdminScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('System Health', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text('System Health',
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold)),
             SizedBox(height: NeuroSpacing.sm),
             healthAsync.when(
               loading: () => const AppLoading(),
-              error: (e, _) => AppErrorState(title: 'Error', message: e.toString(), onRetry: () => ref.invalidate(systemHealthProvider)),
+              error: (e, _) => AppErrorState(
+                  title: 'Error',
+                  message: e.toString(),
+                  onRetry: () => ref.invalidate(systemHealthProvider)),
               data: (health) => Column(
                 children: [
-                  _HealthRow(icon: Icons.speed, label: 'Avg Response', value: '${health.avgResponseTimeMs.toStringAsFixed(0)} ms', color: health.avgResponseTimeMs > 500 ? NeuroColors.critical : NeuroColors.low),
+                  _HealthRow(
+                      icon: Icons.speed,
+                      label: 'Avg Response',
+                      value:
+                          '${health.avgResponseTimeMs.toStringAsFixed(0)} ms',
+                      color: health.avgResponseTimeMs > 500
+                          ? NeuroColors.critical
+                          : NeuroColors.low),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.error_outline, label: 'Error Rate (24h)', value: '${(health.errorRate24h * 100).toStringAsFixed(1)}%', color: health.errorRate24h > 0.05 ? NeuroColors.critical : NeuroColors.low),
+                  _HealthRow(
+                      icon: Icons.error_outline,
+                      label: 'Error Rate (24h)',
+                      value:
+                          '${(health.errorRate24h * 100).toStringAsFixed(1)}%',
+                      color: health.errorRate24h > 0.05
+                          ? NeuroColors.critical
+                          : NeuroColors.low),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.cloud_download, label: 'Requests (24h)', value: '${_formatNumber(health.totalRequests24h)}', color: NeuroColors.chartBlue),
+                  _HealthRow(
+                      icon: Icons.cloud_download,
+                      label: 'Requests (24h)',
+                      value: '${_formatNumber(health.totalRequests24h)}',
+                      color: NeuroColors.chartBlue),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.wifi, label: 'WebSockets', value: '${health.activeWebSockets}', color: NeuroColors.temperature),
+                  _HealthRow(
+                      icon: Icons.wifi,
+                      label: 'WebSockets',
+                      value: '${health.activeWebSockets}',
+                      color: NeuroColors.temperature),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.storage, label: 'DB Connections', value: '${health.databaseConnections}', color: NeuroColors.info),
+                  _HealthRow(
+                      icon: Icons.storage,
+                      label: 'DB Connections',
+                      value: '${health.databaseConnections}',
+                      color: NeuroColors.info),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.cached, label: 'Cache Hit Rate', value: '${(health.cacheHitRate * 100).toStringAsFixed(0)}%', color: health.cacheHitRate > 0.8 ? NeuroColors.low : NeuroColors.medium),
+                  _HealthRow(
+                      icon: Icons.cached,
+                      label: 'Cache Hit Rate',
+                      value:
+                          '${(health.cacheHitRate * 100).toStringAsFixed(0)}%',
+                      color: health.cacheHitRate > 0.8
+                          ? NeuroColors.low
+                          : NeuroColors.medium),
                   SizedBox(height: NeuroSpacing.xs),
-                  _HealthRow(icon: Icons.timer, label: 'Uptime', value: '${health.uptimeHours.toStringAsFixed(0)}h', color: NeuroColors.low),
+                  _HealthRow(
+                      icon: Icons.timer,
+                      label: 'Uptime',
+                      value: '${health.uptimeHours.toStringAsFixed(0)}h',
+                      color: NeuroColors.low),
                   if (health.recentErrors.isNotEmpty) ...[
                     SizedBox(height: NeuroSpacing.lg),
-                    Text('Recent Errors', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                    Text('Recent Errors',
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold)),
                     SizedBox(height: NeuroSpacing.sm),
                     ...health.recentErrors.map((e) => Padding(
-                      padding: EdgeInsets.only(bottom: NeuroSpacing.xs),
-                      child: AppCard(
-                        child: Padding(
-                          padding: EdgeInsets.all(NeuroSpacing.sm),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('${e['message'] ?? 'Unknown error'}', style: theme.textTheme.bodySmall),
-                              if (e['timestamp'] != null) Text('${e['timestamp']}', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-                            ],
+                          padding: EdgeInsets.only(bottom: NeuroSpacing.xs),
+                          child: AppCard(
+                            child: Padding(
+                              padding: EdgeInsets.all(NeuroSpacing.sm),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('${e['message'] ?? 'Unknown error'}',
+                                      style: theme.textTheme.bodySmall),
+                                  if (e['timestamp'] != null)
+                                    Text('${e['timestamp']}',
+                                        style: theme.textTheme.labelSmall
+                                            ?.copyWith(
+                                                color: theme.colorScheme
+                                                    .onSurfaceVariant)),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    )),
+                        )),
                   ],
                 ],
               ),
             ),
             SizedBox(height: NeuroSpacing.lg),
-            Text('Hospitals', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text('Hospitals',
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold)),
             SizedBox(height: NeuroSpacing.sm),
             hospitalAsync.when(
               loading: () => const AppLoading(),
-              error: (e, _) => AppErrorState(title: 'Error', message: e.toString(), onRetry: () => ref.invalidate(hospitalOverviewProvider)),
+              error: (e, _) => AppErrorState(
+                  title: 'Error',
+                  message: e.toString(),
+                  onRetry: () => ref.invalidate(hospitalOverviewProvider)),
               data: (overview) => Column(
                 children: [
                   Row(children: [
-                    Expanded(child: _HospitalMetricCard(label: 'Total', value: '${overview.totalHospitals}', icon: Icons.business, color: NeuroColors.chartBlue)),
+                    Expanded(
+                        child: _HospitalMetricCard(
+                            label: 'Total',
+                            value: '${overview.totalHospitals}',
+                            icon: Icons.business,
+                            color: NeuroColors.chartBlue)),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _HospitalMetricCard(label: 'Total Beds', value: '${overview.totalBeds}', icon: Icons.hotel, color: NeuroColors.low)),
+                    Expanded(
+                        child: _HospitalMetricCard(
+                            label: 'Total Beds',
+                            value: '${overview.totalBeds}',
+                            icon: Icons.hotel,
+                            color: NeuroColors.low)),
                   ]),
                   SizedBox(height: NeuroSpacing.sm),
                   Row(children: [
-                    Expanded(child: _HospitalMetricCard(label: 'Occupied', value: '${overview.occupiedBeds}', icon: Icons.person, color: NeuroColors.medium)),
+                    Expanded(
+                        child: _HospitalMetricCard(
+                            label: 'Occupied',
+                            value: '${overview.occupiedBeds}',
+                            icon: Icons.person,
+                            color: NeuroColors.medium)),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _HospitalMetricCard(
+                    Expanded(
+                        child: _HospitalMetricCard(
                       label: 'Occupancy Rate',
-                      value: overview.totalBeds > 0 ? '${((overview.occupiedBeds / overview.totalBeds) * 100).toStringAsFixed(0)}%' : '0%',
-                      icon: Icons.analytics, color: NeuroColors.temperature,
+                      value: overview.totalBeds > 0
+                          ? '${((overview.occupiedBeds / overview.totalBeds) * 100).toStringAsFixed(0)}%'
+                          : '0%',
+                      icon: Icons.analytics,
+                      color: NeuroColors.temperature,
                     )),
                   ]),
                   SizedBox(height: NeuroSpacing.lg),
-                  Text('Hospital List', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                  Text('Hospital List',
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.bold)),
                   SizedBox(height: NeuroSpacing.sm),
                   ...overview.hospitals.map((h) => Padding(
-                    padding: EdgeInsets.only(bottom: NeuroSpacing.sm),
-                    child: AppCard(
-                      child: Padding(
-                        padding: EdgeInsets.all(NeuroSpacing.md),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(h.name, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
-                            SizedBox(height: NeuroSpacing.sm),
-                            Row(children: [
-                              _MiniStat(label: 'Patients', value: '${h.patientCount}'),
-                              SizedBox(width: NeuroSpacing.md),
-                              _MiniStat(label: 'Devices', value: '${h.deviceCount}'),
-                              SizedBox(width: NeuroSpacing.md),
-                              _MiniStat(label: 'Alerts', value: '${h.activeAlerts}'),
-                            ]),
-                            SizedBox(height: NeuroSpacing.xs),
-                            Row(children: [
-                              _MiniStat(label: 'Bed Cap', value: '${h.bedCapacity}'),
-                              SizedBox(width: NeuroSpacing.md),
-                              _MiniStat(label: 'Occupancy', value: '${(h.bedOccupancy * 100).toStringAsFixed(0)}%'),
-                            ]),
-                          ],
+                        padding: EdgeInsets.only(bottom: NeuroSpacing.sm),
+                        child: AppCard(
+                          child: Padding(
+                            padding: EdgeInsets.all(NeuroSpacing.md),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(h.name,
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                        fontWeight: FontWeight.bold)),
+                                SizedBox(height: NeuroSpacing.sm),
+                                Row(children: [
+                                  _MiniStat(
+                                      label: 'Patients',
+                                      value: '${h.patientCount}'),
+                                  SizedBox(width: NeuroSpacing.md),
+                                  _MiniStat(
+                                      label: 'Devices',
+                                      value: '${h.deviceCount}'),
+                                  SizedBox(width: NeuroSpacing.md),
+                                  _MiniStat(
+                                      label: 'Alerts',
+                                      value: '${h.activeAlerts}'),
+                                ]),
+                                SizedBox(height: NeuroSpacing.xs),
+                                Row(children: [
+                                  _MiniStat(
+                                      label: 'Bed Cap',
+                                      value: '${h.bedCapacity}'),
+                                  SizedBox(width: NeuroSpacing.md),
+                                  _MiniStat(
+                                      label: 'Occupancy',
+                                      value:
+                                          '${(h.bedOccupancy * 100).toStringAsFixed(0)}%'),
+                                ]),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )),
+                      )),
                 ],
               ),
             ),
@@ -145,21 +234,31 @@ class HospitalAdminScreen extends ConsumerWidget {
 }
 
 class _HealthRow extends StatelessWidget {
-  final IconData icon; final String label; final String value; final Color color;
-  const _HealthRow({required this.icon, required this.label, required this.value, required this.color});
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+  const _HealthRow(
+      {required this.icon,
+      required this.label,
+      required this.value,
+      required this.color});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AppCard(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: NeuroSpacing.sm, horizontal: NeuroSpacing.md),
+        padding: EdgeInsets.symmetric(
+            vertical: NeuroSpacing.sm, horizontal: NeuroSpacing.md),
         child: Row(
           children: [
             Icon(icon, color: color, size: 20),
             SizedBox(width: NeuroSpacing.sm),
             Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
-            Text(value, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(value,
+                style: theme.textTheme.bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -168,8 +267,15 @@ class _HealthRow extends StatelessWidget {
 }
 
 class _HospitalMetricCard extends StatelessWidget {
-  final String label; final String value; final IconData icon; final Color color;
-  const _HospitalMetricCard({required this.label, required this.value, required this.icon, required this.color});
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+  const _HospitalMetricCard(
+      {required this.label,
+      required this.value,
+      required this.icon,
+      required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -181,15 +287,21 @@ class _HospitalMetricCard extends StatelessWidget {
           children: [
             Container(
               padding: EdgeInsets.all(NeuroSpacing.sm),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(NeuroRadius.md)),
+              decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(NeuroRadius.md)),
               child: Icon(icon, color: color, size: 20),
             ),
             SizedBox(width: NeuroSpacing.sm),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(value, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                Text(label, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                Text(value,
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold)),
+                Text(label,
+                    style: theme.textTheme.labelSmall
+                        ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
               ],
             ),
           ],
@@ -200,7 +312,8 @@ class _HospitalMetricCard extends StatelessWidget {
 }
 
 class _MiniStat extends StatelessWidget {
-  final String label; final String value;
+  final String label;
+  final String value;
   const _MiniStat({required this.label, required this.value});
 
   @override
@@ -209,8 +322,12 @@ class _MiniStat extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(value, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
-        Text(label, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+        Text(value,
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(fontWeight: FontWeight.bold)),
+        Text(label,
+            style: theme.textTheme.labelSmall
+                ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
       ],
     );
   }

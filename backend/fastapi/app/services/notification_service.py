@@ -30,10 +30,16 @@ class NotificationDispatcher:
 
     def channels(self) -> dict[str, bool]:
         return {
-            "twilio_sms": bool(settings.TWILIO_ACCOUNT_SID and settings.TWILIO_AUTH_TOKEN),
+            "twilio_sms": bool(
+                settings.TWILIO_ACCOUNT_SID and settings.TWILIO_AUTH_TOKEN
+            ),
             "twilio_whatsapp": bool(settings.TWILIO_WHATSAPP_NUMBER),
             "vonage_sms": bool(settings.VONAGE_API_KEY and settings.VONAGE_API_SECRET),
-            "email": bool(settings.SMTP_HOST or settings.RESEND_API_KEY or settings.SENDGRID_API_KEY),
+            "email": bool(
+                settings.SMTP_HOST
+                or settings.RESEND_API_KEY
+                or settings.SENDGRID_API_KEY
+            ),
             "fcm": bool(settings.FIREBASE_CREDENTIALS_PATH),
         }
 
@@ -45,7 +51,9 @@ class NotificationDispatcher:
                 from twilio.rest import Client
 
                 client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-                client.messages.create(body=body, from_=settings.TWILIO_PHONE_NUMBER, to=phone)
+                client.messages.create(
+                    body=body, from_=settings.TWILIO_PHONE_NUMBER, to=phone
+                )
                 delivered.append("twilio_sms")
             except Exception as e:
                 logger.warning("Twilio SMS failed: %s", e)

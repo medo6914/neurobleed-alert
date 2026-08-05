@@ -49,8 +49,7 @@ class Formatters {
     return phone;
   }
 
-  static String gender(String gender) =>
-      gender == 'male' ? 'Male' : 'Female';
+  static String gender(String gender) => gender == 'male' ? 'Male' : 'Female';
 
   static String bloodType(String type) {
     final map = {

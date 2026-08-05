@@ -2,7 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/core.dart';
 import 'package:shared/entities/medical_timeline.dart';
 
-final patientTimelineProvider = FutureProvider.family<List<MedicalTimelineEntry>, String>((ref, patientId) async {
+final patientTimelineProvider =
+    FutureProvider.family<List<MedicalTimelineEntry>, String>(
+        (ref, patientId) async {
   final apiClient = ref.watch(apiClientProvider);
   final errorHandler = ref.watch(errorHandlerProvider);
 

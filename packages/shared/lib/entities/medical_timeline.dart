@@ -79,7 +79,8 @@ class MedicalTimelineEntry extends Equatable {
       id: json['id'] as String,
       patientId: json['patientId'] as String,
       encounterId: json['encounterId'] as String?,
-      eventType: TimelineEventType.values.firstWhere((e) => e.name == json['eventType']),
+      eventType: TimelineEventType.values
+          .firstWhere((e) => e.name == json['eventType']),
       title: json['title'] as String,
       description: json['description'] as String,
       metadata: json['metadata'] as Map<String, dynamic>?,

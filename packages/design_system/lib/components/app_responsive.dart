@@ -25,7 +25,8 @@ class AppResponsive extends StatelessWidget {
     return mobile(context);
   }
 
-  static double adaptiveValue(BuildContext context, {
+  static double adaptiveValue(
+    BuildContext context, {
     required double mobile,
     double? tablet,
     double? desktop,

@@ -17,7 +17,9 @@ class SearchDevices {
       return Left(ValidationFailure(
         message: 'Search query is required',
         code: 'VALIDATION_ERROR',
-        errors: {'query': ['Search query is required']},
+        errors: {
+          'query': ['Search query is required']
+        },
       ));
     }
     return _repository.searchDevices(query, page: page, limit: limit);

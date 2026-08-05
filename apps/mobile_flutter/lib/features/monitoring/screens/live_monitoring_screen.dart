@@ -10,7 +10,8 @@ class LiveMonitoringScreen extends ConsumerStatefulWidget {
   const LiveMonitoringScreen({super.key});
 
   @override
-  ConsumerState<LiveMonitoringScreen> createState() => _LiveMonitoringScreenState();
+  ConsumerState<LiveMonitoringScreen> createState() =>
+      _LiveMonitoringScreenState();
 }
 
 class _LiveMonitoringScreenState extends ConsumerState<LiveMonitoringScreen> {
@@ -78,7 +79,8 @@ class _LiveMonitoringScreenState extends ConsumerState<LiveMonitoringScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.monitor_heart_outlined, size: 64, color: NeuroColors.textSecondary),
+                  Icon(Icons.monitor_heart_outlined,
+                      size: 64, color: NeuroColors.textSecondary),
                   const SizedBox(height: 16),
                   Text(
                     'No active monitoring sessions',
@@ -139,7 +141,8 @@ class _LiveMonitoringScreenState extends ConsumerState<LiveMonitoringScreen> {
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall
-                                    ?.copyWith(color: NeuroColors.textSecondary),
+                                    ?.copyWith(
+                                        color: NeuroColors.textSecondary),
                               ),
                             ],
                           ),

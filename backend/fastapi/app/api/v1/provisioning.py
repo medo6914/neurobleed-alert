@@ -10,8 +10,11 @@ from app.core.rbac import Permission
 from app.models.user import User
 from app.models.enums import ProvisioningKeyStatus, DeviceType
 from app.schemas.provisioning import (
-    ProvisioningKeyCreate, ProvisioningKeyResponse, ProvisioningKeyListResponse,
-    ProvisioningClaimRequest, ProvisioningClaimResponse,
+    ProvisioningKeyCreate,
+    ProvisioningKeyResponse,
+    ProvisioningKeyListResponse,
+    ProvisioningClaimRequest,
+    ProvisioningClaimResponse,
 )
 from app.services.provisioning_service import ProvisioningService
 
@@ -20,11 +23,17 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/devices", tags=["devices"])
 
 
-async def get_provisioning_service(db: AsyncSession = Depends(get_db)) -> ProvisioningService:
+async def get_provisioning_service(
+    db: AsyncSession = Depends(get_db),
+) -> ProvisioningService:
     return ProvisioningService(db)
 
 
-@router.post("/provisioning/keys", response_model=ProvisioningKeyResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/provisioning/keys",
+    response_model=ProvisioningKeyResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 async def generate_provisioning_key(
     data: ProvisioningKeyCreate,
     service: ProvisioningService = Depends(get_provisioning_service),
@@ -43,14 +52,20 @@ async def list_provisioning_keys(
     current_user: User = Depends(require_permission(Permission.DEVICE_LIST)),
 ):
     keys, total = await service.list_keys(
-        page=page, per_page=per_page, status=status, device_type=device_type,
+        page=page,
+        per_page=per_page,
+        status=status,
+        device_type=device_type,
     )
     total_pages = max(1, (total + per_page - 1) // per_page)
     return ProvisioningKeyListResponse(
         items=[ProvisioningKeyResponse.model_validate(k) for k in keys],
-        total=total, page=page, per_page=per_page,
+        total=total,
+        page=page,
+        per_page=per_page,
         total_pages=total_pages,
-        has_next=page < total_pages, has_prev=page > 1,
+        has_next=page < total_pages,
+        has_prev=page > 1,
     )
 
 
@@ -63,7 +78,9 @@ async def get_provisioning_key(
     return await service.get_key(key_id)
 
 
-@router.post("/provisioning/keys/{key_id}/revoke", response_model=ProvisioningKeyResponse)
+@router.post(
+    "/provisioning/keys/{key_id}/revoke", response_model=ProvisioningKeyResponse
+)
 async def revoke_provisioning_key(
     key_id: UUID,
     service: ProvisioningService = Depends(get_provisioning_service),
@@ -84,4 +101,7 @@ async def claim_device(
         raise
     except Exception as e:
         logger.error("Device claim failed", exc_info=e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Claim processing failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Claim processing failed",
+        )

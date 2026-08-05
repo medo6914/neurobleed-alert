@@ -31,9 +31,8 @@ class AppDialog {
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: isDangerous
-                  ? NeuroColors.critical
-                  : NeuroColors.primary,
+              backgroundColor:
+                  isDangerous ? NeuroColors.critical : NeuroColors.primary,
               foregroundColor: NeuroColors.textOnPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(NeuroRadius.md),

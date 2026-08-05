@@ -88,5 +88,7 @@ def cached(ttl: int = 300, prefix: str = ""):
             result = await func(*args, **kwargs)
             await set_cache(cache_key, result, ttl)
             return result
+
         return wrapper
+
     return decorator

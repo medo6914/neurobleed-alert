@@ -30,7 +30,9 @@ class ModelManager:
             "model_path": model_path,
         }
 
-    def generate_synthetic_training_data(self, n_samples: int = 10000) -> tuple[np.ndarray, np.ndarray]:
+    def generate_synthetic_training_data(
+        self, n_samples: int = 10000
+    ) -> tuple[np.ndarray, np.ndarray]:
         np.random.seed(42)
         X = np.zeros((n_samples, 13))
         y = np.zeros(n_samples)
@@ -52,7 +54,21 @@ class ModelManager:
             rso2_drop = max(0, 65.0 - rso2)
             shock_index = hr / max(sbp, 1.0)
 
-            X[i] = [hr, spo2, rso2, ir, red, sbp, dbp, gcs, sq, ma, hr_spo2_ratio, rso2_drop, shock_index]
+            X[i] = [
+                hr,
+                spo2,
+                rso2,
+                ir,
+                red,
+                sbp,
+                dbp,
+                gcs,
+                sq,
+                ma,
+                hr_spo2_ratio,
+                rso2_drop,
+                shock_index,
+            ]
 
             risk = 0.0
             if hr < 50 or hr > 120:
@@ -93,6 +109,7 @@ class ModelManager:
 
         try:
             from app.ai.service import ai_service
+
             risk_engine = ai_service.risk_engine
             risk_engine.train(X, y)
 
@@ -125,10 +142,19 @@ class ModelManager:
             "saved_at": datetime.now().isoformat(),
             "model_version": "NB-RISK-XGB-2.0.0",
             "feature_names": [
-                "heart_rate", "spo2", "rso2", "ir_value", "red_value",
-                "systolic_bp", "diastolic_bp", "gcs",
-                "signal_quality", "motion_artifact",
-                "hr_spo2_ratio", "rso2_drop", "shock_index",
+                "heart_rate",
+                "spo2",
+                "rso2",
+                "ir_value",
+                "red_value",
+                "systolic_bp",
+                "diastolic_bp",
+                "gcs",
+                "signal_quality",
+                "motion_artifact",
+                "hr_spo2_ratio",
+                "rso2_drop",
+                "shock_index",
             ],
         }
         with open(path + ".meta.json", "w") as f:
@@ -140,6 +166,7 @@ class ModelManager:
             return False
         try:
             from app.ai.service import ai_service
+
             pipeline = joblib.load(path)
             re = ai_service.risk_engine
             re.pipeline = pipeline
@@ -159,6 +186,7 @@ class ModelManager:
         is_trained = self._training_status.get("status") == "completed"
         if not is_trained:
             from app.ai.service import ai_service
+
             is_trained = ai_service.risk_engine.is_trained()
         if not is_trained:
             return None
@@ -166,21 +194,28 @@ class ModelManager:
         model_path = os.path.join(self.MODELS_DIR, "risk_engine_xgb.onnx")
         try:
             from app.ai.service import ai_service
+
             xgb_model = ai_service.risk_engine.pipeline.named_steps["model"]
 
             import numpy as np
             from onnxconverter_common.data_types import FloatTensorType
 
             try:
-                from onnxmltools.convert.xgboost.convert import convert as convert_xgboost
+                from onnxmltools.convert.xgboost.convert import (
+                    convert as convert_xgboost,
+                )
+
                 initial_types = [("input", FloatTensorType([None, 13]))]
-                onnx_model = convert_xgboost(xgb_model, name="RiskEngineXGB", initial_types=initial_types)
+                onnx_model = convert_xgboost(
+                    xgb_model, name="RiskEngineXGB", initial_types=initial_types
+                )
                 with open(model_path, "wb") as f:
                     f.write(onnx_model.SerializeToString())
                 return model_path
             except Exception:
                 try:
                     from skl2onnx import to_onnx
+
                     dummy = np.zeros((1, 13), dtype=np.float32)
                     onnx_model = to_onnx(xgb_model, dummy)
                     with open(model_path, "wb") as f:

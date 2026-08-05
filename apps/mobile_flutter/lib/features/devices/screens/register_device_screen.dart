@@ -10,7 +10,8 @@ class RegisterDeviceScreen extends ConsumerStatefulWidget {
   const RegisterDeviceScreen({super.key});
 
   @override
-  ConsumerState<RegisterDeviceScreen> createState() => _RegisterDeviceScreenState();
+  ConsumerState<RegisterDeviceScreen> createState() =>
+      _RegisterDeviceScreenState();
 }
 
 class _RegisterDeviceScreenState extends ConsumerState<RegisterDeviceScreen> {
@@ -63,7 +64,8 @@ class _RegisterDeviceScreenState extends ConsumerState<RegisterDeviceScreen> {
                     hint: 'Enter serial number',
                     controller: _serialNumberController,
                     validator: (v) {
-                      if (v == null || v.isEmpty) return 'Serial number is required';
+                      if (v == null || v.isEmpty)
+                        return 'Serial number is required';
                       final result = DeviceValidator.validateSerialNumber(v);
                       return result.fold((f) => f.message, (_) => null);
                     },
@@ -92,7 +94,6 @@ class _RegisterDeviceScreenState extends ConsumerState<RegisterDeviceScreen> {
                 ],
               ),
               SizedBox(height: NeuroSpacing.lg),
-
               _buildSection(
                 context: context,
                 title: 'Version Info',
@@ -104,7 +105,8 @@ class _RegisterDeviceScreenState extends ConsumerState<RegisterDeviceScreen> {
                     controller: _firmwareVersionController,
                     validator: (v) {
                       if (v != null && v.isNotEmpty) {
-                        final result = DeviceValidator.validateFirmwareVersion(v);
+                        final result =
+                            DeviceValidator.validateFirmwareVersion(v);
                         return result.fold((f) => f.message, (_) => null);
                       }
                       return null;
@@ -119,7 +121,6 @@ class _RegisterDeviceScreenState extends ConsumerState<RegisterDeviceScreen> {
                 ],
               ),
               SizedBox(height: NeuroSpacing.lg),
-
               _buildSection(
                 context: context,
                 title: 'Assignment',
@@ -139,7 +140,6 @@ class _RegisterDeviceScreenState extends ConsumerState<RegisterDeviceScreen> {
                 ],
               ),
               SizedBox(height: NeuroSpacing.xxl),
-
               if (state.error != null)
                 Padding(
                   padding: EdgeInsets.only(bottom: NeuroSpacing.md),
@@ -149,12 +149,12 @@ class _RegisterDeviceScreenState extends ConsumerState<RegisterDeviceScreen> {
                     description: state.error,
                   ),
                 ),
-
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: AppButton(
-                  label: state.isSubmitting ? 'Registering...' : 'Register Device',
+                  label:
+                      state.isSubmitting ? 'Registering...' : 'Register Device',
                   icon: state.isSubmitting ? null : Icons.add_circle,
                   isLoading: state.isSubmitting,
                   onPressed: state.isSubmitting ? null : _submitForm,
@@ -184,9 +184,9 @@ class _RegisterDeviceScreenState extends ConsumerState<RegisterDeviceScreen> {
             Text(
               title,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
             ),
           ],
         ),
@@ -219,10 +219,12 @@ class _RegisterDeviceScreenState extends ConsumerState<RegisterDeviceScreen> {
             vertical: NeuroSpacing.sm,
           ),
         ),
-        items: DeviceType.values.map((t) => DropdownMenuItem(
-          value: t,
-          child: Text(t.name),
-        )).toList(),
+        items: DeviceType.values
+            .map((t) => DropdownMenuItem(
+                  value: t,
+                  child: Text(t.name),
+                ))
+            .toList(),
         onChanged: (v) => setState(() => _selectedDeviceType = v),
         validator: (v) => v == null ? 'Device type is required' : null,
       ),
@@ -240,13 +242,25 @@ class _RegisterDeviceScreenState extends ConsumerState<RegisterDeviceScreen> {
 
     final request = DeviceCreateRequest(
       serialNumber: _serialNumberController.text.trim(),
-      deviceName: _deviceNameController.text.trim().isEmpty ? null : _deviceNameController.text.trim(),
+      deviceName: _deviceNameController.text.trim().isEmpty
+          ? null
+          : _deviceNameController.text.trim(),
       deviceType: _selectedDeviceType!.name,
-      macAddress: _macAddressController.text.trim().isEmpty ? null : _macAddressController.text.trim(),
-      firmwareVersion: _firmwareVersionController.text.trim().isEmpty ? null : _firmwareVersionController.text.trim(),
-      hardwareVersion: _hardwareVersionController.text.trim().isEmpty ? null : _hardwareVersionController.text.trim(),
-      hospitalId: _hospitalIdController.text.trim().isEmpty ? null : _hospitalIdController.text.trim(),
-      department: _departmentController.text.trim().isEmpty ? null : _departmentController.text.trim(),
+      macAddress: _macAddressController.text.trim().isEmpty
+          ? null
+          : _macAddressController.text.trim(),
+      firmwareVersion: _firmwareVersionController.text.trim().isEmpty
+          ? null
+          : _firmwareVersionController.text.trim(),
+      hardwareVersion: _hardwareVersionController.text.trim().isEmpty
+          ? null
+          : _hardwareVersionController.text.trim(),
+      hospitalId: _hospitalIdController.text.trim().isEmpty
+          ? null
+          : _hospitalIdController.text.trim(),
+      department: _departmentController.text.trim().isEmpty
+          ? null
+          : _departmentController.text.trim(),
     );
 
     final notifier = ref.read(registerDeviceProvider.notifier);
@@ -255,12 +269,16 @@ class _RegisterDeviceScreenState extends ConsumerState<RegisterDeviceScreen> {
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
+          SnackBar(
+              content: Text(failure.message),
+              backgroundColor: NeuroColors.critical),
         );
       },
       (device) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Device registered successfully. SN: ${device.serialNumber}')),
+          SnackBar(
+              content: Text(
+                  'Device registered successfully. SN: ${device.serialNumber}')),
         );
         context.pushReplacement('/devices/${device.id}');
       },

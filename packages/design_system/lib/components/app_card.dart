@@ -34,9 +34,7 @@ class AppCard extends StatelessWidget {
             (isDark ? NeuroColors.surfaceDark : NeuroColors.surface),
         borderRadius: borderRadius ?? BorderRadius.circular(NeuroRadius.lg),
         boxShadow: [
-          elevation != null
-              ? NeuroShadows.elevated
-              : NeuroShadows.card,
+          elevation != null ? NeuroShadows.elevated : NeuroShadows.card,
         ],
       ),
       child: child,

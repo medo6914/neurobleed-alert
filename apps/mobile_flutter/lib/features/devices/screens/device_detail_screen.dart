@@ -40,7 +40,8 @@ class _DeviceDetailContent extends ConsumerStatefulWidget {
   const _DeviceDetailContent({required this.device});
 
   @override
-  ConsumerState<_DeviceDetailContent> createState() => _DeviceDetailContentState();
+  ConsumerState<_DeviceDetailContent> createState() =>
+      _DeviceDetailContentState();
 }
 
 class _DeviceDetailContentState extends ConsumerState<_DeviceDetailContent>
@@ -154,7 +155,10 @@ class _OverviewTab extends StatelessWidget {
                       DeviceMetricTile(
                         icon: Icons.access_time,
                         label: 'Last Heartbeat',
-                        value: device.lastHeartbeat.toLocal().toString().substring(0, 16),
+                        value: device.lastHeartbeat
+                            .toLocal()
+                            .toString()
+                            .substring(0, 16),
                       ),
                     ],
                   ),
@@ -165,7 +169,6 @@ class _OverviewTab extends StatelessWidget {
           SizedBox(height: NeuroSpacing.md),
           _ConnectionActions(device: device),
           SizedBox(height: NeuroSpacing.md),
-
           Row(
             children: [
               Expanded(
@@ -206,13 +209,13 @@ class _OverviewTab extends StatelessWidget {
             ],
           ),
           SizedBox(height: NeuroSpacing.md),
-
           AppCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(left: NeuroSpacing.md, top: NeuroSpacing.md),
+                  padding: EdgeInsets.only(
+                      left: NeuroSpacing.md, top: NeuroSpacing.md),
                   child: Text(
                     'Additional Info',
                     style: theme.textTheme.titleSmall?.copyWith(
@@ -233,13 +236,19 @@ class _OverviewTab extends StatelessWidget {
                       DeviceMetricTile(
                         icon: Icons.calendar_today,
                         label: 'Registered',
-                        value: device.createdAt.toLocal().toString().substring(0, 10),
+                        value: device.createdAt
+                            .toLocal()
+                            .toString()
+                            .substring(0, 10),
                       ),
                       if (device.pairedAt != null)
                         DeviceMetricTile(
                           icon: Icons.link,
                           label: 'Paired',
-                          value: device.pairedAt!.toLocal().toString().substring(0, 10),
+                          value: device.pairedAt!
+                              .toLocal()
+                              .toString()
+                              .substring(0, 10),
                         ),
                     ],
                   ),
@@ -294,8 +303,12 @@ class _AssignmentTab extends ConsumerWidget {
                       DeviceMetricTile(
                         icon: Icons.person,
                         label: 'Assigned Patient',
-                        value: device.patientId != null ? device.patientId! : 'Not assigned',
-                        valueColor: device.patientId != null ? null : theme.colorScheme.onSurfaceVariant,
+                        value: device.patientId != null
+                            ? device.patientId!
+                            : 'Not assigned',
+                        valueColor: device.patientId != null
+                            ? null
+                            : theme.colorScheme.onSurfaceVariant,
                       ),
                       if (device.patientId != null) ...[
                         SizedBox(height: NeuroSpacing.sm),
@@ -304,7 +317,8 @@ class _AssignmentTab extends ConsumerWidget {
                           child: AppButton(
                             label: 'View Patient',
                             variant: ButtonVariant.secondary,
-                            onPressed: () => context.push('/patients/${device.patientId}'),
+                            onPressed: () =>
+                                context.push('/patients/${device.patientId}'),
                           ),
                         ),
                       ],
@@ -315,7 +329,6 @@ class _AssignmentTab extends ConsumerWidget {
             ),
           ),
           SizedBox(height: NeuroSpacing.md),
-
           AppCard(
             child: Padding(
               padding: EdgeInsets.all(NeuroSpacing.md),
@@ -325,7 +338,9 @@ class _AssignmentTab extends ConsumerWidget {
                     icon: Icons.local_hospital,
                     label: 'Hospital',
                     value: device.hospitalId ?? 'Not assigned',
-                    valueColor: device.hospitalId != null ? null : theme.colorScheme.onSurfaceVariant,
+                    valueColor: device.hospitalId != null
+                        ? null
+                        : theme.colorScheme.onSurfaceVariant,
                   ),
                   if (device.hospitalId != null)
                     DeviceMetricTile(
@@ -338,13 +353,16 @@ class _AssignmentTab extends ConsumerWidget {
             ),
           ),
           SizedBox(height: NeuroSpacing.xl),
-
           SizedBox(
             width: double.infinity,
             child: AppButton(
-              label: device.patientId != null ? 'Unassign Device' : 'Assign Device',
+              label: device.patientId != null
+                  ? 'Unassign Device'
+                  : 'Assign Device',
               icon: device.patientId != null ? Icons.link_off : Icons.link,
-              variant: device.patientId != null ? ButtonVariant.danger : ButtonVariant.primary,
+              variant: device.patientId != null
+                  ? ButtonVariant.danger
+                  : ButtonVariant.primary,
               onPressed: () {
                 if (device.patientId != null) {
                   _confirmUnassign(context, ref);
@@ -368,11 +386,16 @@ class _AssignmentTab extends ConsumerWidget {
       isDangerous: true,
     ).then((confirmed) {
       if (confirmed == true) {
-        ref.read(deviceAssignProvider.notifier).unassignDevice(device.id).then((result) {
+        ref
+            .read(deviceAssignProvider.notifier)
+            .unassignDevice(device.id)
+            .then((result) {
           result.fold(
             (failure) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
+                SnackBar(
+                    content: Text(failure.message),
+                    backgroundColor: NeuroColors.critical),
               );
             },
             (_) {
@@ -441,7 +464,8 @@ class _DiagnosticsTab extends ConsumerWidget {
                             DeviceMetricTile(
                               icon: Icons.battery_full,
                               label: 'Battery Level',
-                              value: '${diag.batteryLevel!.toStringAsFixed(0)}%',
+                              value:
+                                  '${diag.batteryLevel!.toStringAsFixed(0)}%',
                               valueColor: diag.batteryLevel! < 20
                                   ? NeuroColors.critical
                                   : null,
@@ -456,7 +480,8 @@ class _DiagnosticsTab extends ConsumerWidget {
                             DeviceMetricTile(
                               icon: Icons.thermostat,
                               label: 'Temperature',
-                              value: '${diag.temperature!.toStringAsFixed(1)}°C',
+                              value:
+                                  '${diag.temperature!.toStringAsFixed(1)}°C',
                             ),
                           if (diag.uptime != null)
                             DeviceMetricTile(
@@ -466,7 +491,9 @@ class _DiagnosticsTab extends ConsumerWidget {
                             ),
                           if (diag.chargingStatus != null)
                             DeviceMetricTile(
-                              icon: diag.chargingStatus! ? Icons.bolt : Icons.battery_std,
+                              icon: diag.chargingStatus!
+                                  ? Icons.bolt
+                                  : Icons.battery_std,
                               label: 'Charging',
                               value: diag.chargingStatus! ? 'Yes' : 'No',
                             ),
@@ -477,7 +504,6 @@ class _DiagnosticsTab extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: NeuroSpacing.md),
-
               AppCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -522,7 +548,6 @@ class _DiagnosticsTab extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: NeuroSpacing.md),
-
               AppCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -561,14 +586,14 @@ class _DiagnosticsTab extends ConsumerWidget {
                 ),
               ),
               SizedBox(height: NeuroSpacing.md),
-
               SizedBox(
                 width: double.infinity,
                 child: AppButton(
                   label: 'Full Diagnostics',
                   icon: Icons.monitor_heart,
                   variant: ButtonVariant.secondary,
-                  onPressed: () => context.push('/devices/$deviceId/diagnostics'),
+                  onPressed: () =>
+                      context.push('/devices/$deviceId/diagnostics'),
                 ),
               ),
             ],
@@ -634,7 +659,8 @@ class _HistoryTile extends StatelessWidget {
     final theme = Theme.of(context);
     final type = event['event_type'] as String? ?? 'unknown';
     final timestamp = event['timestamp'] as String? ?? '';
-    final details = event['details'] as String? ?? event['message'] as String? ?? '';
+    final details =
+        event['details'] as String? ?? event['message'] as String? ?? '';
 
     IconData icon;
     Color iconColor;
@@ -790,9 +816,8 @@ class _ConnectionActionsState extends ConsumerState<_ConnectionActions> {
                       style: FilledButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.error,
                       ),
-                      onPressed: _busy
-                          ? null
-                          : () => _setStatus(DeviceStatus.offline),
+                      onPressed:
+                          _busy ? null : () => _setStatus(DeviceStatus.offline),
                     ),
                   )
                 else
@@ -800,9 +825,8 @@ class _ConnectionActionsState extends ConsumerState<_ConnectionActions> {
                     child: FilledButton.icon(
                       icon: const Icon(Icons.link, size: 18),
                       label: Text(_busy ? 'Connecting...' : 'Connect'),
-                      onPressed: _busy
-                          ? null
-                          : () => _setStatus(DeviceStatus.online),
+                      onPressed:
+                          _busy ? null : () => _setStatus(DeviceStatus.online),
                     ),
                   ),
                 const SizedBox(width: NeuroSpacing.md),
@@ -814,8 +838,8 @@ class _ConnectionActionsState extends ConsumerState<_ConnectionActions> {
                         ? null
                         : () => Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    DeviceDiagnosticsScreen(deviceId: device.id),
+                                builder: (_) => DeviceDiagnosticsScreen(
+                                    deviceId: device.id),
                               ),
                             ),
                   ),

@@ -56,11 +56,7 @@ class UserRepository(BaseRepository[User]):
         return result.scalar_one_or_none()
 
     async def get_user_with_roles(self, id: uuid.UUID) -> User | None:
-        stmt = (
-            select(User)
-            .where(User.id == id)
-            .options(selectinload(User.roles))
-        )
+        stmt = select(User).where(User.id == id).options(selectinload(User.roles))
         stmt = self._apply_soft_delete_filter(stmt)
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
@@ -77,9 +73,7 @@ class PatientRepository(BaseRepository[Patient]):
         return result.scalar_one_or_none()
 
     async def search_by_name(self, name: str, limit: int = 20) -> list[Patient]:
-        stmt = select(Patient).where(
-            Patient.full_name.ilike(f"%{name}%")
-        )
+        stmt = select(Patient).where(Patient.full_name.ilike(f"%{name}%"))
         stmt = self._apply_soft_delete_filter(stmt)
         stmt = stmt.limit(limit)
         result = await self.db.execute(stmt)
@@ -141,18 +135,14 @@ class AlertRepository(BaseRepository[Alert]):
     def __init__(self, db):
         super().__init__(Alert, db)
 
-    async def get_unacknowledged(
-        self, skip: int = 0, limit: int = 100
-    ) -> list[Alert]:
+    async def get_unacknowledged(self, skip: int = 0, limit: int = 100) -> list[Alert]:
         stmt = select(Alert).where(Alert.is_acknowledged == False)  # noqa: E712
         stmt = self._apply_soft_delete_filter(stmt)
         stmt = stmt.order_by(Alert.created_at.desc()).offset(skip).limit(limit)
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_unresolved(
-        self, skip: int = 0, limit: int = 100
-    ) -> list[Alert]:
+    async def get_unresolved(self, skip: int = 0, limit: int = 100) -> list[Alert]:
         stmt = select(Alert).where(Alert.is_resolved == False)  # noqa: E712
         stmt = self._apply_soft_delete_filter(stmt)
         stmt = stmt.order_by(Alert.created_at.desc()).offset(skip).limit(limit)
@@ -211,13 +201,21 @@ class AuditLogRepository(BaseRepository[AuditLog]):
     def __init__(self, db):
         super().__init__(AuditLog, db)
 
-    async def get_by_user(self, user_id: uuid.UUID, skip: int = 0, limit: int = 100) -> list[AuditLog]:
+    async def get_by_user(
+        self, user_id: uuid.UUID, skip: int = 0, limit: int = 100
+    ) -> list[AuditLog]:
         stmt = select(AuditLog).where(AuditLog.user_id == user_id)
         stmt = stmt.order_by(AuditLog.created_at.desc()).offset(skip).limit(limit)
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 
-    async def get_by_resource(self, resource: str, resource_id: str | None = None, skip: int = 0, limit: int = 100) -> list[AuditLog]:
+    async def get_by_resource(
+        self,
+        resource: str,
+        resource_id: str | None = None,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> list[AuditLog]:
         stmt = select(AuditLog).where(AuditLog.resource == resource)
         if resource_id:
             stmt = stmt.where(AuditLog.resource_id == resource_id)
@@ -236,11 +234,7 @@ class RoleRepository(BaseRepository[Role]):
         return result.scalar_one_or_none()
 
     async def get_with_permissions(self, id: uuid.UUID) -> Role | None:
-        stmt = (
-            select(Role)
-            .where(Role.id == id)
-            .options(selectinload(Role.permissions))
-        )
+        stmt = select(Role).where(Role.id == id).options(selectinload(Role.permissions))
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
 

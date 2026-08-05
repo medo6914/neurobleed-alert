@@ -65,8 +65,7 @@ class AlertBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(title,
-                    style: theme.labelLarge?.copyWith(color: _color)),
+                Text(title, style: theme.labelLarge?.copyWith(color: _color)),
                 if (description != null) ...[
                   const SizedBox(height: NeuroSpacing.xxs),
                   Text(description!,

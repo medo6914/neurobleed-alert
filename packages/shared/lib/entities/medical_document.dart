@@ -1,6 +1,15 @@
 import 'package:equatable/equatable.dart';
 
-enum DocumentType { labReport, imaging, prescription, consentForm, medicalReport, dischargeSummary, referral, other }
+enum DocumentType {
+  labReport,
+  imaging,
+  prescription,
+  consentForm,
+  medicalReport,
+  dischargeSummary,
+  referral,
+  other
+}
 
 enum DocumentStatus { pending, uploaded, verified, rejected }
 
@@ -108,7 +117,9 @@ class MedicalDocument extends Equatable {
       uploadedBy: json['uploadedBy'] as String?,
       uploadedByName: json['uploadedByName'] as String?,
       verifiedBy: json['verifiedBy'] as String?,
-      verifiedAt: json['verifiedAt'] != null ? DateTime.parse(json['verifiedAt'] as String) : null,
+      verifiedAt: json['verifiedAt'] != null
+          ? DateTime.parse(json['verifiedAt'] as String)
+          : null,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );

@@ -140,14 +140,16 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
                         children: [
                           VitalSignGauge(
                             label: 'Signal',
-                            value: (vitals['signal_quality'] as num?)?.toDouble(),
+                            value:
+                                (vitals['signal_quality'] as num?)?.toDouble(),
                             unit: '',
                             normalRange: Range(0.5, 1.0),
                             icon: Icons.signal_cellular_alt,
                           ),
                           VitalSignGauge(
                             label: 'Motion',
-                            value: (vitals['motion_artifact'] as num?)?.toDouble(),
+                            value:
+                                (vitals['motion_artifact'] as num?)?.toDouble(),
                             unit: '',
                             normalRange: Range(0, 0.3),
                             icon: Icons.run_circle,
@@ -186,7 +188,8 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
                 ),
               ),
             const SizedBox(height: 16),
-            _buildVitalsSummaryCard(vitals, latestVitalsAsync.valueOrNull, theme),
+            _buildVitalsSummaryCard(
+                vitals, latestVitalsAsync.valueOrNull, theme),
             const SizedBox(height: 16),
             _buildLiveChartCard(theme),
           ],
@@ -255,10 +258,9 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildMetric('ضغط الدم',
-                    bp != null ? '$bp/${bpDiastolic ?? '--'}' : '--',
-                    'mmHg'),
-                _buildMetric('درجة الحرارة',
-                    temp != null ? '$temp°C' : '--', ''),
+                    bp != null ? '$bp/${bpDiastolic ?? '--'}' : '--', 'mmHg'),
+                _buildMetric(
+                    'درجة الحرارة', temp != null ? '$temp°C' : '--', ''),
                 _buildMetric(
                     'معدل التنفس',
                     respiratory != null
@@ -286,9 +288,12 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
         ),
         const SizedBox(height: 2),
         Text(label,
-            style: const TextStyle(fontSize: 12, color: NeuroColors.textSecondary)),
+            style: const TextStyle(
+                fontSize: 12, color: NeuroColors.textSecondary)),
         if (unit.isNotEmpty)
-          Text(unit, style: const TextStyle(fontSize: 10, color: NeuroColors.textSecondary)),
+          Text(unit,
+              style: const TextStyle(
+                  fontSize: 10, color: NeuroColors.textSecondary)),
       ],
     );
   }
@@ -420,7 +425,8 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
       child: Column(
         children: [
           Text(label,
-              style: const TextStyle(fontSize: 11, color: NeuroColors.textSecondary)),
+              style: const TextStyle(
+                  fontSize: 11, color: NeuroColors.textSecondary)),
           const SizedBox(height: 2),
           Text(value,
               style: const TextStyle(

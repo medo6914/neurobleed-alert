@@ -5,10 +5,15 @@ void main() {
   group('ProvisioningKey', () {
     test('fromJson creates correct instance', () {
       final json = {
-        'id': 'pk-1', 'key': 'NB-ABCD-EFGH',
-        'device_type': 'nb_01', 'label': 'ICU Monitor',
-        'status': 'active', 'expires_at': null,
-        'used_at': null, 'max_uses': 1, 'use_count': 0,
+        'id': 'pk-1',
+        'key': 'NB-ABCD-EFGH',
+        'device_type': 'nb_01',
+        'label': 'ICU Monitor',
+        'status': 'active',
+        'expires_at': null,
+        'used_at': null,
+        'max_uses': 1,
+        'use_count': 0,
         'created_at': '2026-07-20T10:00:00Z',
       };
       final dto = ProvisioningKey.fromJson(json);
@@ -23,10 +28,15 @@ void main() {
 
     test('fromJson handles null label', () {
       final json = {
-        'id': 'pk-2', 'key': 'NB-WXYZ-6789',
-        'device_type': 'nb_02', 'label': null,
-        'status': 'used', 'expires_at': null,
-        'used_at': '2026-07-21T15:00:00Z', 'max_uses': 1, 'use_count': 1,
+        'id': 'pk-2',
+        'key': 'NB-WXYZ-6789',
+        'device_type': 'nb_02',
+        'label': null,
+        'status': 'used',
+        'expires_at': null,
+        'used_at': '2026-07-21T15:00:00Z',
+        'max_uses': 1,
+        'use_count': 1,
         'created_at': '2026-07-20T10:00:00Z',
       };
       final dto = ProvisioningKey.fromJson(json);

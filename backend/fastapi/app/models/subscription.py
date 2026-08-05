@@ -1,7 +1,17 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import String, DateTime, Float, ForeignKey, Text, Boolean, JSON, func, Integer
+from sqlalchemy import (
+    String,
+    DateTime,
+    Float,
+    ForeignKey,
+    Text,
+    Boolean,
+    JSON,
+    func,
+    Integer,
+)
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -23,12 +33,22 @@ class Subscription(TimestampMixin, SoftDeleteMixin, Base):
     status: Mapped[SubscriptionStatus] = mapped_column(
         SAEnum(SubscriptionStatus), nullable=False, default=SubscriptionStatus.ACTIVE
     )
-    stripe_subscription_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    stripe_subscription_id: Mapped[str | None] = mapped_column(
+        String(255), nullable=True
+    )
     stripe_customer_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    current_period_start: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    current_period_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    canceled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    trial_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    current_period_start: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    current_period_end: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    canceled_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    trial_end: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     max_patients: Mapped[int | None] = mapped_column(Integer, nullable=True)
     max_devices: Mapped[int | None] = mapped_column(Integer, nullable=True)
     max_users: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -50,12 +70,24 @@ class Invoice(TimestampMixin, SoftDeleteMixin, Base):
     )
     stripe_invoice_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
-    currency: Mapped[str] = mapped_column(String(3), default="USD", server_default="USD")
-    status: Mapped[str] = mapped_column(String(50), default="pending", server_default="pending")
-    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    due_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    period_start: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    period_end: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    currency: Mapped[str] = mapped_column(
+        String(3), default="USD", server_default="USD"
+    )
+    status: Mapped[str] = mapped_column(
+        String(50), default="pending", server_default="pending"
+    )
+    paid_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    due_date: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    period_start: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    period_end: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     line_items: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     pdf_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
 

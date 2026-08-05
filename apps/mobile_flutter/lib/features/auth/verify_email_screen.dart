@@ -55,14 +55,15 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                         ? Icons.verified_outlined
                         : Icons.mark_email_unread_outlined,
                     size: 50,
-                    color: _isVerified
-                        ? NeuroColors.success
-                        : NeuroColors.warning,
+                    color:
+                        _isVerified ? NeuroColors.success : NeuroColors.warning,
                   ),
                 ),
                 const SizedBox(height: NeuroSpacing.xl),
                 Text(
-                  _isVerified ? 'تم التحقق من البريد الإلكتروني' : 'تحقق من بريدك الإلكتروني',
+                  _isVerified
+                      ? 'تم التحقق من البريد الإلكتروني'
+                      : 'تحقق من بريدك الإلكتروني',
                   style: theme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),

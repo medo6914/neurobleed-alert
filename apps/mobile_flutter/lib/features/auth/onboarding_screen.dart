@@ -66,7 +66,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Widget build(BuildContext context) {
     final theme = NeuroTypography.textTheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? NeuroColors.backgroundDark : NeuroColors.background;
+    final bgColor =
+        isDark ? NeuroColors.backgroundDark : NeuroColors.background;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -109,8 +110,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           color: _currentPage == index
                               ? NeuroColors.primary
                               : NeuroColors.primaryLight.withAlpha(100),
-                          borderRadius:
-                              BorderRadius.circular(NeuroRadius.full),
+                          borderRadius: BorderRadius.circular(NeuroRadius.full),
                         ),
                       ),
                     ),

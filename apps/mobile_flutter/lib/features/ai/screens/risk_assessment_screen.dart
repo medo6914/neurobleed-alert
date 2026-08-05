@@ -127,8 +127,7 @@ class _RiskAssessmentScreenState extends ConsumerState<RiskAssessmentScreen> {
                         const SizedBox(height: NeuroSpacing.md),
                         _buildTextField(
                             _hrCtrl, 'Heart Rate (bpm)', Icons.favorite),
-                        _buildTextField(
-                            _spo2Ctrl, 'SpO2 (%)', Icons.air),
+                        _buildTextField(_spo2Ctrl, 'SpO2 (%)', Icons.air),
                         _buildTextField(
                             _rso2Ctrl, 'rSO2 (%)', Icons.psychology),
                         _buildTextField(
@@ -145,8 +144,7 @@ class _RiskAssessmentScreenState extends ConsumerState<RiskAssessmentScreen> {
                           value: _signalQuality,
                           activeColor: NeuroColors.primaryLight,
                           inactiveColor: NeuroColors.chartGrid,
-                          onChanged: (v) =>
-                              setState(() => _signalQuality = v),
+                          onChanged: (v) => setState(() => _signalQuality = v),
                           min: 0,
                           max: 1,
                           divisions: 20,
@@ -159,15 +157,16 @@ class _RiskAssessmentScreenState extends ConsumerState<RiskAssessmentScreen> {
                           value: _motionArtifact,
                           activeColor: NeuroColors.primaryLight,
                           inactiveColor: NeuroColors.chartGrid,
-                          onChanged: (v) =>
-                              setState(() => _motionArtifact = v),
+                          onChanged: (v) => setState(() => _motionArtifact = v),
                           min: 0,
                           max: 1,
                           divisions: 20,
                         ),
                         const SizedBox(height: NeuroSpacing.sm),
                         AppButton(
-                          label: state.isAssessing ? 'جارِ التقييم...' : 'تقييم الخطر',
+                          label: state.isAssessing
+                              ? 'جارِ التقييم...'
+                              : 'تقييم الخطر',
                           icon: Icons.assessment,
                           onPressed: state.isAssessing ? null : _assess,
                           isLoading: state.isAssessing,
@@ -264,8 +263,8 @@ class _RiskAssessmentScreenState extends ConsumerState<RiskAssessmentScreen> {
                               spacing: 6,
                               runSpacing: 6,
                               children: result.contributingFactors
-                                  .map((f) =>
-                                      ContributingFactorsChip(factor: f))
+                                  .map(
+                                      (f) => ContributingFactorsChip(factor: f))
                                   .toList(),
                             ),
                           ],

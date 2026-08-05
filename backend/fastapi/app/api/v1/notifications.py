@@ -43,7 +43,10 @@ async def register_fcm_token(
     if data.device_id:
         await db.execute(
             update(Device)
-            .where(Device.id == uuid.UUID(data.device_id), Device.patient_id == str(current_user.id))
+            .where(
+                Device.id == uuid.UUID(data.device_id),
+                Device.patient_id == str(current_user.id),
+            )
             .values(fcm_token=data.fcm_token)
         )
         await db.commit()

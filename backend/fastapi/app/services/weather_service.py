@@ -60,7 +60,9 @@ class WeatherService:
             logger.warning("OpenWeatherMap current failed: %s", e)
             return None
 
-    async def forecast(self, lat: float, lng: float, days: int = 3) -> dict[str, Any] | None:
+    async def forecast(
+        self, lat: float, lng: float, days: int = 3
+    ) -> dict[str, Any] | None:
         if not self.configured():
             return None
         try:

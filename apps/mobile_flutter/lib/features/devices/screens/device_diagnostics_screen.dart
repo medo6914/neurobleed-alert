@@ -4,6 +4,7 @@ import 'package:design_system/design_system.dart';
 import 'package:shared/shared.dart';
 import 'package:core/core.dart';
 import '../providers/device_providers.dart';
+
 class DeviceDiagnosticsScreen extends ConsumerWidget {
   final String deviceId;
 
@@ -45,7 +46,8 @@ class DeviceDiagnosticsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDiagnosticsContent(BuildContext context, DeviceDiagnostics diag, Device? device) {
+  Widget _buildDiagnosticsContent(
+      BuildContext context, DeviceDiagnostics diag, Device? device) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(NeuroSpacing.md),
       child: Column(
@@ -82,7 +84,6 @@ class DeviceDiagnosticsScreen extends ConsumerWidget {
             ],
           ),
           SizedBox(height: NeuroSpacing.md),
-
           _DiagnosticCard(
             title: 'Power',
             icon: Icons.power,
@@ -106,7 +107,6 @@ class DeviceDiagnosticsScreen extends ConsumerWidget {
             ],
           ),
           SizedBox(height: NeuroSpacing.md),
-
           _DiagnosticCard(
             title: 'Connectivity',
             icon: Icons.wifi,
@@ -140,7 +140,6 @@ class DeviceDiagnosticsScreen extends ConsumerWidget {
             ],
           ),
           SizedBox(height: NeuroSpacing.md),
-
           _DiagnosticCard(
             title: 'Hardware',
             icon: Icons.memory,
@@ -168,7 +167,6 @@ class DeviceDiagnosticsScreen extends ConsumerWidget {
             ],
           ),
           SizedBox(height: NeuroSpacing.xl),
-
           if (device != null)
             SizedBox(
               width: double.infinity,

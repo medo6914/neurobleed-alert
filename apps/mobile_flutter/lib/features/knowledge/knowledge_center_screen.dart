@@ -7,7 +7,8 @@ class KnowledgeCenterScreen extends ConsumerStatefulWidget {
   const KnowledgeCenterScreen({super.key});
 
   @override
-  ConsumerState<KnowledgeCenterScreen> createState() => _KnowledgeCenterScreenState();
+  ConsumerState<KnowledgeCenterScreen> createState() =>
+      _KnowledgeCenterScreenState();
 }
 
 class _KnowledgeCenterScreenState extends ConsumerState<KnowledgeCenterScreen> {
@@ -23,7 +24,9 @@ class _KnowledgeCenterScreenState extends ConsumerState<KnowledgeCenterScreen> {
   void _performSearch() {
     final query = _searchController.text.trim();
     if (query.isNotEmpty) {
-      ref.read(knowledgeProvider.notifier).search(query, category: _selectedCategory);
+      ref
+          .read(knowledgeProvider.notifier)
+          .search(query, category: _selectedCategory);
     }
   }
 
@@ -75,7 +78,8 @@ class _KnowledgeCenterScreenState extends ConsumerState<KnowledgeCenterScreen> {
                         selected: _selectedCategory == null,
                         onTap: () {
                           setState(() => _selectedCategory = null);
-                          if (_searchController.text.isNotEmpty) _performSearch();
+                          if (_searchController.text.isNotEmpty)
+                            _performSearch();
                         },
                       ),
                       ...categories.map((cat) => _CategoryChip(
@@ -83,7 +87,8 @@ class _KnowledgeCenterScreenState extends ConsumerState<KnowledgeCenterScreen> {
                             selected: _selectedCategory == cat,
                             onTap: () {
                               setState(() => _selectedCategory = cat);
-                              if (_searchController.text.isNotEmpty) _performSearch();
+                              if (_searchController.text.isNotEmpty)
+                                _performSearch();
                             },
                           )),
                     ],
@@ -137,7 +142,8 @@ class _KnowledgeCenterScreenState extends ConsumerState<KnowledgeCenterScreen> {
             padding: const EdgeInsets.only(bottom: 8),
             child: Text(
               'Found ${state.total} result(s) in ${state.queryTimeMs.toStringAsFixed(0)}ms',
-              style: theme.textTheme.bodySmall?.copyWith(color: NeuroColors.textSecondary),
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: NeuroColors.textSecondary),
             ),
           ),
         if (state.semanticResults.isNotEmpty) ...[
@@ -180,7 +186,8 @@ class _CategoryChip extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _CategoryChip({required this.label, required this.selected, required this.onTap});
+  const _CategoryChip(
+      {required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -216,10 +223,13 @@ class _KnowledgeCard extends StatelessWidget {
       child: ExpansionTile(
         leading: Icon(
           isSemantic ? Icons.psychology : Icons.article,
-          color: isSemantic ? theme.colorScheme.primary : NeuroColors.textSecondary,
+          color: isSemantic
+              ? theme.colorScheme.primary
+              : NeuroColors.textSecondary,
           size: 20,
         ),
-        title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+        title: Text(title,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
         subtitle: Row(
           children: [
             _SmallBadge(label: category),
@@ -227,7 +237,11 @@ class _KnowledgeCard extends StatelessWidget {
               const SizedBox(width: 4),
               _SmallBadge(
                 label: '${(score * 100).round()}%',
-                color: score > 0.7 ? NeuroColors.success : score > 0.4 ? NeuroColors.high : NeuroColors.textSecondary,
+                color: score > 0.7
+                    ? NeuroColors.success
+                    : score > 0.4
+                        ? NeuroColors.high
+                        : NeuroColors.textSecondary,
               ),
             ],
           ],
@@ -247,7 +261,8 @@ class _KnowledgeCard extends StatelessWidget {
                 if (source.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text('Source: $source',
-                      style: theme.textTheme.labelSmall?.copyWith(color: NeuroColors.textSecondary)),
+                      style: theme.textTheme.labelSmall
+                          ?.copyWith(color: NeuroColors.textSecondary)),
                 ],
               ],
             ),
@@ -274,7 +289,8 @@ class _SmallBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(fontSize: 10, color: color ?? NeuroColors.textSecondary),
+        style:
+            TextStyle(fontSize: 10, color: color ?? NeuroColors.textSecondary),
       ),
     );
   }

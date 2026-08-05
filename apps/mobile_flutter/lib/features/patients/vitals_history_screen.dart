@@ -40,31 +40,75 @@ class VitalsHistoryScreen extends ConsumerWidget {
                         children: [
                           Icon(Icons.monitor_heart, color: NeuroColors.primary),
                           SizedBox(width: NeuroSpacing.sm),
-                          Text('Latest Vitals', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                          Text('Latest Vitals',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.w600)),
                           const Spacer(),
-                          Text(_formatDateTime(latest.timestamp), style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          )),
+                          Text(_formatDateTime(latest.timestamp),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  )),
                         ],
                       ),
                       SizedBox(height: NeuroSpacing.md),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _vitalWidget('HR', '${latest.heartRate?.toStringAsFixed(0) ?? "-"}', '/min', _hrColor(latest.heartRate)),
-                          _vitalWidget('SpO₂', '${latest.oxygenSaturation?.toStringAsFixed(0) ?? "-"}', '%', _spo2Color(latest.oxygenSaturation)),
-                          _vitalWidget('BP', latest.systolicBP != null ? '${latest.systolicBP!.toInt()}' : '-', 'mmHg', NeuroColors.primary),
-                          _vitalWidget('Temp', '${latest.temperature?.toStringAsFixed(1) ?? "-"}', '°C', NeuroColors.primary),
+                          _vitalWidget(
+                              'HR',
+                              '${latest.heartRate?.toStringAsFixed(0) ?? "-"}',
+                              '/min',
+                              _hrColor(latest.heartRate)),
+                          _vitalWidget(
+                              'SpO₂',
+                              '${latest.oxygenSaturation?.toStringAsFixed(0) ?? "-"}',
+                              '%',
+                              _spo2Color(latest.oxygenSaturation)),
+                          _vitalWidget(
+                              'BP',
+                              latest.systolicBP != null
+                                  ? '${latest.systolicBP!.toInt()}'
+                                  : '-',
+                              'mmHg',
+                              NeuroColors.primary),
+                          _vitalWidget(
+                              'Temp',
+                              '${latest.temperature?.toStringAsFixed(1) ?? "-"}',
+                              '°C',
+                              NeuroColors.primary),
                         ],
                       ),
                       SizedBox(height: NeuroSpacing.sm),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _vitalWidget('RR', '${latest.respiratoryRate?.toStringAsFixed(0) ?? "-"}', '/min', NeuroColors.primary),
-                          _vitalWidget('ICP', '${latest.icp?.toStringAsFixed(0) ?? "-"}', 'mmHg', NeuroColors.critical),
-                          _vitalWidget('CPP', '${latest.cpp?.toStringAsFixed(0) ?? "-"}', 'mmHg', NeuroColors.warning),
-                          _vitalWidget('Glucose', '${latest.glucose?.toStringAsFixed(0) ?? "-"}', 'mg/dL', NeuroColors.primary),
+                          _vitalWidget(
+                              'RR',
+                              '${latest.respiratoryRate?.toStringAsFixed(0) ?? "-"}',
+                              '/min',
+                              NeuroColors.primary),
+                          _vitalWidget(
+                              'ICP',
+                              '${latest.icp?.toStringAsFixed(0) ?? "-"}',
+                              'mmHg',
+                              NeuroColors.critical),
+                          _vitalWidget(
+                              'CPP',
+                              '${latest.cpp?.toStringAsFixed(0) ?? "-"}',
+                              'mmHg',
+                              NeuroColors.warning),
+                          _vitalWidget(
+                              'Glucose',
+                              '${latest.glucose?.toStringAsFixed(0) ?? "-"}',
+                              'mg/dL',
+                              NeuroColors.primary),
                         ],
                       ),
                     ],
@@ -76,47 +120,73 @@ class VitalsHistoryScreen extends ConsumerWidget {
               _buildTrendChart(context, vitals),
               const SizedBox(height: NeuroSpacing.md),
 
-              Text('History', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+              Text('History',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleSmall
+                      ?.copyWith(fontWeight: FontWeight.w600)),
               SizedBox(height: NeuroSpacing.sm),
               ...vitals.map((v) => Padding(
-                padding: EdgeInsets.only(bottom: NeuroSpacing.sm),
-                child: AppCard(
-                  child: Padding(
-                    padding: EdgeInsets.all(NeuroSpacing.sm),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(_formatDateTime(v.timestamp), style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              )),
-                              SizedBox(height: 2),
-                              Text('HR ${v.heartRate?.toStringAsFixed(0) ?? "-"} | SpO₂ ${v.oxygenSaturation?.toStringAsFixed(0) ?? "-"}%'),
-                              Text('BP ${v.systolicBP?.toInt() ?? "-"}/${v.diastolicBP?.toInt() ?? "-"} | Temp ${v.temperature?.toStringAsFixed(1) ?? "-"}°C',
-                                  style: Theme.of(context).textTheme.bodySmall),
-                            ],
-                          ),
-                        ),
-                        if (v.riskScore != null)
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: (v.riskScore! >= 0.7 ? NeuroColors.critical : v.riskScore! >= 0.4 ? NeuroColors.high : NeuroColors.success).withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(NeuroRadius.sm),
+                    padding: EdgeInsets.only(bottom: NeuroSpacing.sm),
+                    child: AppCard(
+                      child: Padding(
+                        padding: EdgeInsets.all(NeuroSpacing.sm),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(_formatDateTime(v.timestamp),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurfaceVariant,
+                                          )),
+                                  SizedBox(height: 2),
+                                  Text(
+                                      'HR ${v.heartRate?.toStringAsFixed(0) ?? "-"} | SpO₂ ${v.oxygenSaturation?.toStringAsFixed(0) ?? "-"}%'),
+                                  Text(
+                                      'BP ${v.systolicBP?.toInt() ?? "-"}/${v.diastolicBP?.toInt() ?? "-"} | Temp ${v.temperature?.toStringAsFixed(1) ?? "-"}°C',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall),
+                                ],
+                              ),
                             ),
-                            child: Text('${(v.riskScore! * 100).toInt()}%', style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: v.riskScore! >= 0.7 ? NeuroColors.critical : v.riskScore! >= 0.4 ? NeuroColors.high : NeuroColors.success,
-                            )),
-                          ),
-                      ],
+                            if (v.riskScore != null)
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: (v.riskScore! >= 0.7
+                                          ? NeuroColors.critical
+                                          : v.riskScore! >= 0.4
+                                              ? NeuroColors.high
+                                              : NeuroColors.success)
+                                      .withValues(alpha: 0.1),
+                                  borderRadius:
+                                      BorderRadius.circular(NeuroRadius.sm),
+                                ),
+                                child: Text('${(v.riskScore! * 100).toInt()}%',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: v.riskScore! >= 0.7
+                                          ? NeuroColors.critical
+                                          : v.riskScore! >= 0.4
+                                              ? NeuroColors.high
+                                              : NeuroColors.success,
+                                    )),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              )),
+                  )),
             ],
           );
         },
@@ -127,10 +197,14 @@ class VitalsHistoryScreen extends ConsumerWidget {
   Widget _vitalWidget(String label, String value, String unit, Color color) {
     return Column(
       children: [
-        Text(label, style: TextStyle(fontSize: 11, color: NeuroColors.textSecondary)),
+        Text(label,
+            style: TextStyle(fontSize: 11, color: NeuroColors.textSecondary)),
         SizedBox(height: 2),
-        Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-        Text(unit, style: TextStyle(fontSize: 10, color: NeuroColors.textSecondary)),
+        Text(value,
+            style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: color)),
+        Text(unit,
+            style: TextStyle(fontSize: 10, color: NeuroColors.textSecondary)),
       ],
     );
   }
@@ -145,8 +219,10 @@ class VitalsHistoryScreen extends ConsumerWidget {
         .toList();
     if (heartRates.length < 2) return const SizedBox.shrink();
 
-    final minY = (heartRates.reduce((a, b) => a < b ? a : b) - 10).floorToDouble();
-    final maxY = (heartRates.reduce((a, b) => a > b ? a : b) + 10).ceilToDouble();
+    final minY =
+        (heartRates.reduce((a, b) => a < b ? a : b) - 10).floorToDouble();
+    final maxY =
+        (heartRates.reduce((a, b) => a > b ? a : b) + 10).ceilToDouble();
     final spots = <FlSpot>[
       for (var i = 0; i < heartRates.length; i++)
         FlSpot(i.toDouble(), heartRates[i]),
@@ -165,10 +241,11 @@ class VitalsHistoryScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('اتجاه معدل ضربات القلب', style: NeuroTypography.h3.copyWith(
-                color: NeuroColors.textPrimary,
-                fontWeight: FontWeight.w600,
-              )),
+              Text('اتجاه معدل ضربات القلب',
+                  style: NeuroTypography.h3.copyWith(
+                    color: NeuroColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  )),
               Text('24h', style: NeuroTypography.caption),
             ],
           ),
@@ -252,9 +329,12 @@ class VitalsHistoryScreen extends ConsumerWidget {
           // Stats row
           Row(
             children: [
-              _chartStat('أدنى', '${heartRates.reduce((a, b) => a < b ? a : b).toInt()}'),
-              _chartStat('متوسط', '${(heartRates.reduce((a, b) => a + b) / heartRates.length).toInt()}'),
-              _chartStat('أعلى', '${heartRates.reduce((a, b) => a > b ? a : b).toInt()}'),
+              _chartStat('أدنى',
+                  '${heartRates.reduce((a, b) => a < b ? a : b).toInt()}'),
+              _chartStat('متوسط',
+                  '${(heartRates.reduce((a, b) => a + b) / heartRates.length).toInt()}'),
+              _chartStat('أعلى',
+                  '${heartRates.reduce((a, b) => a > b ? a : b).toInt()}'),
             ],
           ),
         ],
@@ -273,10 +353,11 @@ class VitalsHistoryScreen extends ConsumerWidget {
         ),
         child: Column(
           children: [
-            Text(value, style: NeuroTypography.h3.copyWith(
-              color: NeuroColors.textPrimary,
-              fontWeight: FontWeight.w600,
-            )),
+            Text(value,
+                style: NeuroTypography.h3.copyWith(
+                  color: NeuroColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                )),
             Text(label, style: NeuroTypography.caption),
           ],
         ),

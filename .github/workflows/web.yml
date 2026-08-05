@@ -52,9 +52,9 @@ jobs:
           API_BASE_URL: ${{ vars.API_BASE_URL }}
         run: |
           if [ -n "$API_BASE_URL" ]; then
-            flutter build web --release --dart-define=API_BASE_URL=$API_BASE_URL
+            flutter build web --release --base-href /neurobleed-alert/ --dart-define=API_BASE_URL=$API_BASE_URL
           else
-            flutter build web --release
+            flutter build web --release --base-href /neurobleed-alert/
           fi
 
       - name: Copy presentation landing page into web build

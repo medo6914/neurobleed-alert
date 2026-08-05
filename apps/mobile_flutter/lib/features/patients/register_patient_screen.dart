@@ -10,7 +10,8 @@ class RegisterPatientScreen extends ConsumerStatefulWidget {
   const RegisterPatientScreen({super.key});
 
   @override
-  ConsumerState<RegisterPatientScreen> createState() => _RegisterPatientScreenState();
+  ConsumerState<RegisterPatientScreen> createState() =>
+      _RegisterPatientScreenState();
 }
 
 class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
@@ -130,47 +131,77 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
               if (isTablet)
                 Row(
                   children: [
-                    Expanded(child: _buildTextField(context, _firstNameController, localizations.t('firstName'), required: true)),
+                    Expanded(
+                        child: _buildTextField(context, _firstNameController,
+                            localizations.t('firstName'),
+                            required: true)),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _buildTextField(context, _middleNameController, localizations.t('middleName'))),
-                    Expanded(child: _buildTextField(context, _lastNameController, localizations.t('lastName'), required: true)),
+                    Expanded(
+                        child: _buildTextField(context, _middleNameController,
+                            localizations.t('middleName'))),
+                    Expanded(
+                        child: _buildTextField(context, _lastNameController,
+                            localizations.t('lastName'),
+                            required: true)),
                   ],
                 )
               else ...[
-                _buildTextField(context, _firstNameController, localizations.t('firstName'), required: true),
-                _buildTextField(context, _middleNameController, localizations.t('middleName')),
-                _buildTextField(context, _lastNameController, localizations.t('lastName'), required: true),
+                _buildTextField(
+                    context, _firstNameController, localizations.t('firstName'),
+                    required: true),
+                _buildTextField(context, _middleNameController,
+                    localizations.t('middleName')),
+                _buildTextField(
+                    context, _lastNameController, localizations.t('lastName'),
+                    required: true),
               ],
               if (isTablet)
                 Row(
                   children: [
-                    Expanded(child: _buildDateField(context, _dateOfBirthController, localizations.t('dateOfBirth'), required: true)),
+                    Expanded(
+                        child: _buildDateField(context, _dateOfBirthController,
+                            localizations.t('dateOfBirth'),
+                            required: true)),
                     SizedBox(width: NeuroSpacing.sm),
                     Expanded(child: _buildGenderDropdown(context)),
                   ],
                 )
               else ...[
-                _buildDateField(context, _dateOfBirthController, localizations.t('dateOfBirth'), required: true),
+                _buildDateField(context, _dateOfBirthController,
+                    localizations.t('dateOfBirth'),
+                    required: true),
                 _buildGenderDropdown(context),
               ],
               if (isTablet)
                 Row(
                   children: [
-                    Expanded(child: _buildTextField(context, _nationalityController, localizations.t('nationality'))),
+                    Expanded(
+                        child: _buildTextField(context, _nationalityController,
+                            localizations.t('nationality'))),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _buildTextField(context, _nationalIdController, localizations.t('nationalId'))),
+                    Expanded(
+                        child: _buildTextField(context, _nationalIdController,
+                            localizations.t('nationalId'))),
                   ],
                 )
               else ...[
-                _buildTextField(context, _nationalityController, localizations.t('nationality')),
-                _buildTextField(context, _nationalIdController, localizations.t('nationalId')),
+                _buildTextField(context, _nationalityController,
+                    localizations.t('nationality')),
+                _buildTextField(context, _nationalIdController,
+                    localizations.t('nationalId')),
               ],
               if (isTablet)
                 Row(
                   children: [
-                    Expanded(child: _buildTextField(context, _weightController, localizations.t('weight'), keyboardType: TextInputType.number)),
+                    Expanded(
+                        child: _buildTextField(context, _weightController,
+                            localizations.t('weight'),
+                            keyboardType: TextInputType.number)),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _buildTextField(context, _heightController, localizations.t('height'), keyboardType: TextInputType.number)),
+                    Expanded(
+                        child: _buildTextField(context, _heightController,
+                            localizations.t('height'),
+                            keyboardType: TextInputType.number)),
                     SizedBox(width: NeuroSpacing.sm),
                     Expanded(child: _buildBloodTypeDropdown(context)),
                   ],
@@ -178,9 +209,15 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
               else ...[
                 Row(
                   children: [
-                    Expanded(child: _buildTextField(context, _weightController, localizations.t('weight'), keyboardType: TextInputType.number)),
+                    Expanded(
+                        child: _buildTextField(context, _weightController,
+                            localizations.t('weight'),
+                            keyboardType: TextInputType.number)),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _buildTextField(context, _heightController, localizations.t('height'), keyboardType: TextInputType.number)),
+                    Expanded(
+                        child: _buildTextField(context, _heightController,
+                            localizations.t('height'),
+                            keyboardType: TextInputType.number)),
                   ],
                 ),
                 _buildBloodTypeDropdown(context),
@@ -189,7 +226,6 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
             ],
           ),
           SizedBox(height: NeuroSpacing.lg),
-
           _buildSection(
             context: context,
             title: localizations.t('contactInfo'),
@@ -198,35 +234,58 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
               if (isTablet)
                 Row(
                   children: [
-                    Expanded(child: _buildTextField(context, _emailController, localizations.t('email'), keyboardType: TextInputType.emailAddress)),
+                    Expanded(
+                        child: _buildTextField(
+                            context, _emailController, localizations.t('email'),
+                            keyboardType: TextInputType.emailAddress)),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _buildTextField(context, _phoneController, localizations.t('phone'), keyboardType: TextInputType.phone)),
+                    Expanded(
+                        child: _buildTextField(
+                            context, _phoneController, localizations.t('phone'),
+                            keyboardType: TextInputType.phone)),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _buildTextField(context, _phoneSecondaryController, localizations.t('phoneSecondary'), keyboardType: TextInputType.phone)),
+                    Expanded(
+                        child: _buildTextField(
+                            context,
+                            _phoneSecondaryController,
+                            localizations.t('phoneSecondary'),
+                            keyboardType: TextInputType.phone)),
                   ],
                 )
               else ...[
-                _buildTextField(context, _emailController, localizations.t('email'), keyboardType: TextInputType.emailAddress),
-                _buildTextField(context, _phoneController, localizations.t('phone'), keyboardType: TextInputType.phone),
-                _buildTextField(context, _phoneSecondaryController, localizations.t('phoneSecondary'), keyboardType: TextInputType.phone),
+                _buildTextField(
+                    context, _emailController, localizations.t('email'),
+                    keyboardType: TextInputType.emailAddress),
+                _buildTextField(
+                    context, _phoneController, localizations.t('phone'),
+                    keyboardType: TextInputType.phone),
+                _buildTextField(context, _phoneSecondaryController,
+                    localizations.t('phoneSecondary'),
+                    keyboardType: TextInputType.phone),
               ],
-              _buildTextField(context, _addressController, localizations.t('address')),
+              _buildTextField(
+                  context, _addressController, localizations.t('address')),
               if (isTablet)
                 Row(
                   children: [
-                    Expanded(child: _buildTextField(context, _cityController, localizations.t('city'))),
+                    Expanded(
+                        child: _buildTextField(
+                            context, _cityController, localizations.t('city'))),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _buildTextField(context, _countryController, localizations.t('country'))),
+                    Expanded(
+                        child: _buildTextField(context, _countryController,
+                            localizations.t('country'))),
                   ],
                 )
               else ...[
-                _buildTextField(context, _cityController, localizations.t('city')),
-                _buildTextField(context, _countryController, localizations.t('country')),
+                _buildTextField(
+                    context, _cityController, localizations.t('city')),
+                _buildTextField(
+                    context, _countryController, localizations.t('country')),
               ],
             ],
           ),
           SizedBox(height: NeuroSpacing.lg),
-
           _buildSection(
             context: context,
             title: localizations.t('insurance'),
@@ -235,33 +294,44 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
               if (isTablet)
                 Row(
                   children: [
-                    Expanded(child: _buildTextField(context, _insuranceProviderController, localizations.t('provider'))),
+                    Expanded(
+                        child: _buildTextField(
+                            context,
+                            _insuranceProviderController,
+                            localizations.t('provider'))),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _buildTextField(context, _insuranceIdController, localizations.t('insuranceId'))),
+                    Expanded(
+                        child: _buildTextField(context, _insuranceIdController,
+                            localizations.t('insuranceId'))),
                   ],
                 )
               else ...[
-                _buildTextField(context, _insuranceProviderController, localizations.t('provider')),
-                _buildTextField(context, _insuranceIdController, localizations.t('insuranceId')),
+                _buildTextField(context, _insuranceProviderController,
+                    localizations.t('provider')),
+                _buildTextField(context, _insuranceIdController,
+                    localizations.t('insuranceId')),
               ],
             ],
           ),
           SizedBox(height: NeuroSpacing.lg),
-
           _buildSection(
             context: context,
             title: localizations.t('medicalInfo'),
             icon: Icons.medical_services,
             children: [
-              _buildTextField(context, _primaryDiagnosisController, localizations.t('primaryDiagnosis')),
-              _buildTagField(context, _diagnosisController, _diagnoses, localizations.t('diagnoses')),
-              _buildTagField(context, _allergyController, _allergies, localizations.t('allergies')),
-              _buildTagField(context, _medicationController, _medications, localizations.t('medications')),
-              _buildTagField(context, _comorbidityController, _comorbidities, localizations.t('comorbidities')),
+              _buildTextField(context, _primaryDiagnosisController,
+                  localizations.t('primaryDiagnosis')),
+              _buildTagField(context, _diagnosisController, _diagnoses,
+                  localizations.t('diagnoses')),
+              _buildTagField(context, _allergyController, _allergies,
+                  localizations.t('allergies')),
+              _buildTagField(context, _medicationController, _medications,
+                  localizations.t('medications')),
+              _buildTagField(context, _comorbidityController, _comorbidities,
+                  localizations.t('comorbidities')),
             ],
           ),
           SizedBox(height: NeuroSpacing.lg),
-
           _buildSection(
             context: context,
             title: localizations.t('emergencyContact'),
@@ -270,26 +340,48 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
               if (isTablet)
                 Row(
                   children: [
-                    Expanded(child: _buildTextField(context, _emergencyNameController, localizations.t('name'), required: true)),
+                    Expanded(
+                        child: _buildTextField(context,
+                            _emergencyNameController, localizations.t('name'),
+                            required: true)),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _buildTextField(context, _emergencyRelationshipController, localizations.t('relationship'), required: true)),
+                    Expanded(
+                        child: _buildTextField(
+                            context,
+                            _emergencyRelationshipController,
+                            localizations.t('relationship'),
+                            required: true)),
                   ],
                 )
               else ...[
-                _buildTextField(context, _emergencyNameController, localizations.t('name'), required: true),
-                _buildTextField(context, _emergencyRelationshipController, localizations.t('relationship'), required: true),
+                _buildTextField(
+                    context, _emergencyNameController, localizations.t('name'),
+                    required: true),
+                _buildTextField(context, _emergencyRelationshipController,
+                    localizations.t('relationship'),
+                    required: true),
               ],
               if (isTablet)
                 Row(
                   children: [
-                    Expanded(child: _buildTextField(context, _emergencyPhoneController, localizations.t('phone'))),
+                    Expanded(
+                        child: _buildTextField(
+                            context,
+                            _emergencyPhoneController,
+                            localizations.t('phone'))),
                     SizedBox(width: NeuroSpacing.sm),
-                    Expanded(child: _buildTextField(context, _emergencyEmailController, localizations.t('email'))),
+                    Expanded(
+                        child: _buildTextField(
+                            context,
+                            _emergencyEmailController,
+                            localizations.t('email'))),
                   ],
                 )
               else ...[
-                _buildTextField(context, _emergencyPhoneController, localizations.t('phone')),
-                _buildTextField(context, _emergencyEmailController, localizations.t('email')),
+                _buildTextField(context, _emergencyPhoneController,
+                    localizations.t('phone')),
+                _buildTextField(context, _emergencyEmailController,
+                    localizations.t('email')),
               ],
               SwitchListTile(
                 title: Text(localizations.t('primaryContact')),
@@ -299,12 +391,13 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
             ],
           ),
           SizedBox(height: NeuroSpacing.xxl),
-
           SizedBox(
             width: double.infinity,
             height: 48,
             child: AppButton(
-              label: _isSubmitting ? localizations.t('registering') : localizations.t('registerPatient'),
+              label: _isSubmitting
+                  ? localizations.t('registering')
+                  : localizations.t('registerPatient'),
               icon: _isSubmitting ? null : Icons.person_add,
               isLoading: _isSubmitting,
               onPressed: _isSubmitting ? null : _submitForm,
@@ -332,9 +425,9 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
             Text(
               title,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
             ),
           ],
         ),
@@ -398,12 +491,14 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
         onTap: () async {
           final date = await showDatePicker(
             context: context,
-            initialDate: DateTime.now().subtract(const Duration(days: 365 * 30)),
+            initialDate:
+                DateTime.now().subtract(const Duration(days: 365 * 30)),
             firstDate: DateTime(1900),
             lastDate: DateTime.now(),
           );
           if (date != null) {
-            controller.text = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+            controller.text =
+                '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
           }
         },
         validator: required
@@ -428,10 +523,12 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
             vertical: NeuroSpacing.sm,
           ),
         ),
-        items: Gender.values.map((g) => DropdownMenuItem(
-          value: g,
-          child: Text(g.name),
-        )).toList(),
+        items: Gender.values
+            .map((g) => DropdownMenuItem(
+                  value: g,
+                  child: Text(g.name),
+                ))
+            .toList(),
         onChanged: (v) => setState(() => _selectedGender = v),
       ),
     );
@@ -452,10 +549,12 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
             vertical: NeuroSpacing.sm,
           ),
         ),
-        items: BloodType.values.map((b) => DropdownMenuItem(
-          value: b,
-          child: Text(b.name),
-        )).toList(),
+        items: BloodType.values
+            .map((b) => DropdownMenuItem(
+                  value: b,
+                  child: Text(b.name),
+                ))
+            .toList(),
         onChanged: (v) => setState(() => _selectedBloodType = v!),
       ),
     );
@@ -476,11 +575,15 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
             vertical: NeuroSpacing.sm,
           ),
         ),
-        items: MaritalStatus.values.map((m) => DropdownMenuItem(
-          value: m,
-          child: Text(m.name),
-        )).toList(),
-        onChanged: (v) => setState(() { if (v != null) _selectedMaritalStatus = v; }),
+        items: MaritalStatus.values
+            .map((m) => DropdownMenuItem(
+                  value: m,
+                  child: Text(m.name),
+                ))
+            .toList(),
+        onChanged: (v) => setState(() {
+          if (v != null) _selectedMaritalStatus = v;
+        }),
       ),
     );
   }
@@ -537,12 +640,14 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
             Wrap(
               spacing: NeuroSpacing.xs,
               runSpacing: NeuroSpacing.xs,
-              children: tags.map((tag) => Chip(
-                label: Text(tag, style: const TextStyle(fontSize: 12)),
-                deleteIcon: const Icon(Icons.close, size: 16),
-                onDeleted: () => setState(() => tags.remove(tag)),
-                visualDensity: VisualDensity.compact,
-              )).toList(),
+              children: tags
+                  .map((tag) => Chip(
+                        label: Text(tag, style: const TextStyle(fontSize: 12)),
+                        deleteIcon: const Icon(Icons.close, size: 16),
+                        onDeleted: () => setState(() => tags.remove(tag)),
+                        visualDensity: VisualDensity.compact,
+                      ))
+                  .toList(),
             ),
           ],
         ],
@@ -566,25 +671,49 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
       id: '',
       mrn: '',
       firstName: _firstNameController.text.trim(),
-      middleName: _middleNameController.text.trim().isEmpty ? null : _middleNameController.text.trim(),
+      middleName: _middleNameController.text.trim().isEmpty
+          ? null
+          : _middleNameController.text.trim(),
       lastName: _lastNameController.text.trim(),
       dateOfBirth: _dateOfBirthController.text.trim(),
       gender: _selectedGender!,
-      nationality: _nationalityController.text.trim().isEmpty ? null : _nationalityController.text.trim(),
-      nationalId: _nationalIdController.text.trim().isEmpty ? null : _nationalIdController.text.trim(),
+      nationality: _nationalityController.text.trim().isEmpty
+          ? null
+          : _nationalityController.text.trim(),
+      nationalId: _nationalIdController.text.trim().isEmpty
+          ? null
+          : _nationalIdController.text.trim(),
       bloodType: _selectedBloodType,
       weight: double.tryParse(_weightController.text),
       height: double.tryParse(_heightController.text),
-      email: _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
-      phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
-      phoneSecondary: _phoneSecondaryController.text.trim().isEmpty ? null : _phoneSecondaryController.text.trim(),
-      address: _addressController.text.trim().isEmpty ? null : _addressController.text.trim(),
-      city: _cityController.text.trim().isEmpty ? null : _cityController.text.trim(),
-      country: _countryController.text.trim().isEmpty ? null : _countryController.text.trim(),
+      email: _emailController.text.trim().isEmpty
+          ? null
+          : _emailController.text.trim(),
+      phone: _phoneController.text.trim().isEmpty
+          ? null
+          : _phoneController.text.trim(),
+      phoneSecondary: _phoneSecondaryController.text.trim().isEmpty
+          ? null
+          : _phoneSecondaryController.text.trim(),
+      address: _addressController.text.trim().isEmpty
+          ? null
+          : _addressController.text.trim(),
+      city: _cityController.text.trim().isEmpty
+          ? null
+          : _cityController.text.trim(),
+      country: _countryController.text.trim().isEmpty
+          ? null
+          : _countryController.text.trim(),
       maritalStatus: _selectedMaritalStatus,
-      insuranceProvider: _insuranceProviderController.text.trim().isEmpty ? null : _insuranceProviderController.text.trim(),
-      insuranceId: _insuranceIdController.text.trim().isEmpty ? null : _insuranceIdController.text.trim(),
-      primaryDiagnosis: _primaryDiagnosisController.text.trim().isEmpty ? null : _primaryDiagnosisController.text.trim(),
+      insuranceProvider: _insuranceProviderController.text.trim().isEmpty
+          ? null
+          : _insuranceProviderController.text.trim(),
+      insuranceId: _insuranceIdController.text.trim().isEmpty
+          ? null
+          : _insuranceIdController.text.trim(),
+      primaryDiagnosis: _primaryDiagnosisController.text.trim().isEmpty
+          ? null
+          : _primaryDiagnosisController.text.trim(),
       diagnoses: _diagnoses,
       allergies: _allergies,
       medications: _medications,
@@ -601,12 +730,16 @@ class _RegisterPatientScreenState extends ConsumerState<RegisterPatientScreen> {
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(failure.message), backgroundColor: NeuroColors.critical),
+          SnackBar(
+              content: Text(failure.message),
+              backgroundColor: NeuroColors.critical),
         );
       },
       (createdPatient) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Patient registered successfully. MRN: ${createdPatient.mrn}')),
+          SnackBar(
+              content: Text(
+                  'Patient registered successfully. MRN: ${createdPatient.mrn}')),
         );
         context.pushReplacement('/patients/${createdPatient.id}');
       },

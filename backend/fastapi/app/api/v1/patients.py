@@ -13,8 +13,12 @@ from app.models.alert import Alert
 from app.models.ai_report import AIReport
 from app.models.user import User
 from app.schemas.patient import (
-    PatientCreate, PatientUpdate, PatientResponse, PatientListResponse,
-    PatientHistoryResponse, PatientHistoryItem,
+    PatientCreate,
+    PatientUpdate,
+    PatientResponse,
+    PatientListResponse,
+    PatientHistoryResponse,
+    PatientHistoryItem,
 )
 
 logger = logging.getLogger(__name__)
@@ -32,7 +36,10 @@ async def create_patient(
     db.add(patient)
     await db.commit()
     await db.refresh(patient)
-    logger.info("Patient created", extra={"patient_id": str(patient.id), "user_id": str(current_user.id)})
+    logger.info(
+        "Patient created",
+        extra={"patient_id": str(patient.id), "user_id": str(current_user.id)},
+    )
     return patient
 
 
@@ -87,9 +94,12 @@ async def list_patients(
     total_pages = max(1, (total + per_page - 1) // per_page)
     return PatientListResponse(
         items=[PatientResponse.model_validate(p) for p in patients],
-        total=total, page=page, per_page=per_page,
+        total=total,
+        page=page,
+        per_page=per_page,
         total_pages=total_pages,
-        has_next=page < total_pages, has_prev=page > 1,
+        has_next=page < total_pages,
+        has_prev=page > 1,
     )
 
 
@@ -99,12 +109,12 @@ async def get_patient(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.PATIENT_VIEW)),
 ):
-    result = await db.execute(
-        select(Patient).where(Patient.id == patient_id)
-    )
+    result = await db.execute(select(Patient).where(Patient.id == patient_id))
     patient = result.scalar_one_or_none()
     if not patient:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
+        )
     return patient
 
 
@@ -118,7 +128,9 @@ async def update_patient(
     result = await db.execute(select(Patient).where(Patient.id == patient_id))
     patient = result.scalar_one_or_none()
     if not patient:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
+        )
 
     update_data = data.model_dump(exclude_unset=True)
     if update_data:
@@ -127,7 +139,10 @@ async def update_patient(
 
     await db.commit()
     await db.refresh(patient)
-    logger.info("Patient updated", extra={"patient_id": str(patient.id), "user_id": str(current_user.id)})
+    logger.info(
+        "Patient updated",
+        extra={"patient_id": str(patient.id), "user_id": str(current_user.id)},
+    )
     return patient
 
 
@@ -140,12 +155,17 @@ async def delete_patient(
     result = await db.execute(select(Patient).where(Patient.id == patient_id))
     patient = result.scalar_one_or_none()
     if not patient:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
+        )
 
     patient.is_active = False
     patient.deleted_at = datetime.now(timezone.utc)
     await db.commit()
-    logger.info("Patient soft-deleted", extra={"patient_id": str(patient_id), "user_id": str(current_user.id)})
+    logger.info(
+        "Patient soft-deleted",
+        extra={"patient_id": str(patient_id), "user_id": str(current_user.id)},
+    )
 
 
 @router.get("/{patient_id}/history", response_model=PatientHistoryResponse)
@@ -157,47 +177,64 @@ async def get_patient_history(
     result = await db.execute(select(Patient).where(Patient.id == patient_id))
     patient = result.scalar_one_or_none()
     if not patient:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
+        )
 
     events: list[PatientHistoryItem] = []
 
     # Admission/discharge events
     if patient.admission_date:
-        events.append(PatientHistoryItem(
-            event_type="admission",
-            event_date=patient.admission_date,
-            description=f"Patient admitted to {'bed ' + patient.bed_number if patient.bed_number else 'hospital'}",
-        ))
+        events.append(
+            PatientHistoryItem(
+                event_type="admission",
+                event_date=patient.admission_date,
+                description=f"Patient admitted to {'bed ' + patient.bed_number if patient.bed_number else 'hospital'}",
+            )
+        )
     if patient.discharge_date:
-        events.append(PatientHistoryItem(
-            event_type="discharge",
-            event_date=patient.discharge_date,
-            description="Patient discharged",
-        ))
+        events.append(
+            PatientHistoryItem(
+                event_type="discharge",
+                event_date=patient.discharge_date,
+                description="Patient discharged",
+            )
+        )
 
     # Alert events
     alert_result = await db.execute(
-        select(Alert).where(Alert.patient_id == patient_id).order_by(desc(Alert.created_at))
+        select(Alert)
+        .where(Alert.patient_id == patient_id)
+        .order_by(desc(Alert.created_at))
     )
     for alert in alert_result.scalars().all():
-        events.append(PatientHistoryItem(
-            event_type=f"alert_{alert.alert_type.value if hasattr(alert.alert_type, 'value') else alert.alert_type}",
-            event_date=alert.created_at,
-            description=alert.message,
-            details={"severity": str(alert.severity), "risk_score": alert.risk_score},
-        ))
+        events.append(
+            PatientHistoryItem(
+                event_type=f"alert_{alert.alert_type.value if hasattr(alert.alert_type, 'value') else alert.alert_type}",
+                event_date=alert.created_at,
+                description=alert.message,
+                details={
+                    "severity": str(alert.severity),
+                    "risk_score": alert.risk_score,
+                },
+            )
+        )
 
     # AI report events
     report_result = await db.execute(
-        select(AIReport).where(AIReport.patient_id == patient_id).order_by(desc(AIReport.created_at))
+        select(AIReport)
+        .where(AIReport.patient_id == patient_id)
+        .order_by(desc(AIReport.created_at))
     )
     for report in report_result.scalars().all():
-        events.append(PatientHistoryItem(
-            event_type="ai_report",
-            event_date=report.created_at,
-            description=f"AI risk assessment performed (score: {report.risk_score})",
-            details={"risk_score": report.risk_score},
-        ))
+        events.append(
+            PatientHistoryItem(
+                event_type="ai_report",
+                event_date=report.created_at,
+                description=f"AI risk assessment performed (score: {report.risk_score})",
+                details={"risk_score": report.risk_score},
+            )
+        )
 
     events.sort(key=lambda e: e.event_date, reverse=True)
 

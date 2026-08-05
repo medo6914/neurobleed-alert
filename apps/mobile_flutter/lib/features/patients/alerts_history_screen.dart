@@ -9,7 +9,8 @@ class AlertsHistoryScreen extends ConsumerStatefulWidget {
   const AlertsHistoryScreen({super.key, required this.patientId});
 
   @override
-  ConsumerState<AlertsHistoryScreen> createState() => _AlertsHistoryScreenState();
+  ConsumerState<AlertsHistoryScreen> createState() =>
+      _AlertsHistoryScreenState();
 }
 
 class _AlertsHistoryScreenState extends ConsumerState<AlertsHistoryScreen> {
@@ -30,7 +31,8 @@ class _AlertsHistoryScreenState extends ConsumerState<AlertsHistoryScreen> {
             itemBuilder: (context) => [
               const PopupMenuItem(value: null, child: Text('All')),
               const PopupMenuItem(value: 'active', child: Text('Active')),
-              const PopupMenuItem(value: 'acknowledged', child: Text('Acknowledged')),
+              const PopupMenuItem(
+                  value: 'acknowledged', child: Text('Acknowledged')),
               const PopupMenuItem(value: 'resolved', child: Text('Resolved')),
             ],
           ),
@@ -42,14 +44,18 @@ class _AlertsHistoryScreenState extends ConsumerState<AlertsHistoryScreen> {
         data: (alerts) {
           var filtered = alerts;
           if (_statusFilter != null) {
-            filtered = alerts.where((AlertRecord a) => a.status.name == _statusFilter).toList();
+            filtered = alerts
+                .where((AlertRecord a) => a.status.name == _statusFilter)
+                .toList();
           }
 
           if (filtered.isEmpty) {
             return AppEmptyState(
               icon: Icons.check_circle_outline,
               title: 'No Alerts',
-              message: _statusFilter != null ? 'No $_statusFilter alerts' : 'No alerts recorded',
+              message: _statusFilter != null
+                  ? 'No $_statusFilter alerts'
+                  : 'No alerts recorded',
             );
           }
 
@@ -77,36 +83,60 @@ class _AlertsHistoryScreenState extends ConsumerState<AlertsHistoryScreen> {
                             Icon(Icons.circle, size: 12, color: severityColor),
                             SizedBox(width: NeuroSpacing.sm),
                             Expanded(
-                              child: Text(alert.title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                              child: Text(alert.title,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleSmall
+                                      ?.copyWith(fontWeight: FontWeight.w600)),
                             ),
                             Chip(
-                              label: Text(alert.status.name, style: const TextStyle(fontSize: 10, color: NeuroColors.textPrimary)),
-                              backgroundColor: alert.status == AlertStatus.active
-                                  ? NeuroColors.critical
-                                  : alert.status == AlertStatus.acknowledged
-                                      ? NeuroColors.warning
-                                      : NeuroColors.success,
+                              label: Text(alert.status.name,
+                                  style: const TextStyle(
+                                      fontSize: 10,
+                                      color: NeuroColors.textPrimary)),
+                              backgroundColor:
+                                  alert.status == AlertStatus.active
+                                      ? NeuroColors.critical
+                                      : alert.status == AlertStatus.acknowledged
+                                          ? NeuroColors.warning
+                                          : NeuroColors.success,
                               visualDensity: VisualDensity.compact,
                             ),
                           ],
                         ),
                         SizedBox(height: NeuroSpacing.xs),
-                        Text(alert.description, style: Theme.of(context).textTheme.bodyMedium),
+                        Text(alert.description,
+                            style: Theme.of(context).textTheme.bodyMedium),
                         SizedBox(height: NeuroSpacing.sm),
                         Row(
                           children: [
-                            Text(alert.createdAt.toLocal().toString().substring(0, 16), style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            )),
+                            Text(
+                                alert.createdAt
+                                    .toLocal()
+                                    .toString()
+                                    .substring(0, 16),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    )),
                             if (alert.riskScore != null) ...[
                               const Spacer(),
                               Container(
-                                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: severityColor.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(NeuroRadius.sm),
+                                  borderRadius:
+                                      BorderRadius.circular(NeuroRadius.sm),
                                 ),
-                                child: Text('Risk: ${(alert.riskScore! * 100).toInt()}%', style: TextStyle(fontSize: 10, color: severityColor)),
+                                child: Text(
+                                    'Risk: ${(alert.riskScore! * 100).toInt()}%',
+                                    style: TextStyle(
+                                        fontSize: 10, color: severityColor)),
                               ),
                             ],
                           ],

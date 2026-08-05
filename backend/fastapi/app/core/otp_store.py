@@ -20,12 +20,14 @@ async def store_otp(email_or_phone: str, otp: str, ttl: int = _OTP_TTL) -> bool:
         return False
     try:
         key = f"{_OTP_NS}:{email_or_phone}"
-        data = json.dumps({
-            "otp": otp,
-            "verified": False,
-            "attempts": 0,
-            "created_at": datetime.now(timezone.utc).isoformat(),
-        })
+        data = json.dumps(
+            {
+                "otp": otp,
+                "verified": False,
+                "attempts": 0,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }
+        )
         await redis.setex(key, ttl, data)
         return True
     except Exception as e:

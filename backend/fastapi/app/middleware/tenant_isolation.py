@@ -12,14 +12,23 @@ logger = logging.getLogger(__name__)
 
 TENANT_HEADER = "X-Tenant-ID"
 TENANT_CLAIM = "tenant_id"
-BYPASS_PATHS = {"/health", "/v1/auth/register", "/v1/auth/login", "/v1/auth/refresh", "/v1/auth/forgot-password", "/v1/auth/reset-password"}
+BYPASS_PATHS = {
+    "/health",
+    "/v1/auth/register",
+    "/v1/auth/login",
+    "/v1/auth/refresh",
+    "/v1/auth/forgot-password",
+    "/v1/auth/reset-password",
+}
 
 
 class TenantIsolationMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
 
-        if path in BYPASS_PATHS or path.startswith(("/docs", "/openapi.json", "/redoc")):
+        if path in BYPASS_PATHS or path.startswith(
+            ("/docs", "/openapi.json", "/redoc")
+        ):
             return await call_next(request)
 
         auth_header = request.headers.get("Authorization")
@@ -45,7 +54,9 @@ class TenantIsolationMiddleware(BaseHTTPMiddleware):
         if not tenant_id:
             return await call_next(request)
 
-        request.state.tenant_id = str(tenant_id) if isinstance(tenant_id, uuid.UUID) else tenant_id
+        request.state.tenant_id = (
+            str(tenant_id) if isinstance(tenant_id, uuid.UUID) else tenant_id
+        )
         request.state.tenant_source = "header" if tenant_header else "token"
 
         response = await call_next(request)

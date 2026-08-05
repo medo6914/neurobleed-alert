@@ -28,24 +28,28 @@ async def get_fhir_patient(
     result = await db.execute(select(Patient).where(Patient.id == patient_id))
     patient = result.scalar_one_or_none()
     if not patient:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
+        )
 
     return fhir_mapper.patient_to_fhir(patient)
 
 
-@router.get("/Patient/{patient_id}/Observation", summary="Get FHIR R4 vital sign observations")
+@router.get(
+    "/Patient/{patient_id}/Observation", summary="Get FHIR R4 vital sign observations"
+)
 async def get_fhir_observations(
     patient_id: uuid.UUID,
     limit: int = Query(50, le=200),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.PATIENT_VIEW)),
 ):
-    result = await db.execute(
-        select(Patient).where(Patient.id == patient_id)
-    )
+    result = await db.execute(select(Patient).where(Patient.id == patient_id))
     patient = result.scalar_one_or_none()
     if not patient:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
+        )
 
     readings_result = await db.execute(
         select(SensorReading)
@@ -57,23 +61,32 @@ async def get_fhir_observations(
 
     all_observations = []
     for reading in readings:
-        all_observations.extend(fhir_mapper.observation_to_fhir(reading, str(patient_id)))
+        all_observations.extend(
+            fhir_mapper.observation_to_fhir(reading, str(patient_id))
+        )
 
-    return {"resourceType": "Bundle", "type": "searchset", "entry": [{"resource": obs} for obs in all_observations], "total": len(all_observations)}
+    return {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "entry": [{"resource": obs} for obs in all_observations],
+        "total": len(all_observations),
+    }
 
 
-@router.get("/Patient/{patient_id}/Condition", summary="Get FHIR R4 conditions from AI reports")
+@router.get(
+    "/Patient/{patient_id}/Condition", summary="Get FHIR R4 conditions from AI reports"
+)
 async def get_fhir_conditions(
     patient_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission(Permission.PATIENT_VIEW)),
 ):
-    result = await db.execute(
-        select(Patient).where(Patient.id == patient_id)
-    )
+    result = await db.execute(select(Patient).where(Patient.id == patient_id))
     patient = result.scalar_one_or_none()
     if not patient:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
+        )
 
     ai_result = await db.execute(
         select(AIReport)
@@ -89,10 +102,17 @@ async def get_fhir_conditions(
         if condition:
             conditions.append(condition)
 
-    return {"resourceType": "Bundle", "type": "searchset", "entry": [{"resource": c} for c in conditions], "total": len(conditions)}
+    return {
+        "resourceType": "Bundle",
+        "type": "searchset",
+        "entry": [{"resource": c} for c in conditions],
+        "total": len(conditions),
+    }
 
 
-@router.get("/Patient/{patient_id}/$everything", summary="FHIR R4 patient compartment export")
+@router.get(
+    "/Patient/{patient_id}/$everything", summary="FHIR R4 patient compartment export"
+)
 async def get_fhir_everything(
     patient_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
@@ -101,7 +121,9 @@ async def get_fhir_everything(
     result = await db.execute(select(Patient).where(Patient.id == patient_id))
     patient = result.scalar_one_or_none()
     if not patient:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
+        )
 
     patient_resource = fhir_mapper.patient_to_fhir(patient)
     entries = [{"resource": patient_resource}]

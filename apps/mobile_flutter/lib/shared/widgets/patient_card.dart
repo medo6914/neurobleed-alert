@@ -17,7 +17,8 @@ class PatientCard extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+          backgroundColor:
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
           child: Text(
             (patient['full_name'] as String?)?.isNotEmpty == true
                 ? patient['full_name'][0].toUpperCase()

@@ -57,7 +57,8 @@ class BleService {
     }
   }
 
-  Future<void> startScan({Duration timeout = const Duration(seconds: 10)}) async {
+  Future<void> startScan(
+      {Duration timeout = const Duration(seconds: 10)}) async {
     if (!isAvailable || _state == BleState.scanning) return;
 
     _state = BleState.scanning;

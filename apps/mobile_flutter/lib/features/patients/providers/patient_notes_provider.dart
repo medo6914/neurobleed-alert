@@ -14,7 +14,8 @@ class AddPatientNote {
   }
 }
 
-final patientNotesProvider = FutureProvider.family<List<PatientNote>, String>((ref, patientId) async {
+final patientNotesProvider =
+    FutureProvider.family<List<PatientNote>, String>((ref, patientId) async {
   final repository = ref.watch(notesRepositoryProvider);
   final result = await repository.getPatientNotes(patientId);
   return result.fold(

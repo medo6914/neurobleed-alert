@@ -112,7 +112,8 @@ class PatientListNotifier extends StateNotifier<PatientListState> {
   }
 }
 
-final patientListProvider = StateNotifierProvider<PatientListNotifier, PatientListState>((ref) {
+final patientListProvider =
+    StateNotifierProvider<PatientListNotifier, PatientListState>((ref) {
   final repository = ref.watch(patientRepositoryProvider);
   return PatientListNotifier(repository);
 });

@@ -78,7 +78,9 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
       context.pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pairing failed'), backgroundColor: NeuroColors.critical),
+        const SnackBar(
+            content: Text('Pairing failed'),
+            backgroundColor: NeuroColors.critical),
       );
     }
   }
@@ -116,18 +118,24 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: theme.colorScheme.primary.withValues(
-                          alpha: isScanning ? 0.3 - (_scanAnimation.value * 0.2) : 0.1,
+                          alpha: isScanning
+                              ? 0.3 - (_scanAnimation.value * 0.2)
+                              : 0.1,
                         ),
                         border: Border.all(
                           color: theme.colorScheme.primary.withValues(
-                            alpha: isScanning ? 0.6 - (_scanAnimation.value * 0.4) : 0.3,
+                            alpha: isScanning
+                                ? 0.6 - (_scanAnimation.value * 0.4)
+                                : 0.3,
                           ),
                           width: 2,
                         ),
                       ),
                       child: Center(
                         child: Icon(
-                          isScanning ? Icons.bluetooth_searching : Icons.bluetooth,
+                          isScanning
+                              ? Icons.bluetooth_searching
+                              : Icons.bluetooth,
                           size: 36,
                           color: theme.colorScheme.primary,
                         ),
@@ -149,7 +157,9 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                   child: AppButton(
                     label: isScanning ? 'Stop Scan' : 'Scan for Devices',
                     icon: isScanning ? Icons.stop : Icons.search,
-                    variant: isScanning ? ButtonVariant.secondary : ButtonVariant.primary,
+                    variant: isScanning
+                        ? ButtonVariant.secondary
+                        : ButtonVariant.primary,
                     onPressed: isScanning ? _stopScan : _startScan,
                   ),
                 ),
@@ -176,7 +186,8 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
       return AppEmptyState(
         icon: Icons.bluetooth_disabled,
         title: 'Not Scanning',
-        message: 'Tap "Scan for Devices" to discover nearby NeuroBleed devices.',
+        message:
+            'Tap "Scan for Devices" to discover nearby NeuroBleed devices.',
       );
     }
 
@@ -225,10 +236,12 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                       Container(
                         padding: EdgeInsets.all(NeuroSpacing.sm),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                          color: theme.colorScheme.primaryContainer
+                              .withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(NeuroRadius.md),
                         ),
-                        child: Icon(Icons.bluetooth, size: 24, color: theme.colorScheme.primary),
+                        child: Icon(Icons.bluetooth,
+                            size: 24, color: theme.colorScheme.primary),
                       ),
                       SizedBox(width: NeuroSpacing.md),
                       Expanded(
@@ -237,7 +250,8 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                           children: [
                             Text(
                               device.name,
-                              style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                              style: theme.textTheme.titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.w600),
                             ),
                             SizedBox(height: 2),
                             Text(
@@ -261,7 +275,8 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           else
-                            Icon(Icons.chevron_right, color: theme.colorScheme.onSurfaceVariant),
+                            Icon(Icons.chevron_right,
+                                color: theme.colorScheme.onSurfaceVariant),
                         ],
                       ),
                     ],
@@ -283,7 +298,13 @@ class _SignalStrengthIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bars = strength >= -50 ? 4 : strength >= -70 ? 3 : strength >= -85 ? 2 : 1;
+    final bars = strength >= -50
+        ? 4
+        : strength >= -70
+            ? 3
+            : strength >= -85
+                ? 2
+                : 1;
     final theme = Theme.of(context);
 
     return Row(

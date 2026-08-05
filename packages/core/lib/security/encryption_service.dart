@@ -81,7 +81,8 @@ class EncryptionService {
   String encrypt(String plaintext) {
     if (plaintext.isEmpty) return plaintext;
     final iv = enc.IV.fromSecureRandom(16);
-    final encrypter = enc.Encrypter(enc.AES(_encryptionKey, mode: enc.AESMode.cbc));
+    final encrypter =
+        enc.Encrypter(enc.AES(_encryptionKey, mode: enc.AESMode.cbc));
     final encrypted = encrypter.encrypt(plaintext, iv: iv);
     return '${base64Encode(iv.bytes)}:${encrypted.base64}';
   }
@@ -98,7 +99,8 @@ class EncryptionService {
       if (parts.length != 2) return encrypted;
       final iv = enc.IV(base64Decode(parts[0]));
       final ciphertext = enc.Encrypted.fromBase64(parts[1]);
-      final encrypter = enc.Encrypter(enc.AES(_encryptionKey, mode: enc.AESMode.cbc));
+      final encrypter =
+          enc.Encrypter(enc.AES(_encryptionKey, mode: enc.AESMode.cbc));
       return encrypter.decrypt(ciphertext, iv: iv);
     } catch (_) {
       return encrypted;

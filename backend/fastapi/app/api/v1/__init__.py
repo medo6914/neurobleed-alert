@@ -1,7 +1,23 @@
 from fastapi import APIRouter
 
-from app.api.v1 import auth, patients, devices, readings, alerts, device_ws, device_history
-from app.api.v1 import clinical_reports, emergency, fhir, hl7, subscriptions, provisioning, analytics
+from app.api.v1 import (
+    auth,
+    patients,
+    devices,
+    readings,
+    alerts,
+    device_ws,
+    device_history,
+)
+from app.api.v1 import (
+    clinical_reports,
+    emergency,
+    fhir,
+    hl7,
+    subscriptions,
+    provisioning,
+    analytics,
+)
 from app.api.v1 import maps, notifications, medical, weather, payments, files
 from app.ai import ai_router
 

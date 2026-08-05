@@ -115,7 +115,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     );
   }
 
-  List<Map<String, dynamic>> _filterByPeriod(List<Map<String, dynamic>> reports) {
+  List<Map<String, dynamic>> _filterByPeriod(
+      List<Map<String, dynamic>> reports) {
     if (_period == ReportPeriod.all) return reports;
     final now = DateTime.now();
     final cutoff = switch (_period) {
@@ -167,7 +168,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     final now = DateTime.now();
     final days = <DateTime>[];
     for (int i = 6; i >= 0; i--) {
-      days.add(DateTime(now.year, now.month, now.day).subtract(Duration(days: i)));
+      days.add(
+          DateTime(now.year, now.month, now.day).subtract(Duration(days: i)));
     }
     final counts = days
         .map((d) => reports.where((r) {
@@ -201,12 +203,12 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                   gridData: const FlGridData(show: false),
                   borderData: FlBorderData(show: false),
                   titlesData: FlTitlesData(
-                    leftTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
-                    topTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                    leftTitles:
+                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles:
+                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles:
+                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
@@ -293,8 +295,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
           backgroundColor: statusColor.withValues(alpha: 0.1),
           child: Icon(icon, color: statusColor),
         ),
-        title: Text(title,
-            style: const TextStyle(fontWeight: FontWeight.w600)),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -317,7 +318,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                   const SizedBox(width: 8),
                   Text(
                     'Risk: ${((riskScore as num) * 100).toStringAsFixed(0)}%',
-                    style: const TextStyle(fontSize: 12, color: NeuroColors.high),
+                    style:
+                        const TextStyle(fontSize: 12, color: NeuroColors.high),
                   ),
                 ],
               ],

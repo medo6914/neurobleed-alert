@@ -22,7 +22,8 @@ class OfflineCache {
     await file.writeAsString(encoded);
   }
 
-  Future<T?> get<T>(String key, {T Function(Map<String, dynamic>)? fromJson}) async {
+  Future<T?> get<T>(String key,
+      {T Function(Map<String, dynamic>)? fromJson}) async {
     try {
       final file = _file(key);
       if (await file.exists()) {
@@ -33,8 +34,7 @@ class OfflineCache {
             ? fromJson(data as Map<String, dynamic>)
             : data as T;
       }
-    } catch (_) {
-    }
+    } catch (_) {}
     return null;
   }
 

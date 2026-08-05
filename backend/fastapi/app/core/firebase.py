@@ -59,14 +59,21 @@ async def verify_firebase_token(id_token: str) -> dict | None:
 async def get_firebase_user(uid: str) -> dict | None:
     try:
         user = firebase_auth.get_user(uid)
-        return {"uid": user.uid, "email": user.email, "phone": user.phone_number, "name": user.display_name}
+        return {
+            "uid": user.uid,
+            "email": user.email,
+            "phone": user.phone_number,
+            "name": user.display_name,
+        }
     except Exception:
         return None
 
 
 async def create_firebase_user(email: str, password: str, name: str) -> dict | None:
     try:
-        user = firebase_auth.create_user(email=email, password=password, display_name=name)
+        user = firebase_auth.create_user(
+            email=email, password=password, display_name=name
+        )
         return {"uid": user.uid, "email": user.email}
     except Exception:
         return None

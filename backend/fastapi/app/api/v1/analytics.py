@@ -9,8 +9,13 @@ from app.core.dependencies import get_current_user, require_permission
 from app.core.rbac import Permission
 from app.models.user import User
 from app.schemas.analytics import (
-    AnalyticsOverview, PatientAnalytics, DeviceAnalytics, AlertAnalytics,
-    HospitalOverview, SystemHealth, ActivityFeedItem,
+    AnalyticsOverview,
+    PatientAnalytics,
+    DeviceAnalytics,
+    AlertAnalytics,
+    HospitalOverview,
+    SystemHealth,
+    ActivityFeedItem,
 )
 from app.services.analytics_service import AnalyticsService
 

@@ -31,8 +31,7 @@ class OfflineCache {
             ? fromJson(data as Map<String, dynamic>)
             : data as T;
       }
-    } catch (_) {
-    }
+    } catch (_) {}
     return null;
   }
 

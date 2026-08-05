@@ -76,7 +76,8 @@ class DeviceAssignNotifier extends StateNotifier<DeviceAssignState> {
   }
 }
 
-final deviceAssignProvider = StateNotifierProvider<DeviceAssignNotifier, DeviceAssignState>((ref) {
+final deviceAssignProvider =
+    StateNotifierProvider<DeviceAssignNotifier, DeviceAssignState>((ref) {
   final repository = ref.watch(deviceRepositoryProvider);
   return DeviceAssignNotifier(repository);
 });
