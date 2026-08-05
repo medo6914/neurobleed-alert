@@ -1,17 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
+import '../../core/auth/auth_provider.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _logoController;
   late AnimationController _glowController;
@@ -75,17 +77,29 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _startAnimations() async {
     await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
     _logoController.forward();
 
     await Future.delayed(const Duration(milliseconds: 500));
+    if (!mounted) return;
     _glowController.repeat(reverse: true);
 
     await Future.delayed(const Duration(milliseconds: 800));
+    if (!mounted) return;
     _textController.forward();
+  }
 
-    await Future.delayed(const Duration(milliseconds: 2000));
-    if (mounted) {
-      context.go('/login');
+  void _navigate(AuthStatus status) {
+    if (!mounted) return;
+    switch (status) {
+      case AuthStatus.authenticated:
+        context.go('/dashboard');
+      case AuthStatus.onboarding:
+        context.go('/onboarding');
+      case AuthStatus.unauthenticated:
+        context.go('/login');
+      case AuthStatus.unknown:
+        break;
     }
   }
 
@@ -99,6 +113,19 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AuthState>(authStateProvider, (_, state) {
+      final guard = ref.read(authGuardProvider);
+      if (guard.isInitialized && state.status != AuthStatus.unknown) {
+        _navigate(state.status);
+      }
+    });
+    final state = ref.read(authStateProvider);
+    if (ref.read(authGuardProvider).isInitialized &&
+        state.status != AuthStatus.unknown) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _navigate(state.status);
+      });
+    }
     return Scaffold(
       backgroundColor: NeuroColors.bgPrimary,
       body: Container(
@@ -241,7 +268,7 @@ class _SplashScreenState extends State<SplashScreen>
         const SizedBox(height: NeuroSpacing.lg),
         Text(
           'نظام تقييم خطر النزيف الدماغي',
-          style: NeuroTypography.body?.copyWith(
+          style: NeuroTypography.body.copyWith(
             color: NeuroColors.textSecondary,
           ),
         ),

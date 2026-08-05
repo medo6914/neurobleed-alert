@@ -9,6 +9,14 @@ final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref.read(apiClientProvider), SecureStorageService());
 });
 
+final authGuardProvider = ChangeNotifierProvider<AuthGuard>((ref) {
+  final guard = AuthGuard();
+  ref.listen<AuthState>(authStateProvider, (_, state) {
+    guard.setAuthenticated(state.status == AuthStatus.authenticated);
+  });
+  return guard;
+});
+
 enum AuthStatus { unknown, unauthenticated, authenticated, onboarding }
 
 class AuthState {
@@ -56,51 +64,56 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> _checkAuthStatus() async {
-    final hasToken = await _storage.hasToken();
-    if (!hasToken) {
-      final onboardingDone = await _storage.getOnboardingComplete();
-      state = state.copyWith(
-        status:
-            onboardingDone ? AuthStatus.unauthenticated : AuthStatus.onboarding,
-        isOnboardingComplete: onboardingDone,
-      );
-      return;
-    }
-
-    if (!await _storage.getRememberMe()) {
-      await _storage.clearAll();
-      state = state.copyWith(status: AuthStatus.unauthenticated);
-      return;
-    }
-
     try {
-      final response = await _api.get('/v1/auth/me');
-      final data = response.data;
-      final user = User(
-        id: data['id'],
-        email: data['email'],
-        phone: data['phone'],
-        displayName: data['full_name'] ?? data['display_name'],
-        photoUrl: data['profile_image_url'],
-        role: UserRole.values.firstWhere(
-          (r) => r.name == data['role'],
-          orElse: () => UserRole.doctor,
-        ),
-        authProvider: AuthProvider.values.firstWhere(
-          (p) => p.name == (data['auth_provider'] ?? 'email'),
-          orElse: () => AuthProvider.email,
-        ),
-        isActive: data['is_active'] ?? true,
-        hospitalId: data['hospital_id'],
-        createdAt: DateTime.parse(data['created_at']),
-        updatedAt: DateTime.parse(data['updated_at']),
-      );
-      state = state.copyWith(
-        status: AuthStatus.authenticated,
-        user: user,
-      );
+      final hasToken = await _storage.hasToken();
+      if (!hasToken) {
+        final onboardingDone = await _storage.getOnboardingComplete();
+        state = state.copyWith(
+          status: onboardingDone
+              ? AuthStatus.unauthenticated
+              : AuthStatus.onboarding,
+          isOnboardingComplete: onboardingDone,
+        );
+        return;
+      }
+
+      if (!await _storage.getRememberMe()) {
+        await _storage.clearAll();
+        state = state.copyWith(status: AuthStatus.unauthenticated);
+        return;
+      }
+
+      try {
+        final response = await _api.get('/v1/auth/me');
+        final data = response.data;
+        final user = User(
+          id: data['id'],
+          email: data['email'],
+          phone: data['phone'],
+          displayName: data['full_name'] ?? data['display_name'],
+          photoUrl: data['profile_image_url'],
+          role: UserRole.values.firstWhere(
+            (r) => r.name == data['role'],
+            orElse: () => UserRole.doctor,
+          ),
+          authProvider: AuthProvider.values.firstWhere(
+            (p) => p.name == (data['auth_provider'] ?? 'email'),
+            orElse: () => AuthProvider.email,
+          ),
+          isActive: data['is_active'] ?? true,
+          hospitalId: data['hospital_id'],
+          createdAt: DateTime.parse(data['created_at']),
+          updatedAt: DateTime.parse(data['updated_at']),
+        );
+        state = state.copyWith(
+          status: AuthStatus.authenticated,
+          user: user,
+        );
+      } catch (e) {
+        await _storage.clearAll();
+        state = state.copyWith(status: AuthStatus.unauthenticated);
+      }
     } catch (e) {
-      await _storage.clearAll();
       state = state.copyWith(status: AuthStatus.unauthenticated);
     }
   }
