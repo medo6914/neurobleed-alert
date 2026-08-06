@@ -34,6 +34,10 @@ class AuthGuard extends ChangeNotifier {
     final location = state.matchedLocation;
     final isPublicRoute = _publicRoutes.any((r) => location == r);
 
+    if (isSplashLocation(location)) {
+      return _isAuthenticated ? getHome(role: _role) : '/login';
+    }
+
     if (_isAuthenticated && isPublicRoute) {
       return _isSuperAdmin ? '/admin' : '/dashboard';
     }
@@ -48,6 +52,12 @@ class AuthGuard extends ChangeNotifier {
 
     return null;
   }
+
+  bool isSplashLocation(String location) {
+    return location == '/splash' || location == '/' || location.isEmpty;
+  }
+
+  String? getHome({String? role}) => role == 'super_admin' ? '/admin' : '/dashboard';
 
   bool get _isSuperAdmin => _role == 'super_admin';
 }

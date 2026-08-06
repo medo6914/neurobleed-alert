@@ -1,15 +1,11 @@
-"""Seed the system accounts and hospitals.
+"""Seed system data only (roles + hospitals).
 
-Creates (idempotently) exactly two accounts:
+No user accounts are created here. The app is official: accounts are
+created only through registration. A user who registers with an email
+listed in settings.SUPER_ADMIN_EMAILS is automatically promoted to
+super_admin by the auth service (never via UI role selection).
 
-- medomaree11@gmail.com / settings.SUPER_ADMIN_PASSWORD  (role: super_admin)
-- settings.SEED_USER_EMAIL / settings.SEED_USER_PASSWORD (role: user)
-
-Super Admin can never be created through the UI; it is provisioned only
-here by the backend. All legacy demo accounts are removed on every boot.
-
-Usage:
-    python -m app.seed_data
+All legacy demo accounts are removed on every boot.
 """
 
 import asyncio
@@ -19,7 +15,6 @@ from datetime import datetime, timezone
 from sqlalchemy import delete, select
 
 from app.config import settings
-from app.core.security import hash_password
 from app.database import async_session, init_db
 from app.models.enums import UserRole, HospitalType
 from app.models.hospital import Hospital
@@ -31,22 +26,12 @@ LEGACY_DEMO_EMAILS = [
     "admin@neurobleed.com",
     "doctor@neurobleed.com",
     "patient@neurobleed.com",
+    "medomaree11@gmail.com",
+    "Ziad@gmail.com",
 ]
 
-CORE_ACCOUNTS = [
-    {
-        "email": "medomaree11@gmail.com",
-        "password": settings.SUPER_ADMIN_PASSWORD,
-        "full_name": "Super Admin",
-        "role": UserRole.SUPER_ADMIN,
-    },
-    {
-        "email": settings.SEED_USER_EMAIL,
-        "password": settings.SEED_USER_PASSWORD,
-        "full_name": "Ziad",
-        "role": UserRole.USER,
-    },
-]
+# No pre-installed accounts: users are created only via registration.
+CORE_ACCOUNTS = []
 
 ROLE_NAMES = [
     "super_admin",
@@ -211,34 +196,6 @@ async def seed() -> int:
         created += await _seed_roles(session)
         created += await _seed_hospitals(session)
         created += await _delete_legacy_demo_users(session)
-        for entry in CORE_ACCOUNTS:
-            email = entry["email"].strip()
-            result = await session.execute(
-                select(User).where(User.email == email)
-            )
-            existing = result.scalar_one_or_none()
-            if existing is not None:
-                existing.role = entry["role"]
-                await _assign_role(session, existing, entry["role"].value)
-                print(f"[seed] updated: {email} (role={entry['role'].value})")
-                continue
-
-            user = User(
-                email=email,
-                hashed_password=hash_password(entry["password"]),
-                full_name=entry["full_name"],
-                role=entry["role"],
-                is_active=True,
-                is_email_verified=True,
-                is_phone_verified=True,
-                last_password_change=datetime.now(timezone.utc),
-            )
-            session.add(user)
-            await session.flush()
-            await _assign_role(session, user, entry["role"].value)
-            print(f"[seed] created: {email} (role={entry['role'].value})")
-            created += 1
-
         await session.commit()
     return created
 

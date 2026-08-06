@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart' hide User, AuthProvider;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared/entities/user.dart';
@@ -8,7 +9,10 @@ import 'package:core/core.dart';
 import '../../features/notifications/push_notification_service.dart';
 
 final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(ref.read(apiClientProvider), SecureStorageService());
+  return AuthNotifier(
+    ref.read(apiClientProvider),
+    ref.watch(secureStorageProvider),
+  );
 });
 
 final authGuardProvider = ChangeNotifierProvider<AuthGuard>((ref) {
@@ -94,25 +98,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       try {
         final response = await _api.get('/v1/auth/me');
         final data = response.data;
-        final user = User(
-          id: data['id'],
-          email: data['email'],
-          phone: data['phone'],
-          displayName: data['full_name'] ?? data['display_name'],
-          photoUrl: data['profile_image_url'],
-          role: UserRole.values.firstWhere(
-            (r) => r.name == data['role'],
-            orElse: () => UserRole.doctor,
-          ),
-          authProvider: AuthProvider.values.firstWhere(
-            (p) => p.name == (data['auth_provider'] ?? 'email'),
-            orElse: () => AuthProvider.email,
-          ),
-          isActive: data['is_active'] ?? true,
-          hospitalId: data['hospital_id'],
-          createdAt: DateTime.parse(data['created_at']),
-          updatedAt: DateTime.parse(data['updated_at']),
-        );
+        final user = _userFromResponse(data);
         state = state.copyWith(
           status: AuthStatus.authenticated,
           user: user,
@@ -160,6 +146,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> _registerPush() async {
     try {
+      if (kIsWeb) return;
       await PushNotificationService(_api).initialize();
     } catch (_) {}
   }
@@ -172,13 +159,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      await _api.post('/v1/auth/register', data: {
+      await _storage.saveRememberMe(true);
+      final response = await _api.post('/v1/auth/register', data: {
         'email': email,
         'password': password,
         'full_name': fullName,
         'role': role,
       });
-      await login(email, password);
+      final data = response.data;
+      await _storage.saveToken(data['access_token']);
+      if (data['refresh_token'] != null) {
+        await _storage.saveRefreshToken(data['refresh_token']);
+      }
+      await _storage.saveUserId(data['user_id']);
+      await _storage.saveUserRole(data['role']);
+
+      final user = _userFromResponse(data);
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        user: user,
+        isLoading: false,
+      );
+      unawaited(_registerPush());
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -400,16 +402,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  User _userFromResponse(Map<String, dynamic> data) {
+User _userFromResponse(Map<String, dynamic> data) {
+    final now = DateTime.now();
     return User(
-      id: data['user_id'] ?? data['id'],
-      email: data['email'],
+      id: data['user_id'] ?? data['id'] ?? '',
+      email: data['email'] ?? '',
       phone: data['phone'],
       displayName: data['full_name'] ?? data['display_name'],
       photoUrl: data['profile_image_url'] ?? data['photo_url'],
       role: UserRole.values.firstWhere(
         (r) => r.name == data['role'],
-        orElse: () => UserRole.doctor,
+        orElse: () => UserRole.user,
       ),
       authProvider: AuthProvider.values.firstWhere(
         (p) => p.name == (data['auth_provider'] ?? 'email'),
@@ -417,8 +420,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       ),
       isActive: data['is_active'] ?? true,
       hospitalId: data['hospital_id'],
-      createdAt: DateTime.tryParse(data['created_at'] ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(data['updated_at'] ?? '') ?? DateTime.now(),
+      createdAt: DateTime.tryParse(data['created_at'] ?? '') ?? now,
+      updatedAt: DateTime.tryParse(data['updated_at'] ?? '') ?? now,
     );
   }
 
