@@ -35,6 +35,7 @@ from app.core.session_store import (
 )
 from app.core.audit import log_action
 from app.models.user import User
+from app.models.enums import UserRole
 from app.models.refresh_token import RefreshToken
 from app.schemas.user import (
     UserCreate,
@@ -78,6 +79,31 @@ def _clean_expired_stores():
 
 def _generate_code() -> str:
     return str(secrets.randbelow(900000) + 100000)
+
+
+def _super_admin_emails() -> set[str]:
+    return {
+        email.strip().lower()
+        for email in (settings.SUPER_ADMIN_EMAILS or "").split(",")
+        if email.strip()
+    }
+
+
+def _resolve_role(email: str, requested: str | None) -> UserRole:
+    """Public registrations can never request privileged roles.
+
+    Super Admin is assigned automatically by the backend only when the
+    email belongs to a configured Super Admin account.
+    """
+    if email.strip().lower() in _super_admin_emails():
+        return UserRole.SUPER_ADMIN
+    try:
+        role = UserRole(requested) if requested else None
+    except ValueError:
+        role = None
+    if role in (UserRole.SUPER_ADMIN, UserRole.ADMIN):
+        return UserRole.USER
+    return role or UserRole.USER
 
 
 def _hash_token(token: str) -> str:
@@ -129,7 +155,7 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
         email=data.email,
         hashed_password=hash_password(data.password),
         full_name=data.full_name,
-        role=data.role or "doctor",
+        role=_resolve_role(data.email, data.role),
         phone=data.phone,
         hospital_id=data.hospital_id,
         firebase_uid=firebase_uid,
@@ -196,12 +222,15 @@ async def google_login(data: GoogleLoginRequest, db: AsyncSession = Depends(get_
             email=email,
             hashed_password=hash_password(secrets.token_urlsafe(16)),
             full_name=name,
-            role="doctor",
+            role=_resolve_role(decoded.get("email") or email, None),
             firebase_uid=firebase_uid,
         )
         db.add(user)
         await db.commit()
         await db.refresh(user)
+    elif email.strip().lower() in _super_admin_emails() and user.role != UserRole.SUPER_ADMIN:
+        user.role = UserRole.SUPER_ADMIN
+        await db.commit()
 
     user.firebase_uid = firebase_uid
     await db.commit()
@@ -569,7 +598,7 @@ async def verify_otp(data: OtpVerifyRequest, db: AsyncSession = Depends(get_db))
             email=f"{phone}@neurobleed.otp",
             hashed_password=hash_password(secrets.token_urlsafe(16)),
             full_name=f"User {phone[-4:]}",
-            role="doctor",
+            role=UserRole.USER,
             phone=phone,
         )
         db.add(user)

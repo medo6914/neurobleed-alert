@@ -1,7 +1,9 @@
 import 'package:equatable/equatable.dart';
 
 enum UserRole {
+  super_admin,
   admin,
+  user,
   doctor,
   nurse,
   technician,

@@ -1,12 +1,12 @@
-"""Seed demo users and hospitals for the graduation presentation.
+"""Seed the system accounts and hospitals.
 
-Creates (idempotently) the three demo accounts:
+Creates (idempotently) exactly two accounts:
 
-- admin@neurobleed.com  / Admin123!   (role: admin)
-- doctor@neurobleed.com / Doctor123!  (role: doctor)
-- patient@neurobleed.com / Patient123! (role: patient)
+- medomaree11@gmail.com / settings.SUPER_ADMIN_PASSWORD  (role: super_admin)
+- settings.SEED_USER_EMAIL / settings.SEED_USER_PASSWORD (role: user)
 
-And a set of real Cairo hospitals with OSM coordinates for the map feature.
+Super Admin can never be created through the UI; it is provisioned only
+here by the backend. All legacy demo accounts are removed on every boot.
 
 Usage:
     python -m app.seed_data
@@ -16,37 +16,47 @@ import asyncio
 import sys
 from datetime import datetime, timezone
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
+from app.config import settings
 from app.core.security import hash_password
 from app.database import async_session, init_db
 from app.models.enums import UserRole, HospitalType
 from app.models.hospital import Hospital
 from app.models.role import Role
 from app.models.user import User
+from app.models.user_role import user_role
 
-DEMO_USERS = [
+LEGACY_DEMO_EMAILS = [
+    "admin@neurobleed.com",
+    "doctor@neurobleed.com",
+    "patient@neurobleed.com",
+]
+
+CORE_ACCOUNTS = [
     {
-        "email": "admin@neurobleed.com",
-        "password": "Admin123!",
-        "full_name": "Demo Admin",
-        "role": UserRole.ADMIN,
-        "phone": "+201000000001",
+        "email": "medomaree11@gmail.com",
+        "password": settings.SUPER_ADMIN_PASSWORD,
+        "full_name": "Super Admin",
+        "role": UserRole.SUPER_ADMIN,
     },
     {
-        "email": "doctor@neurobleed.com",
-        "password": "Doctor123!",
-        "full_name": "Demo Doctor",
-        "role": UserRole.DOCTOR,
-        "phone": "+201000000002",
+        "email": settings.SEED_USER_EMAIL,
+        "password": settings.SEED_USER_PASSWORD,
+        "full_name": "Ziad",
+        "role": UserRole.USER,
     },
-    {
-        "email": "patient@neurobleed.com",
-        "password": "Patient123!",
-        "full_name": "Demo Patient",
-        "role": UserRole.PATIENT,
-        "phone": "+201000000003",
-    },
+]
+
+ROLE_NAMES = [
+    "super_admin",
+    "admin",
+    "user",
+    "doctor",
+    "nurse",
+    "technician",
+    "patient",
+    "emergency",
 ]
 
 
@@ -134,6 +144,19 @@ DEMO_HOSPITALS = [
 ]
 
 
+async def _seed_roles(session) -> int:
+    created = 0
+    for name in ROLE_NAMES:
+        result = await session.execute(select(Role).where(Role.name == name))
+        role = result.scalar_one_or_none()
+        if role is None:
+            session.add(Role(name=name, description=None, is_system=True))
+            print(f"[seed] role created: {name}")
+            created += 1
+    await session.commit()
+    return created
+
+
 async def _seed_hospitals(session) -> int:
     created = 0
     for entry in DEMO_HOSPITALS:
@@ -151,35 +174,60 @@ async def _seed_hospitals(session) -> int:
     return created
 
 
+async def _delete_legacy_demo_users(session) -> int:
+    deleted = 0
+    for email in LEGACY_DEMO_EMAILS:
+        result = await session.execute(select(User.id).where(User.email == email))
+        user_ids = [row[0] for row in result.all()]
+        for user_id in user_ids:
+            await session.execute(
+                delete(User).where(User.id == user_id)
+            )
+            print(f"[seed] demo account removed: {email}")
+            deleted += 1
+    await session.commit()
+    return deleted
+
+
 async def _assign_role(session, user: User, role_name: str) -> None:
     result = await session.execute(select(Role).where(Role.name == role_name))
     role = result.scalar_one_or_none()
     if role is None:
         return
-    if role not in user.roles:
-        user.roles.append(role)
+    already = await session.execute(
+        select(user_role.c.user_id).where(
+            user_role.c.user_id == user.id, user_role.c.role_id == role.id
+        )
+    )
+    if already.scalar_one_or_none() is None:
+        await session.execute(
+            user_role.insert().values(user_id=user.id, role_id=role.id)
+        )
 
 
 async def seed() -> int:
     created = 0
     async with async_session() as session:
+        created += await _seed_roles(session)
         created += await _seed_hospitals(session)
-        for entry in DEMO_USERS:
+        created += await _delete_legacy_demo_users(session)
+        for entry in CORE_ACCOUNTS:
+            email = entry["email"].strip()
             result = await session.execute(
-                select(User).where(User.email == entry["email"])
+                select(User).where(User.email == email)
             )
             existing = result.scalar_one_or_none()
             if existing is not None:
+                existing.role = entry["role"]
                 await _assign_role(session, existing, entry["role"].value)
-                print(f"[seed] exists: {entry['email']}")
+                print(f"[seed] updated: {email} (role={entry['role'].value})")
                 continue
 
             user = User(
-                email=entry["email"],
+                email=email,
                 hashed_password=hash_password(entry["password"]),
                 full_name=entry["full_name"],
                 role=entry["role"],
-                phone=entry["phone"],
                 is_active=True,
                 is_email_verified=True,
                 is_phone_verified=True,
@@ -188,7 +236,7 @@ async def seed() -> int:
             session.add(user)
             await session.flush()
             await _assign_role(session, user, entry["role"].value)
-            print(f"[seed] created: {entry['email']} (role={entry['role'].value})")
+            print(f"[seed] created: {email} (role={entry['role'].value})")
             created += 1
 
         await session.commit()

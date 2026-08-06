@@ -8,7 +8,7 @@ class UserCreate(BaseModel):
     email: str
     password: str
     full_name: str
-    role: str = "doctor"
+    role: str = "user"
     phone: str | None = None
     hospital_id: UUID | None = None
 

@@ -205,13 +205,12 @@ class AnalyticsService:
             key=lambda x: x["month"],
         )
 
-        q = base.where(Patient.department.isnot(None))
         result = await self.db.execute(
-            select(Patient.department, func.count(Patient.id)).group_by(
-                Patient.department
-            )
+            select(Patient.department_id, func.count(Patient.id))
+            .where(Patient.department_id.isnot(None))
+            .group_by(Patient.department_id)
         )
-        by_department = [{"department": r[0], "count": r[1]} for r in result]
+        by_department = [{"department": str(r[0]), "count": r[1]} for r in result]
 
         return PatientAnalytics(
             total=total,
@@ -395,15 +394,17 @@ class AnalyticsService:
             ) or 0
             a_count = (
                 await self.db.scalar(
-                    select(func.count(Alert.id)).where(
-                        Alert.hospital_id == h.id, Alert.is_deleted == False
+                    select(func.count(Alert.id))
+                    .join(Patient, Alert.patient_id == Patient.id)
+                    .where(
+                        Patient.hospital_id == h.id, Alert.is_deleted == False
                     )
                 )
             ) or 0
 
-            beds = h.bed_count or 0
+            beds = 0
             total_beds += beds
-            occ = min(p_count, beds) if beds else 0
+            occ = 0
             occupied_beds += occ
 
             metrics.append(
@@ -414,7 +415,7 @@ class AnalyticsService:
                     device_count=d_count,
                     active_alerts=a_count,
                     bed_capacity=beds,
-                    bed_occupancy=round((occ / beds * 100) if beds else 0, 1),
+                    bed_occupancy=0.0,
                     alert_trend=[],
                 )
             )

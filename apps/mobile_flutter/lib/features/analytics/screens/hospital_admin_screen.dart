@@ -25,7 +25,7 @@ class HospitalAdminScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Hospital & System Admin')),
+      appBar: AppBar(title: const Text('Hospital Management')),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(NeuroSpacing.md),
         child: Column(

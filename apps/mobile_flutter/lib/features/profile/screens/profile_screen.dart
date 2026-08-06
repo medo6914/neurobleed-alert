@@ -99,49 +99,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             style: NeuroTypography.caption,
           ),
           const SizedBox(height: NeuroSpacing.md),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: NeuroSpacing.md,
-              vertical: NeuroSpacing.xs,
-            ),
-            decoration: BoxDecoration(
-              color: NeuroColors.primary.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(NeuroRadius.badge),
-              border: Border.all(
-                color: NeuroColors.primary.withValues(alpha: 0.4),
-              ),
-            ),
-            child: Text(
-              _roleLabel(user.role),
-              style: NeuroTypography.badge.copyWith(
-                color: NeuroColors.primaryLight,
-              ),
-            ),
+          Text(
+            user.email,
+            style: NeuroTypography.caption,
           ),
         ],
       ),
     );
-  }
-
-  String _roleLabel(UserRole role) {
-    switch (role) {
-      case UserRole.admin:
-        return 'مدير النظام';
-      case UserRole.doctor:
-        return 'طبيب';
-      case UserRole.nurse:
-        return 'ممرض/ممرضة';
-      case UserRole.technician:
-        return 'فني';
-      case UserRole.patient:
-        return 'مريض';
-      case UserRole.emergency:
-        return 'طوارئ';
-      case UserRole.researcher:
-        return 'باحث';
-      case UserRole.family:
-        return 'عائلة';
-    }
   }
 
   Widget _buildInfoCard(User user) {

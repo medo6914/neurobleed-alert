@@ -4,12 +4,14 @@ import 'package:go_router/go_router.dart';
 class AuthGuard extends ChangeNotifier {
   bool _isAuthenticated = false;
   bool _isInitialized = false;
+  String? _role;
 
   bool get isAuthenticated => _isAuthenticated;
   bool get isInitialized => _isInitialized;
 
-  void setAuthenticated(bool value) {
+  void setAuthenticated(bool value, {String? role}) {
     _isAuthenticated = value;
+    _role = role;
     _isInitialized = true;
     notifyListeners();
   }
@@ -32,14 +34,20 @@ class AuthGuard extends ChangeNotifier {
     final location = state.matchedLocation;
     final isPublicRoute = _publicRoutes.any((r) => location == r);
 
+    if (_isAuthenticated && isPublicRoute) {
+      return _isSuperAdmin ? '/admin' : '/dashboard';
+    }
+
+    if (_isAuthenticated && location == '/admin' && !_isSuperAdmin) {
+      return '/dashboard';
+    }
+
     if (!_isAuthenticated && !isPublicRoute) {
       return '/login';
     }
 
-    if (_isAuthenticated && isPublicRoute) {
-      return '/dashboard';
-    }
-
     return null;
   }
+
+  bool get _isSuperAdmin => _role == 'super_admin';
 }

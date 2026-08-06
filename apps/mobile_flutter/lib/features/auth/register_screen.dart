@@ -19,7 +19,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
-  String _role = 'doctor';
 
   @override
   void dispose() {
@@ -36,7 +35,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             email: _emailController.text.trim(),
             password: _passwordController.text,
             fullName: _nameController.text.trim(),
-            role: _role,
           );
     }
   }
@@ -188,39 +186,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     },
                                   ),
                                   const SizedBox(height: NeuroSpacing.lg),
-                                  DropdownButtonFormField<String>(
-                                    initialValue: _role,
-                                    decoration: InputDecoration(
-                                      labelText: 'الدور',
-                                      prefixIcon:
-                                          const Icon(Icons.badge_outlined),
-                                      filled: true,
-                                      fillColor: NeuroColors.bgInput,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            NeuroRadius.input),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            NeuroRadius.input),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                    ),
-                                    items: const [
-                                      DropdownMenuItem(
-                                          value: 'doctor', child: Text('طبيب')),
-                                      DropdownMenuItem(
-                                          value: 'nurse', child: Text('ممرض')),
-                                      DropdownMenuItem(
-                                          value: 'technician',
-                                          child: Text('فني')),
-                                      DropdownMenuItem(
-                                          value: 'admin', child: Text('مدير')),
-                                    ],
-                                    onChanged: (v) =>
-                                        setState(() => _role = v ?? 'doctor'),
-                                  ),
                                   if (authState.error != null) ...[
                                     const SizedBox(height: NeuroSpacing.md),
                                     AlertBanner(

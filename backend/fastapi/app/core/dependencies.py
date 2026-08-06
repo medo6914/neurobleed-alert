@@ -43,7 +43,7 @@ async def get_current_user(
 
 async def require_role(role: str):
     async def role_checker(current_user: User = Depends(get_current_user)):
-        if current_user.role != role and current_user.role != "admin":
+        if current_user.role not in (role, "admin", "super_admin"):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
             )

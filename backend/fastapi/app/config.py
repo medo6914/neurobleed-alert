@@ -12,6 +12,11 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
+    SUPER_ADMIN_EMAILS: str = "medomaree11@gmail.com"
+    SUPER_ADMIN_PASSWORD: str = "NeuroBleed@2026!"
+    SEED_USER_EMAIL: str = "Ziad@gmail.com"
+    SEED_USER_PASSWORD: str = "Ziad@2026!"
+
     FIREBASE_CREDENTIALS_PATH: str | None = None
     FIREBASE_API_KEY: str | None = None
     FIREBASE_PROJECT_ID: str | None = None

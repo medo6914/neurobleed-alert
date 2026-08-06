@@ -14,7 +14,10 @@ final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
 final authGuardProvider = ChangeNotifierProvider<AuthGuard>((ref) {
   final guard = AuthGuard();
   ref.listen<AuthState>(authStateProvider, (_, state) {
-    guard.setAuthenticated(state.status == AuthStatus.authenticated);
+    guard.setAuthenticated(
+      state.status == AuthStatus.authenticated,
+      role: state.user?.role.name,
+    );
   });
   return guard;
 });
@@ -165,7 +168,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String email,
     required String password,
     required String fullName,
-    String role = 'doctor',
+    String role = 'user',
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
