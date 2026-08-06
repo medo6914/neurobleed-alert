@@ -8,6 +8,7 @@ from sqlalchemy import select
 import secrets
 
 from app.database import get_db
+from app.config import settings
 from app.core.security import (
     hash_password,
     verify_password,
@@ -17,7 +18,11 @@ from app.core.security import (
     decode_refresh_token,
 )
 from app.core.password_policy import validate_password
-from app.core.firebase import verify_firebase_token, create_firebase_user
+from app.core.firebase import (
+    verify_firebase_token,
+    verify_google_id_token,
+    create_firebase_user,
+)
 from app.core.twilio import send_otp_sms, send_emergency_alert
 from app.core.dependencies import get_current_user, require_permission
 from app.core.rbac import Permission
@@ -172,6 +177,8 @@ async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
 @router.post("/google", response_model=TokenResponse)
 async def google_login(data: GoogleLoginRequest, db: AsyncSession = Depends(get_db)):
     decoded = await verify_firebase_token(data.id_token)
+    if not decoded:
+        decoded = await verify_google_id_token(data.id_token)
     if not decoded:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Google token"
@@ -487,7 +494,12 @@ async def revoke_all_sessions(
 
 @router.post("/send-otp")
 async def send_otp(data: OtpRequest, request: Request):
-    phone = data.phone
+    phone = data.resolved_phone()
+    if not phone:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="phone (or identifier) is required",
+        )
     _clean_expired_stores()
 
     recent = [v for k, v in _otp_store.items() if k == phone]
@@ -505,6 +517,12 @@ async def send_otp(data: OtpRequest, request: Request):
     }
     sent = await send_otp_sms(phone, otp)
     if not sent:
+        if settings.ENVIRONMENT == "development":
+            return {
+                "message": "OTP sent successfully",
+                "otp_length": 4,
+                "dev_otp": otp,
+            }
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to send OTP",
@@ -514,8 +532,13 @@ async def send_otp(data: OtpRequest, request: Request):
 
 @router.post("/verify-otp", response_model=TokenResponse)
 async def verify_otp(data: OtpVerifyRequest, db: AsyncSession = Depends(get_db)):
-    phone = data.phone
-    otp = data.otp
+    phone = data.resolved_phone()
+    otp = data.resolved_code()
+    if not phone or not otp:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="phone/identifier and otp/code are required",
+        )
     stored = _otp_store.get(phone)
     if not stored:
         raise HTTPException(

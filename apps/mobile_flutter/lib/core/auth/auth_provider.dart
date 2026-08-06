@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart' hide User, AuthProvider;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared/entities/user.dart';
 import 'package:core/core.dart';
 import '../../features/notifications/push_notification_service.dart';
@@ -59,8 +61,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final ApiClient _api;
   final SecureStorageService _storage;
 
-  AuthNotifier(this._api, this._storage) : super(const AuthState()) {
-    _checkAuthStatus();
+  AuthNotifier(this._api, this._storage, {bool checkOnInit = true})
+      : super(const AuthState()) {
+    if (checkOnInit) {
+      _checkAuthStatus();
+    }
   }
 
   Future<void> _checkAuthStatus() async {
@@ -288,23 +293,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> verifyOtp(String identifier, String code) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      await _api.post('/v1/auth/verify-otp', data: {
+      final response = await _api.post('/v1/auth/verify-otp', data: {
         'identifier': identifier,
         'code': code,
       });
-      state = state.copyWith(isLoading: false);
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'رمز التحقق غير صحيح: ${_extractError(e)}',
-      );
-    }
-  }
-
-  Future<void> loginWithGoogle() async {
-    state = state.copyWith(isLoading: true, error: null);
-    try {
-      final response = await _api.post('/v1/auth/google');
       final data = response.data;
       await _storage.saveToken(data['access_token']);
       if (data['refresh_token'] != null) {
@@ -319,6 +311,48 @@ class AuthNotifier extends StateNotifier<AuthState> {
         user: user,
         isLoading: false,
       );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'رمز التحقق غير صحيح: ${_extractError(e)}',
+      );
+    }
+  }
+
+  Future<void> loginWithGoogle() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        state = state.copyWith(isLoading: false);
+        return;
+      }
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+        accessToken: googleAuth.accessToken,
+      );
+      final userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+      final idToken = await userCredential.user!.getIdToken();
+      final response = await _api.post('/v1/auth/google', data: {
+        'id_token': idToken,
+      });
+      final data = response.data;
+      await _storage.saveToken(data['access_token']);
+      if (data['refresh_token'] != null) {
+        await _storage.saveRefreshToken(data['refresh_token']);
+      }
+      await _storage.saveUserId(data['user_id']);
+      await _storage.saveUserRole(data['role']);
+
+      final user = _userFromResponse(data);
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        user: user,
+        isLoading: false,
+      );
+      unawaited(_registerPush());
     } catch (e) {
       state = state.copyWith(
         isLoading: false,

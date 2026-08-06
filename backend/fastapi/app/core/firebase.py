@@ -56,6 +56,32 @@ async def verify_firebase_token(id_token: str) -> dict | None:
         return None
 
 
+async def verify_google_id_token(id_token: str) -> dict | None:
+    """Keyless Google ID token verification via Google's public tokeninfo endpoint."""
+    import httpx
+
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.get(
+                "https://oauth2.googleapis.com/tokeninfo",
+                params={"id_token": id_token},
+            )
+        if response.status_code != 200:
+            return None
+        data = response.json()
+        if data.get("email_verified") not in (True, "true") or not data.get("email"):
+            return None
+        if settings.GOOGLE_CLIENT_ID and data.get("aud") != settings.GOOGLE_CLIENT_ID:
+            return None
+        return {
+            "uid": data.get("sub"),
+            "email": data.get("email"),
+            "name": data.get("name"),
+        }
+    except Exception:
+        return None
+
+
 async def get_firebase_user(uid: str) -> dict | None:
     try:
         user = firebase_auth.get_user(uid)

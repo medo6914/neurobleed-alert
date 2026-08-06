@@ -135,7 +135,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: NeuroSpacing.xs),
         Text(
           'نظام تقييم خطر النزيف الدماغي',
-          style: NeuroTypography.body?.copyWith(
+          style: NeuroTypography.body.copyWith(
             color: NeuroColors.textSecondary,
           ),
         ),
@@ -234,37 +234,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ],
             ),
             const SizedBox(height: NeuroSpacing.lg),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildBiometricButton(Icons.fingerprint, 'بصمة'),
-                const SizedBox(width: NeuroSpacing.lg),
-                _buildBiometricButton(Icons.face, 'وجه'),
-              ],
+            AppButton(
+              label: 'تسجيل الدخول بـ Google',
+              onPressed: authState.isLoading
+                  ? null
+                  : () => ref
+                      .read(authStateProvider.notifier)
+                      .loginWithGoogle(),
+              isLoading: authState.isLoading,
+              icon: Icons.g_mobiledata,
             ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildBiometricButton(IconData icon, String label) {
-    return Column(
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: NeuroColors.bgInput,
-            borderRadius: BorderRadius.circular(NeuroRadius.md),
-            border: Border.all(
-                color: NeuroColors.textPrimary.withValues(alpha: 0.1)),
-          ),
-          child: Icon(icon, color: NeuroColors.textSecondary, size: 30),
-        ),
-        const SizedBox(height: NeuroSpacing.xs),
-        Text(label, style: NeuroTypography.caption),
-      ],
     );
   }
 

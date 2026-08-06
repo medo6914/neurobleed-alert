@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:core/core.dart';
 import 'package:design_system/design_system.dart';
 import '../../core/auth/auth_provider.dart';
 
@@ -14,7 +15,7 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _logoController;
   late AnimationController _glowController;
   late AnimationController _textController;
@@ -113,19 +114,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<AuthState>(authStateProvider, (_, state) {
+    void maybeNavigate(AuthStatus status) {
       final guard = ref.read(authGuardProvider);
-      if (guard.isInitialized && state.status != AuthStatus.unknown) {
-        _navigate(state.status);
+      if (guard.isInitialized && status != AuthStatus.unknown) {
+        _navigate(status);
       }
-    });
-    final state = ref.read(authStateProvider);
-    if (ref.read(authGuardProvider).isInitialized &&
-        state.status != AuthStatus.unknown) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _navigate(state.status);
-      });
     }
+
+    ref.listen<AuthState>(authStateProvider, (_, state) {
+      maybeNavigate(state.status);
+    });
+    ref.listen<AuthGuard>(authGuardProvider, (_, __) {
+      maybeNavigate(ref.read(authStateProvider).status);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      maybeNavigate(ref.read(authStateProvider).status);
+    });
     return Scaffold(
       backgroundColor: NeuroColors.bgPrimary,
       body: Container(

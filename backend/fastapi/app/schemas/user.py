@@ -23,12 +23,24 @@ class GoogleLoginRequest(BaseModel):
 
 
 class OtpRequest(BaseModel):
-    phone: str
+    phone: str | None = None
+    identifier: str | None = None
+
+    def resolved_phone(self) -> str | None:
+        return self.phone or self.identifier
 
 
 class OtpVerifyRequest(BaseModel):
-    phone: str
-    otp: str
+    phone: str | None = None
+    identifier: str | None = None
+    otp: str | None = None
+    code: str | None = None
+
+    def resolved_phone(self) -> str | None:
+        return self.phone or self.identifier
+
+    def resolved_code(self) -> str | None:
+        return self.otp or self.code
 
 
 class EmergencySmsRequest(BaseModel):
