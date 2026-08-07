@@ -5,7 +5,7 @@
     "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "python -c \"import asyncio,os;from sqlalchemy.ext.asyncio import create_async_engine;from sqlalchemy import text;async def r():e=create_async_engine(os.environ['DATABASE_URL'].replace('postgresql://','postgresql+async://'));async with e.connect() as c:await c.execute(text('DROP SCHEMA public CASCADE; CREATE SCHEMA public;'));await c.commit();await e.dispose();print('DB reset');asyncio.run(r())\" && alembic upgrade head && python -m app.seed_data && python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT",
+    "startCommand": "python start_prod.py",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 300,
     "healthcheckInterval": 15,
