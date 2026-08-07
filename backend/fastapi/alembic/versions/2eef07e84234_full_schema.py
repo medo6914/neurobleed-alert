@@ -28,15 +28,15 @@ def _create_enums():
         "patient",
         "emergency",
         name="userrole",
-    ).create(op.get_bind())
-    sa.Enum("male", "female", "other", name="gender").create(op.get_bind())
+    ).create(op.get_bind(), checkfirst=True)
+    sa.Enum("male", "female", "other", name="gender").create(op.get_bind(), checkfirst=True)
     sa.Enum("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", name="bloodtype").create(
-        op.get_bind()
+        op.get_bind(), checkfirst=True
     )
     sa.Enum("low", "medium", "high", "critical", "unknown", name="risklevel").create(
-        op.get_bind()
+        op.get_bind(), checkfirst=True
     )
-    sa.Enum("low", "medium", "high", "critical", name="severity").create(op.get_bind())
+    sa.Enum("low", "medium", "high", "critical", name="severity").create(op.get_bind(), checkfirst=True)
     sa.Enum(
         "icp_elevated",
         "desaturation",
@@ -48,10 +48,10 @@ def _create_enums():
         "system",
         "general",
         name="alerttype",
-    ).create(op.get_bind())
-    sa.Enum("NB-01", "NB-02", name="devicetype").create(op.get_bind())
+    ).create(op.get_bind(), checkfirst=True)
+    sa.Enum("NB-01", "NB-02", name="devicetype").create(op.get_bind(), checkfirst=True)
     sa.Enum("online", "offline", "error", "maintenance", name="devicestatus").create(
-        op.get_bind()
+        op.get_bind(), checkfirst=True
     )
     sa.Enum(
         "risk_assessment",
@@ -59,12 +59,12 @@ def _create_enums():
         "icp_prediction",
         "herniation_prediction",
         name="reporttype",
-    ).create(op.get_bind())
-    sa.Enum("low", "medium", "high", name="icprisk").create(op.get_bind())
-    sa.Enum("low", "medium", "high", name="herniationrisk").create(op.get_bind())
+    ).create(op.get_bind(), checkfirst=True)
+    sa.Enum("low", "medium", "high", name="icprisk").create(op.get_bind(), checkfirst=True)
+    sa.Enum("low", "medium", "high", name="herniationrisk").create(op.get_bind(), checkfirst=True)
     sa.Enum(
         "general", "specialized", "teaching", "clinic", "research", name="hospitaltype"
-    ).create(op.get_bind())
+    ).create(op.get_bind(), checkfirst=True)
     sa.Enum(
         "hospital",
         "clinic",
@@ -73,7 +73,7 @@ def _create_enums():
         "insurance",
         "pharma",
         name="organizationtype",
-    ).create(op.get_bind())
+    ).create(op.get_bind(), checkfirst=True)
     sa.Enum(
         "create",
         "update",
@@ -81,7 +81,7 @@ def _create_enums():
         "publish",
         "unpublish",
         name="knowledgeupdateaction",
-    ).create(op.get_bind())
+    ).create(op.get_bind(), checkfirst=True)
 
 
 def _drop_enums():
@@ -264,7 +264,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(length=255), nullable=False),
         sa.Column(
             "org_type",
-            sa.Enum(
+            postgresql.ENUM(
                 "hospital",
                 "clinic",
                 "research_center",
@@ -272,6 +272,7 @@ def upgrade() -> None:
                 "insurance",
                 "pharma",
                 name="organizationtype",
+                create_type=False,
             ),
             nullable=False,
         ),
@@ -302,13 +303,14 @@ def upgrade() -> None:
         "hospitals",
         sa.Column(
             "hospital_type",
-            sa.Enum(
+            postgresql.ENUM(
                 "general",
                 "specialized",
                 "teaching",
                 "clinic",
                 "research",
                 name="hospitaltype",
+                create_type=False,
             ),
             nullable=True,
         ),
@@ -620,14 +622,14 @@ def upgrade() -> None:
     op.add_column(
         "ai_reports",
         sa.Column(
-            "icp_risk", sa.Enum("low", "medium", "high", name="icprisk"), nullable=True
+            "icp_risk", postgresql.ENUM("low", "medium", "high", name="icprisk", create_type=False), nullable=True
         ),
     )
     op.add_column(
         "ai_reports",
         sa.Column(
             "herniation_risk",
-            sa.Enum("low", "medium", "high", name="herniationrisk"),
+            postgresql.ENUM("low", "medium", "high", name="herniationrisk", create_type=False),
             nullable=True,
         ),
     )
