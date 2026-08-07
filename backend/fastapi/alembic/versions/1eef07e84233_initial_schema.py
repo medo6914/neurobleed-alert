@@ -63,8 +63,8 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("email"),
-        sa.UniqueConstraint("license_number"),
+        sa.UniqueConstraint("email", name="uq_hospitals_email"),
+        sa.UniqueConstraint("license_number", name="uq_hospitals_license_number"),
     )
     op.create_table(
         "knowledge_base",
