@@ -9,6 +9,7 @@ def run_cmd(cmd):
 
 async def setup_db():
     from sqlalchemy.ext.asyncio import create_async_engine
+    from sqlalchemy import text
     from app.database import Base
     import app.models
     from app.config import settings
@@ -20,8 +21,8 @@ async def setup_db():
     print("Resetting DB schema...")
     engine = create_async_engine(url)
     async with engine.connect() as conn:
-        await conn.execute(__import__('sqlalchemy').text("DROP SCHEMA public CASCADE"))
-        await conn.execute(__import__('sqlalchemy').text("CREATE SCHEMA public"))
+        await conn.execute(text("DROP SCHEMA public CASCADE"))
+        await conn.execute(text("CREATE SCHEMA public"))
         await conn.commit()
     await engine.dispose()
     print("DB reset complete")
