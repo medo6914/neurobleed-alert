@@ -7,27 +7,32 @@ def run_cmd(cmd):
     result = subprocess.run(cmd)
     return result.returncode == 0
 
+async def reset_db(url):
+    from sqlalchemy.ext.asyncio import create_async_engine
+    from sqlalchemy import text
+    engine = create_async_engine(url)
+    async with engine.connect() as conn:
+        await conn.execute(text("DROP SCHEMA public CASCADE"))
+        await conn.execute(text("CREATE SCHEMA public"))
+        await conn.commit()
+    await engine.dispose()
+    print("DB reset complete")
+
 async def reset_and_start():
     port = os.environ.get("PORT", "8000")
 
     url = os.environ.get("DATABASE_URL", "")
+    if url and url.startswith("postgresql://"):
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
     if url:
-        if url.startswith("postgresql://"):
-            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
-        print("Trying alembic migration...")
+        print("Resetting DB schema...")
+        await reset_db(url)
+
+        print("Running alembic migration...")
         if not run_cmd(["alembic", "upgrade", "head"]):
-            print("Migration failed, resetting DB schema...")
-            from sqlalchemy.ext.asyncio import create_async_engine
-            from sqlalchemy import text
-            engine = create_async_engine(url)
-            async with engine.connect() as conn:
-                await conn.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public;"))
-                await conn.commit()
-            await engine.dispose()
-            print("DB reset complete, re-running migration...")
-            if not run_cmd(["alembic", "upgrade", "head"]):
-                print("ERROR: Migration still failed after reset")
-                sys.exit(1)
+            print("ERROR: Migration failed")
+            sys.exit(1)
 
     run_cmd([sys.executable, "-m", "app.seed_data"])
     os.execvp(sys.executable, [
