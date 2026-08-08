@@ -16,10 +16,13 @@ class ShellScreen extends ConsumerStatefulWidget {
 
 class _ShellScreenState extends ConsumerState<ShellScreen> {
   int _currentIndex(String location) {
-    if (location.startsWith('/patients')) return 1;
-    if (location.startsWith('/monitoring')) return 2;
-    if (location.startsWith('/alerts')) return 3;
-    if (location.startsWith('/settings')) return 4;
+    if (location.startsWith('/devices')) return 1;
+    if (location.startsWith('/reports') || location.startsWith('/monitoring')) {
+      return 2;
+    }
+    if (location.startsWith('/settings') || location.startsWith('/admin')) {
+      return 3;
+    }
     return 0;
   }
 
@@ -29,15 +32,12 @@ class _ShellScreenState extends ConsumerState<ShellScreen> {
         if (location != '/dashboard') context.go('/dashboard');
         break;
       case 1:
-        context.go('/patients');
+        context.go('/devices');
         break;
       case 2:
-        context.go('/monitoring');
+        context.go('/reports');
         break;
       case 3:
-        context.go('/alerts');
-        break;
-      case 4:
         context.go('/settings');
         break;
     }
@@ -64,7 +64,7 @@ class _ShellScreenState extends ConsumerState<ShellScreen> {
           child: SafeArea(
             top: false,
             child: SizedBox(
-              height: 58,
+              height: 62,
               child: BottomNavigationBar(
                 currentIndex: currentIndex,
                 onTap: (index) => _onTap(index, location),
@@ -73,41 +73,28 @@ class _ShellScreenState extends ConsumerState<ShellScreen> {
                 elevation: 0,
                 selectedItemColor: NeuroColors.navActive,
                 unselectedItemColor: NeuroColors.navInactive,
+                selectedFontSize: 11,
+                unselectedFontSize: 11,
                 items: [
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.home_outlined),
                     activeIcon: const Icon(Icons.home),
-                    label: AppLocalizations.of(context)
-                            .translate(L10n.dashboard) ??
-                        'Home',
+                    label: 'الرئيسية',
                   ),
                   BottomNavigationBarItem(
-                    icon: const Icon(Icons.people_outlined),
-                    activeIcon: const Icon(Icons.people),
-                    label:
-                        AppLocalizations.of(context).translate(L10n.patients) ??
-                            'Patients',
+                    icon: const Icon(Icons.devices_outlined),
+                    activeIcon: const Icon(Icons.devices),
+                    label: 'الأجهزة',
                   ),
                   BottomNavigationBarItem(
-                    icon: const Icon(Icons.monitor_heart_outlined),
-                    activeIcon: const Icon(Icons.monitor_heart),
-                    label: AppLocalizations.of(context)
-                            .translate(L10n.monitoring) ??
-                        'Monitoring',
+                    icon: const Icon(Icons.insert_chart_outlined),
+                    activeIcon: const Icon(Icons.insert_chart),
+                    label: 'السجل',
                   ),
                   BottomNavigationBarItem(
-                    icon: const Icon(Icons.notifications_outlined),
-                    activeIcon: const Icon(Icons.notifications),
-                    label:
-                        AppLocalizations.of(context).translate(L10n.alerts) ??
-                            'Alerts',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.settings_outlined),
-                    activeIcon: const Icon(Icons.settings),
-                    label:
-                        AppLocalizations.of(context).translate(L10n.settings) ??
-                            'Settings',
+                    icon: const Icon(Icons.person_outline),
+                    activeIcon: const Icon(Icons.person),
+                    label: 'الملف الشخصي',
                   ),
                 ],
               ),

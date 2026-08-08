@@ -2,27 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
-
 import 'package:core/core.dart';
 import '../../core/auth/auth_provider.dart';
-
-final patientsProvider = FutureProvider<List<dynamic>>((ref) async {
-  final api = ref.read(apiClientProvider);
-  final response = await api.get('/v1/patients/');
-  final data = response.data;
-  if (data is Map && data['items'] is List) return data['items'] as List;
-  if (data is List) return data;
-  return [];
-});
-
-final recentAlertsProvider = FutureProvider<List<dynamic>>((ref) async {
-  final api = ref.read(apiClientProvider);
-  final response = await api.get('/v1/alerts/', queryParameters: {'acknowledged': false, 'per_page': 5});
-  final data = response.data;
-  if (data is Map && data['items'] is List) return data['items'] as List;
-  if (data is List) return data;
-  return [];
-});
 
 final dashboardDevicesProvider = FutureProvider<List<dynamic>>((ref) async {
   final api = ref.read(apiClientProvider);
@@ -34,60 +15,56 @@ final dashboardDevicesProvider = FutureProvider<List<dynamic>>((ref) async {
   return [];
 });
 
-class DashboardScreen extends ConsumerWidget {
+final recentAlertsProvider = FutureProvider<List<dynamic>>((ref) async {
+  final api = ref.read(apiClientProvider);
+  final response = await api
+      .get('/v1/alerts/', queryParameters: {'acknowledged': false, 'per_page': 5});
+  final data = response.data;
+  if (data is Map && data['items'] is List) return data['items'] as List;
+  if (data is List) return data;
+  return [];
+});
+
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final patientsAsync = ref.watch(patientsProvider);
-    final alertsAsync = ref.watch(recentAlertsProvider);
-    final devicesAsync = ref.watch(dashboardDevicesProvider);
-    ref.watch(authStateProvider);
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
 
-    final patientCount = patientsAsync.value?.length ?? 0;
-    final alertCount = alertsAsync.value?.length ?? 0;
-    final stableCount = patientsAsync.value?.where((p) {
-          final level = (p['risk_level'] as String?)?.toLowerCase();
-          return level == null || level == 'low' || level == 'stable';
-        }).length ??
-        0;
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final devicesAsync = ref.watch(dashboardDevicesProvider);
+    final alertsAsync = ref.watch(recentAlertsProvider);
 
     return Scaffold(
+      backgroundColor: NeuroColors.bgPrimary,
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.invalidate(patientsProvider);
+          ref.invalidate(dashboardDevicesProvider);
           ref.invalidate(recentAlertsProvider);
         },
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
-              child: _buildGlassHeader(
-                context,
-                patientCount: patientCount,
-                alertCount: alertCount,
-                stableCount: stableCount,
-              ),
+              child: _buildHeader(context),
             ),
             SliverPadding(
-              padding: const EdgeInsets.all(NeuroSpacing.lg),
+              padding: const EdgeInsets.symmetric(horizontal: NeuroSpacing.lg),
               sliver: SliverList.list(
                 children: [
-                  _buildQuickActions(context, patientsAsync),
-                  const SizedBox(height: NeuroSpacing.xl),
-                  _buildDeviceStatusCard(context, ref, devicesAsync),
-                  const SizedBox(height: NeuroSpacing.xl),
-                  _buildSectionHeader(context, 'المرضى النشطون', () {
-                    context.go('/patients');
-                  }),
-                  const SizedBox(height: NeuroSpacing.md),
-                  ..._buildPatientCards(context, ref, patientsAsync),
-                  const SizedBox(height: NeuroSpacing.xl),
-                  _buildSectionHeader(context, 'آخر الإنذارات', () {
-                    context.go('/alerts');
-                  }),
-                  const SizedBox(height: NeuroSpacing.md),
-                  ..._buildAlertTiles(context, ref, alertsAsync),
+                  const SizedBox(height: NeuroSpacing.lg),
+                  _buildDeviceCard(context, devicesAsync),
+                  const SizedBox(height: NeuroSpacing.lg),
+                  _buildBrainStateCard(context, alertsAsync),
+                  const SizedBox(height: NeuroSpacing.lg),
+                  _buildVitalSignsCard(context),
+                  const SizedBox(height: NeuroSpacing.lg),
+                  _buildEmergencyCard(context),
+                  const SizedBox(height: NeuroSpacing.lg),
+                  _buildQuickActions(context),
                   const SizedBox(height: NeuroSpacing.xl),
                 ],
               ),
@@ -98,17 +75,11 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // ─── Glassmorphism Header ─────────────────────────────────────────
-  Widget _buildGlassHeader(
-    BuildContext context, {
-    required int patientCount,
-    required int alertCount,
-    required int stableCount,
-  }) {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
         NeuroSpacing.lg,
-        MediaQuery.of(context).padding.top + NeuroSpacing.lg,
+        MediaQuery.of(context).padding.top + NeuroSpacing.sm,
         NeuroSpacing.lg,
         NeuroSpacing.lg,
       ),
@@ -119,172 +90,160 @@ class DashboardScreen extends ConsumerWidget {
           colors: [NeuroColors.headerGradTop, NeuroColors.headerGradBottom],
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'NeuroBleed Alert',
-                    style: NeuroTypography.h3?.copyWith(
-                      color: NeuroColors.textSecondary,
-                    ),
-                  ),
-                  Text(
-                    'مرحباً بك 👋',
-                    style: NeuroTypography.h1,
-                  ),
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  NeuroColors.primary.withValues(alpha: 0.4),
+                  NeuroColors.bgPrimary,
                 ],
               ),
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const RadialGradient(
-                    colors: [
-                      Color(0xFFAEE4FF),
-                      Color(0xFF10265A),
-                      Colors.transparent,
+            ),
+            child: const Icon(
+              Icons.psychology,
+              color: NeuroColors.primaryLight,
+              size: 28,
+            ),
+          ),
+          const SizedBox(width: NeuroSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Neuro',
+                        style: NeuroTypography.h2?.copyWith(
+                          color: NeuroColors.textPrimary,
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'Bleed',
+                        style: NeuroTypography.h2?.copyWith(
+                          color: NeuroColors.critical,
+                        ),
+                      ),
                     ],
-                    stops: [0.0, 0.7, 1.0],
-                  ),
-                  border: Border.all(
-                    color: NeuroColors.primaryLight.withValues(alpha: 0.4),
                   ),
                 ),
-                child: const Icon(
-                  Icons.psychology_outlined,
-                  size: 26,
-                  color: Color(0xFFAEE4FF),
+                Text(
+                  'دكاء اصطناعي لحماية دماغك',
+                  style: NeuroTypography.caption,
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined,
+                color: NeuroColors.textPrimary),
+            onPressed: () => context.go('/alerts'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeviceCard(
+      BuildContext context, AsyncValue<List<dynamic>> devicesAsync) {
+    return Container(
+      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [NeuroColors.cardGradTop, NeuroColors.cardGradBottom],
+        ),
+        borderRadius: BorderRadius.circular(NeuroRadius.card),
+        border: Border.all(
+            color: NeuroColors.primary.withValues(alpha: 0.3)),
+      ),
+      child: devicesAsync.when(
+        loading: () => const Center(child: AppLoading()),
+        error: (err, _) => Row(
+          children: [
+            Icon(Icons.bluetooth_disabled,
+                color: NeuroColors.navInactive, size: 20),
+            const SizedBox(width: NeuroSpacing.sm),
+            Text('تعذر الاتصال بالجهاز', style: NeuroTypography.bodyMedium),
+          ],
+        ),
+        data: (devices) {
+          final connected = devices.firstWhere(
+            (d) {
+              final s = (d['status'] as String?)?.toLowerCase();
+              return s == 'online' || s == 'active' || s == 'connected';
+            },
+            orElse: () => null,
+          );
+          final deviceName = connected?['device_name'] ??
+              connected?['serial_number'] ??
+              'NBA-HEADBAND-01';
+          final isConnected = connected != null;
+
+          return Row(
+            children: [
+              Icon(
+                Icons.bluetooth,
+                color: isConnected ? NeuroColors.primary : NeuroColors.navInactive,
+                size: 28,
+              ),
+              const SizedBox(width: NeuroSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isConnected ? 'متصل بالجهاز' : 'غير متصل',
+                      style: NeuroTypography.bodyMedium?.copyWith(
+                        color: NeuroColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '$deviceName',
+                      style: NeuroTypography.caption?.copyWith(
+                        color: NeuroColors.primaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: NeuroColors.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(NeuroRadius.md),
+                ),
+                child: Icon(
+                  Icons.headset_mic,
+                  color: NeuroColors.primaryLight,
+                  size: 32,
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: NeuroSpacing.xl),
-          _buildStatsRow(
-            context,
-            patientCount: patientCount,
-            alertCount: alertCount,
-            stableCount: stableCount,
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildStatsRow(
-    BuildContext context, {
-    required int patientCount,
-    required int alertCount,
-    required int stableCount,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(NeuroSpacing.md),
-      decoration: BoxDecoration(
-        color: NeuroColors.bgCard.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(NeuroRadius.lg),
-        border: Border.all(
-          color: NeuroColors.textPrimary.withValues(alpha: 0.06),
-        ),
-      ),
-      child: Row(
-        children: [
-          _buildStatItem(
-              context, 'مرضى', '$patientCount', NeuroColors.textPrimary),
-          _buildStatDivider(context),
-          _buildStatItem(
-              context, 'إنذارات', '$alertCount', NeuroColors.critical),
-          _buildStatDivider(context),
-          _buildStatItem(context, 'مستقر', '$stableCount', NeuroColors.low),
-        ],
-      ),
-    );
-  }
+  Widget _buildBrainStateCard(
+      BuildContext context, AsyncValue<List<dynamic>> alertsAsync) {
+    final hasCriticalAlert = alertsAsync.valueOrNull?.any((a) =>
+            (a['severity'] as String?)?.toLowerCase() == 'critical') ??
+        false;
+    final riskPercent = hasCriticalAlert ? 78 : 18;
+    final riskColor = hasCriticalAlert ? NeuroColors.critical : NeuroColors.low;
+    final statusText = hasCriticalAlert ? 'حالة طارئة' : 'الحالة مستقرة';
 
-  Widget _buildStatItem(
-      BuildContext context, String label, String value, Color color) {
-    return Expanded(
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: NeuroTypography.displayLarge?.copyWith(
-              fontSize: 26,
-              color: color,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: NeuroTypography.caption,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatDivider(BuildContext context) {
-    return Container(
-      width: 1,
-      height: 36,
-      color: NeuroColors.textPrimary.withValues(alpha: 0.08),
-    );
-  }
-
-  // ─── Quick Actions ───────────────────────────────────────────────
-  Widget _buildQuickActions(
-    BuildContext context,
-    AsyncValue<List<dynamic>> patientsAsync,
-  ) {
-    return Row(
-      children: [
-        _QuickAction(
-          icon: Icons.sos,
-          label: 'SOS',
-          color: NeuroColors.critical,
-          onTap: () {
-            final patients = patientsAsync.valueOrNull ?? [];
-            if (patients.isNotEmpty) {
-              final id = patients.first['id'] ?? patients.first['patient_id'];
-              context.push('/patients/$id/sos');
-            } else {
-              context.push('/alerts');
-            }
-          },
-        ),
-        _QuickAction(
-          icon: Icons.map_outlined,
-          label: 'الخريطة',
-          color: NeuroColors.info,
-          onTap: () => context.push('/map'),
-        ),
-        _QuickAction(
-          icon: Icons.description_outlined,
-          label: 'التقارير',
-          color: NeuroColors.primary,
-          onTap: () => context.push('/reports'),
-        ),
-        _QuickAction(
-          icon: Icons.devices_other,
-          label: 'الأجهزة',
-          color: NeuroColors.info,
-          onTap: () => context.push('/devices'),
-        ),
-      ],
-    );
-  }
-
-  // ─── Device Status Card ──────────────────────────────────────────
-  Widget _buildDeviceStatusCard(
-    BuildContext context,
-    WidgetRef ref,
-    AsyncValue<List<dynamic>> devicesAsync,
-  ) {
     return Container(
       padding: const EdgeInsets.all(NeuroSpacing.lg),
       decoration: BoxDecoration(
@@ -296,238 +255,340 @@ class DashboardScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(NeuroRadius.card),
         border:
             Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
-        boxShadow: const [NeuroShadows.card],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('حالة الأجهزة', style: NeuroTypography.h3),
-              TextButton(
-                onPressed: () => context.push('/devices'),
-                child: const Text('عرض الكل'),
-              ),
-            ],
-          ),
-          const SizedBox(height: NeuroSpacing.sm),
-          devicesAsync.when(
-            loading: () => const AppLoading(),
-            error: (err, _) => Row(
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.cloud_off, color: NeuroColors.error),
-                const SizedBox(width: NeuroSpacing.sm),
-                Expanded(
-                  child: Text(
-                    'تعذر الاتصال بالخادم لعرض حالة الأجهزة',
-                    style: NeuroTypography.caption,
+                Row(
+                  children: [
+                    Text(
+                      'حالة الدماغ الآن',
+                      style: NeuroTypography.h3?.copyWith(
+                        color: NeuroColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: NeuroSpacing.sm),
+                    Icon(Icons.show_chart,
+                        color: NeuroColors.primaryLight, size: 18),
+                  ],
+                ),
+                const SizedBox(height: NeuroSpacing.xl),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: 120,
+                      height: 120,
+                      child: CircularProgressIndicator(
+                        value: riskPercent / 100,
+                        strokeWidth: 10,
+                        backgroundColor:
+                            NeuroColors.textPrimary.withValues(alpha: 0.08),
+                        valueColor:
+                            AlwaysStoppedAnimation(riskColor),
+                        strokeCap: StrokeCap.round,
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          '$riskPercent%',
+                          style: NeuroTypography.displayLarge?.copyWith(
+                            fontSize: 32,
+                            color: NeuroColors.textPrimary,
+                          ),
+                        ),
+                        Text(
+                          'احتمال النزيف',
+                          style: NeuroTypography.caption?.copyWith(
+                            color: riskColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: NeuroSpacing.lg),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: NeuroSpacing.md,
+                    vertical: NeuroSpacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: riskColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(NeuroRadius.badge),
+                    border: Border.all(color: riskColor),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        hasCriticalAlert
+                            ? Icons.warning_amber_rounded
+                            : Icons.check_circle,
+                        color: riskColor,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        statusText,
+                        style: NeuroTypography.badge?.copyWith(color: riskColor),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-            data: (devices) {
-              final online = devices.where((d) {
-                final s = (d['status'] as String?)?.toLowerCase();
-                return s == 'online' || s == 'active' || s == 'connected';
-              }).toList();
-              final connected = online.isNotEmpty ? online.first : null;
-              final total = devices.length;
-
-              if (total == 0) {
-                return Column(
-                  children: [
-                    const AppEmptyState(
-                      icon: Icons.sensors_off,
-                      title: 'لا توجد أجهزة متصلة',
-                      message: 'قم بتوصيل جهاز مراقبة لبدء متابعة القياسات',
-                    ),
-                    const SizedBox(height: NeuroSpacing.sm),
-                    AppButton(
-                      label: 'توصيل جهاز',
-                      icon: Icons.link,
-                      onPressed: () => context.push('/devices/pair'),
-                    ),
+          ),
+          const SizedBox(width: NeuroSpacing.lg),
+          Expanded(
+            flex: 1,
+            child: Container(
+              height: 180,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(NeuroRadius.md),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    NeuroColors.primary.withValues(alpha: 0.2),
+                    NeuroColors.bgPrimary,
                   ],
-                );
-              }
-
-              final battery = (connected?['battery_level'] as num?)?.toDouble();
-              final signal =
-                  (connected?['signal_strength'] as num?)?.toDouble();
-              final deviceName = connected?['device_name'] ??
-                  connected?['serial_number'] ??
-                  'جهاز';
-              final lastSeen = connected?['last_seen'] as String?;
-
-              return Column(
-                children: [
-                  Row(
-                    children: [
-                      _DeviceStatusPill(
-                        icon: Icons.circle,
-                        color: connected != null
-                            ? NeuroColors.success
-                            : NeuroColors.critical,
-                        label: connected != null ? 'متصلة' : 'غير متصلة',
-                      ),
-                      const SizedBox(width: NeuroSpacing.md),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              connected != null ? '$deviceName' : '—',
-                              style: NeuroTypography.bodyMedium?.copyWith(
-                                color: NeuroColors.textPrimary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              lastSeen != null
-                                  ? 'آخر تحديث: $lastSeen'
-                                  : 'آخر تحديث: —',
-                              style: NeuroTypography.caption,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: NeuroSpacing.md),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _DeviceMiniMetric(
-                          icon: Icons.battery_full,
-                          value: battery != null
-                              ? '${battery.toStringAsFixed(0)}%'
-                              : '—',
-                          label: 'البطارية',
-                        ),
-                      ),
-                      Expanded(
-                        child: _DeviceMiniMetric(
-                          icon: Icons.network_cell,
-                          value: signal != null
-                              ? '${signal.toStringAsFixed(0)}%'
-                              : '—',
-                          label: 'قوة الاتصال',
-                        ),
-                      ),
-                      Expanded(
-                        child: _DeviceMiniMetric(
-                          icon: Icons.sensors,
-                          value: '$total',
-                          label: 'إجمالي الأجهزة',
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            },
+                ),
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.psychology,
+                  size: 80,
+                  color: NeuroColors.primaryLight,
+                ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  // ─── Section Header ───────────────────────────────────────────────
-  Widget _buildSectionHeader(
-      BuildContext context, String title, VoidCallback onSeeAll) {
+  Widget _buildVitalSignsCard(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [NeuroColors.cardGradTop, NeuroColors.cardGradBottom],
+        ),
+        borderRadius: BorderRadius.circular(NeuroRadius.card),
+        border:
+            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('المؤشرات الحيوية', style: NeuroTypography.h3),
+          const SizedBox(height: NeuroSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: _VitalSignTile(
+                  icon: Icons.water_drop_outlined,
+                  label: 'تنشيع الأكسجين',
+                  value: '96%',
+                  color: NeuroColors.info,
+                ),
+              ),
+              const SizedBox(width: NeuroSpacing.sm),
+              Expanded(
+                child: _VitalSignTile(
+                  icon: Icons.psychology_outlined,
+                  label: 'تددفق الدم للدماغ',
+                  value: '75%',
+                  color: NeuroColors.primaryLight,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: NeuroSpacing.sm),
+          Row(
+            children: [
+              Expanded(
+                child: _VitalSignTile(
+                  icon: Icons.favorite_outline,
+                  label: 'معدل النبض',
+                  value: '78 BPM',
+                  color: NeuroColors.critical,
+                ),
+              ),
+              const SizedBox(width: NeuroSpacing.sm),
+              Expanded(
+                child: _VitalSignTile(
+                  icon: Icons.thermostat,
+                  label: 'درجة الحرارة',
+                  value: '36.6°C',
+                  color: NeuroColors.info,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmergencyCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.go('/alerts'),
+      child: Container(
+        padding: const EdgeInsets.all(NeuroSpacing.lg),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              NeuroColors.critical.withValues(alpha: 0.2),
+              NeuroColors.critical.withValues(alpha: 0.08),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(NeuroRadius.card),
+          border: Border.all(
+              color: NeuroColors.critical.withValues(alpha: 0.4)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: NeuroColors.critical.withValues(alpha: 0.2),
+              ),
+              child: const Icon(
+                Icons.warning_amber_rounded,
+                color: NeuroColors.critical,
+                size: 28,
+              ),
+            ),
+            const SizedBox(width: NeuroSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'حالة طارئة',
+                    style: NeuroTypography.h3?.copyWith(
+                      color: NeuroColors.criticalBright,
+                    ),
+                  ),
+                  Text(
+                    'اضغط إذا شعرت بأي أعراض خطرة',
+                    style: NeuroTypography.caption,
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right,
+              color: NeuroColors.critical,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: NeuroTypography.h2),
-        TextButton(
-          onPressed: onSeeAll,
-          child: const Text('عرض الكل'),
+        Expanded(
+          child: _QuickAction(
+            icon: Icons.phone,
+            label: 'اتصال طوارئ',
+            color: NeuroColors.critical,
+            onTap: () {},
+          ),
+        ),
+        const SizedBox(width: NeuroSpacing.sm),
+        Expanded(
+          child: _QuickAction(
+            icon: Icons.local_hospital_outlined,
+            label: 'أقرب مستشفى',
+            color: NeuroColors.primary,
+            onTap: () => context.go('/map'),
+          ),
+        ),
+        const SizedBox(width: NeuroSpacing.sm),
+        Expanded(
+          child: _QuickAction(
+            icon: Icons.share_location_outlined,
+            label: 'مشاركة الموقع',
+            color: NeuroColors.info,
+            onTap: () {},
+          ),
+        ),
+        const SizedBox(width: NeuroSpacing.sm),
+        Expanded(
+          child: _QuickAction(
+            icon: Icons.description_outlined,
+            label: 'سجل التقارير',
+            color: NeuroColors.primaryLight,
+            onTap: () => context.go('/reports'),
+          ),
         ),
       ],
-    );
-  }
-
-  // ─── Patient Cards ────────────────────────────────────────────────
-  List<Widget> _buildPatientCards(
-    BuildContext context,
-    WidgetRef ref,
-    AsyncValue<List<dynamic>> patientsAsync,
-  ) {
-    return patientsAsync.when(
-      loading: () => [
-        const AppLoading(),
-      ],
-      error: (err, _) => [
-        AppErrorState(
-          title: 'تعذر تحميل المرضى',
-          message: '$err',
-          onRetry: () => ref.invalidate(patientsProvider),
-        ),
-      ],
-      data: (patients) {
-        if (patients.isEmpty) {
-          return [
-            AppEmptyState(
-              icon: Icons.person_add_alt_1,
-              title: 'لا يوجد مرضى مسجلين',
-              message: 'ابدأ بإضافة أول مريض',
-              actionLabel: 'إضافة مريض',
-              onAction: () => context.push('/patients/create'),
-            ),
-          ];
-        }
-        return patients.take(4).map((patient) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: NeuroSpacing.md),
-            child: _PatientCard(patient: patient),
-          );
-        }).toList();
-      },
-    );
-  }
-
-  // ─── Alert Tiles ──────────────────────────────────────────────────
-  List<Widget> _buildAlertTiles(
-    BuildContext context,
-    WidgetRef ref,
-    AsyncValue<List<dynamic>> alertsAsync,
-  ) {
-    return alertsAsync.when(
-      loading: () => [
-        const AppLoading(),
-      ],
-      error: (err, _) => [
-        AppErrorState(
-          title: 'تعذر تحميل الإنذارات',
-          message: '$err',
-          onRetry: () => ref.invalidate(recentAlertsProvider),
-        ),
-      ],
-      data: (alerts) {
-        if (alerts.isEmpty) {
-          return [
-            const AppEmptyState(
-              icon: Icons.notifications_none,
-              title: 'لا توجد إنذارات حالية',
-              message: 'سيتم إشعارك عند وجود إنذارات جديدة',
-            ),
-          ];
-        }
-        return alerts.take(3).map((alert) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: NeuroSpacing.md),
-            child: _AlertTile(alert: alert),
-          );
-        }).toList();
-      },
     );
   }
 }
 
-// ─── Quick Action Button ───────────────────────────────────────────
+class _VitalSignTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _VitalSignTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(NeuroSpacing.md),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(NeuroRadius.md),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(height: NeuroSpacing.sm),
+          Text(
+            label,
+            style: NeuroTypography.caption?.copyWith(
+              color: NeuroColors.textPrimary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: NeuroTypography.h2?.copyWith(
+              color: color,
+              fontSize: 18,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _QuickAction extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -543,379 +604,30 @@ class _QuickAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          padding: const EdgeInsets.symmetric(vertical: NeuroSpacing.md),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(NeuroRadius.md),
-            border: Border.all(color: color.withValues(alpha: 0.3)),
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: color, size: 26),
-              const SizedBox(height: 6),
-              Text(
-                label,
-                style: NeuroTypography.caption?.copyWith(
-                  color: NeuroColors.textPrimary,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: NeuroSpacing.md),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(NeuroRadius.md),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
-      ),
-    );
-  }
-}
-
-// ─── Device Status Pill ────────────────────────────────────────────
-class _DeviceStatusPill extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final String label;
-
-  const _DeviceStatusPill({
-    required this.icon,
-    required this.color,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: NeuroSpacing.sm,
-        vertical: NeuroSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(NeuroRadius.badge),
-        border: Border.all(color: color),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 12),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: NeuroTypography.badge.copyWith(color: color),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Device Mini Metric ────────────────────────────────────────────
-class _DeviceMiniMetric extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-
-  const _DeviceMiniMetric({
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.all(NeuroSpacing.sm),
-      decoration: BoxDecoration(
-        color: NeuroColors.textPrimary.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(NeuroRadius.md),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: NeuroColors.primaryLight, size: 20),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: NeuroTypography.h3?.copyWith(
-              color: NeuroColors.textPrimary,
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 26),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: NeuroTypography.caption?.copyWith(
+                color: NeuroColors.textPrimary,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          Text(label, style: NeuroTypography.caption),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Patient Card (Home) ─────────────────────────────────────────────
-class _PatientCard extends StatelessWidget {
-  final dynamic patient;
-
-  const _PatientCard({required this.patient});
-
-  Color get _riskColor {
-    final level = (patient['risk_level'] as String?)?.toLowerCase();
-    final score = (patient['risk_score'] as num?)?.toDouble() ?? 0;
-    switch (level) {
-      case 'critical':
-        return NeuroColors.critical;
-      case 'high':
-        return NeuroColors.high;
-      case 'medium':
-        return NeuroColors.medium;
-      case 'low':
-        return NeuroColors.low;
-      default:
-        return score >= 0.7
-            ? NeuroColors.critical
-            : score >= 0.4
-                ? NeuroColors.high
-                : NeuroColors.low;
-    }
-  }
-
-  String get _riskLabel {
-    final level = (patient['risk_level'] as String?)?.toLowerCase();
-    switch (level) {
-      case 'critical':
-        return 'حرج';
-      case 'high':
-        return 'مرتفع';
-      case 'medium':
-        return 'متوسط';
-      case 'low':
-        return 'منخفض';
-      default:
-        return 'منخفض';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final name = patient['full_name'] ?? 'مريض';
-    final mrn = patient['mrn'] ?? '—';
-    final isActive = patient['is_active'] != false;
-    final riskScore =
-        ((patient['risk_score'] as num?)?.toDouble() ?? 0).clamp(0.0, 1.0);
-
-    return Container(
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [NeuroColors.cardGradTop, NeuroColors.cardGradBottom],
+          ],
         ),
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        boxShadow: const [NeuroShadows.card],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              // Avatar
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: NeuroColors.primary.withValues(alpha: 0.3),
-                    child: Text(
-                      name.toString().isNotEmpty ? name[0].toUpperCase() : '?',
-                      style: TextStyle(
-                        color: NeuroColors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isActive
-                            ? NeuroColors.success
-                            : NeuroColors.critical,
-                        border: Border.all(
-                          color: NeuroColors.bgCard,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: NeuroSpacing.md),
-              // Name + MRN
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: NeuroTypography.h3?.copyWith(
-                        color: NeuroColors.textPrimary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'MRN: $mrn',
-                      style: NeuroTypography.caption,
-                    ),
-                  ],
-                ),
-              ),
-              // Risk badge
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: NeuroSpacing.sm,
-                  vertical: NeuroSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: _riskColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(NeuroRadius.badge),
-                  border: Border.all(color: _riskColor),
-                ),
-                child: Text(
-                  _riskLabel,
-                  style: NeuroTypography.badge.copyWith(color: _riskColor),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: NeuroSpacing.md),
-          // Risk score bar
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: riskScore,
-              minHeight: 4,
-              backgroundColor: NeuroColors.textPrimary.withValues(alpha: 0.06),
-              valueColor: AlwaysStoppedAnimation(_riskColor),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Alert Tile (Home) ───────────────────────────────────────────────
-class _AlertTile extends StatelessWidget {
-  final dynamic alert;
-
-  const _AlertTile({required this.alert});
-
-  Color get _severityColor {
-    final severity = (alert['severity'] as String?)?.toLowerCase();
-    switch (severity) {
-      case 'critical':
-        return NeuroColors.criticalBright;
-      case 'high':
-        return NeuroColors.high;
-      case 'medium':
-        return NeuroColors.medium;
-      default:
-        return NeuroColors.low;
-    }
-  }
-
-  IconData get _severityIcon {
-    final severity = (alert['severity'] as String?)?.toLowerCase();
-    switch (severity) {
-      case 'critical':
-        return Icons.warning_amber_rounded;
-      case 'high':
-      case 'medium':
-        return Icons.warning_rounded;
-      default:
-        return Icons.check_circle_outline;
-    }
-  }
-
-  String _formatTime(String? iso) {
-    if (iso == null || iso.isEmpty) return '';
-    try {
-      final dt = DateTime.parse(iso).toLocal();
-      return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-    } catch (_) {
-      return '';
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final severity = (alert['severity'] as String?)?.toLowerCase() ?? 'low';
-    final isCritical = severity == 'critical';
-
-    return Container(
-      padding: const EdgeInsets.all(NeuroSpacing.md),
-      decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.md),
-        border: Border(
-          left: BorderSide(
-            color: _severityColor,
-            width: 4,
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: _severityColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(NeuroRadius.sm),
-            ),
-            child: Icon(
-              _severityIcon,
-              color: _severityColor,
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: NeuroSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  alert['alert_type'] ?? 'إنذار',
-                  style: NeuroTypography.h3?.copyWith(
-                    color: isCritical
-                        ? NeuroColors.criticalBright
-                        : NeuroColors.textPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  alert['message'] ?? '',
-                  style: NeuroTypography.caption,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: NeuroSpacing.sm),
-          Text(
-            _formatTime(alert['created_at']),
-            style: NeuroTypography.caption,
-          ),
-        ],
       ),
     );
   }

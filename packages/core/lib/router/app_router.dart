@@ -53,6 +53,25 @@ class AppRouter {
             ),
           ),
           GoRoute(
+            path: '/devices',
+            name: 'devices',
+            builder: (context, state) => const Scaffold(
+              body: Center(child: Text('Device List')),
+            ),
+            routes: [
+              GoRoute(
+                path: ':id',
+                name: 'device-detail',
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return Scaffold(
+                    body: Center(child: Text('Device Detail: $id')),
+                  );
+                },
+              ),
+            ],
+          ),
+          GoRoute(
             path: '/patients',
             name: 'patients',
             builder: (context, state) => const Scaffold(
@@ -75,25 +94,6 @@ class AppRouter {
                 builder: (context, state) => const Scaffold(
                   body: Center(child: Text('Create Patient')),
                 ),
-              ),
-            ],
-          ),
-          GoRoute(
-            path: '/devices',
-            name: 'devices',
-            builder: (context, state) => const Scaffold(
-              body: Center(child: Text('Device List')),
-            ),
-            routes: [
-              GoRoute(
-                path: ':id',
-                name: 'device-detail',
-                builder: (context, state) {
-                  final id = state.pathParameters['id']!;
-                  return Scaffold(
-                    body: Center(child: Text('Device Detail: $id')),
-                  );
-                },
               ),
             ],
           ),
