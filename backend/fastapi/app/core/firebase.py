@@ -1,5 +1,9 @@
 import logging
 
+import json
+import tempfile
+import os
+
 import firebase_admin
 from firebase_admin import credentials, auth as firebase_auth, messaging
 
@@ -12,9 +16,40 @@ _firebase_app = None
 
 def init_firebase():
     global _firebase_app
-    if _firebase_app is None and settings.FIREBASE_CREDENTIALS_PATH:
-        cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS_PATH)
-        _firebase_app = firebase_admin.initialize_app(cred)
+    if _firebase_app is not None:
+        return
+
+    cred_obj = None
+
+    if settings.FIREBASE_CREDENTIALS_JSON:
+        try:
+            info = json.loads(settings.FIREBASE_CREDENTIALS_JSON)
+            cred_obj = credentials.Certificate(info)
+            logger.info("Firebase credentials loaded from env var")
+        except Exception as e:
+            logger.warning("Failed to parse FIREBASE_CREDENTIALS_JSON: %s", e)
+
+    if cred_obj is None and settings.FIREBASE_CREDENTIALS_PATH:
+        try:
+            cred_obj = credentials.Certificate(settings.FIREBASE_CREDENTIALS_PATH)
+            logger.info("Firebase credentials loaded from file: %s", settings.FIREBASE_CREDENTIALS_PATH)
+        except FileNotFoundError:
+            logger.warning(
+                "Firebase credentials file not found at %s",
+                settings.FIREBASE_CREDENTIALS_PATH,
+            )
+        except Exception as e:
+            logger.warning("Failed to load Firebase credentials from file: %s", e)
+
+    if cred_obj is None:
+        logger.info("No Firebase credentials configured, Firebase disabled")
+        return
+
+    try:
+        _firebase_app = firebase_admin.initialize_app(cred_obj)
+        logger.info("Firebase initialized successfully")
+    except Exception as e:
+        logger.warning("Firebase init failed: %s", e)
 
 
 def firebase_available() -> bool:

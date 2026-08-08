@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     SEED_USER_PASSWORD: str = "ziad1111"
 
     FIREBASE_CREDENTIALS_PATH: str | None = None
+    FIREBASE_CREDENTIALS_JSON: str | None = None
     FIREBASE_API_KEY: str | None = None
     FIREBASE_PROJECT_ID: str | None = None
 

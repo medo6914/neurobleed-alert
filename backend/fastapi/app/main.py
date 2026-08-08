@@ -9,11 +9,10 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from app.config import settings
 from app.database import init_db, check_database
 from app.core.security import validate_production_config
-from app.core.firebase import init_firebase
+from app.core.firebase import init_firebase, firebase_available
 from app.core.rate_limiter import add_rate_limiting
 from app.core.audit import log_action, generate_correlation_id
 from app.core.redis import init_redis, close_redis
-from app.core.migrations import run_migrations
 from app.services.monitoring_service import register_handlers
 from app.services.maps_service import maps_service
 from app.services.weather_service import weather_service
@@ -53,7 +52,6 @@ def init_sentry():
 async def lifespan(app: FastAPI):
     validate_production_config()
     init_sentry()
-    run_migrations()
     await init_db()
     await seed_demo_data()
     init_firebase()
@@ -134,7 +132,7 @@ async def health_check():
         else "sqlite",
         "maps": "nominatim/osrm/overpass",
         "llm_providers": llm_gateway.providers_available(),
-        "firebase": bool(settings.FIREBASE_CREDENTIALS_PATH),
+        "firebase": firebase_available(),
         "sentry": bool(settings.SENTRY_DSN),
         "weather": weather_service.configured(),
         "payments": payment_service.providers(),
