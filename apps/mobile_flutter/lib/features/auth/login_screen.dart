@@ -246,19 +246,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               icon: Icons.g_mobiledata,
             ),
             const SizedBox(height: NeuroSpacing.sm),
-            if (defaultTargetPlatform == TargetPlatform.iOS ||
-                defaultTargetPlatform == TargetPlatform.macOS)
-              AppButton(
-                label: 'تسجيل الدخول بـ Apple',
-                onPressed: authState.isLoading
-                    ? null
-                    : () => ref
-                        .read(authStateProvider.notifier)
-                        .loginWithApple(),
-                isLoading: authState.isLoading,
-                icon: Icons.apple,
-                variant: ButtonVariant.secondary,
-              ),
+            AppButton(
+              label: 'تسجيل الدخول بـ Apple',
+              onPressed: authState.isLoading
+                  ? null
+                  : () => ref
+                      .read(authStateProvider.notifier)
+                      .loginWithApple(),
+              isLoading: authState.isLoading,
+              icon: Icons.apple,
+              variant: ButtonVariant.secondary,
+            ),
           ],
         ),
       ),
