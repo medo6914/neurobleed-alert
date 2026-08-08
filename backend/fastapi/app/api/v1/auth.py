@@ -248,53 +248,32 @@ async def google_login(data: GoogleLoginRequest, db: AsyncSession = Depends(get_
 
 @router.post("/apple", response_model=TokenResponse)
 async def apple_login(data: AppleLoginRequest, db: AsyncSession = Depends(get_db)):
-    try:
-        import httpx
-        async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.get(
-                "https://appleid.apple.com/auth/token",
-                params={"id_token": data.identity_token},
-            )
-        if resp.status_code == 200:
-            decoded = resp.json()
-            email = decoded.get("email")
-            name = decoded.get("name", "")
-        else:
-            parts = data.identity_token.split(".")
-            if len(parts) >= 2:
-                import base64
-                payload_str = parts[1] + "=" * (4 - len(parts[1]) % 4)
-                decoded = json.loads(base64.urlsafe_b64decode(payload_str))
-                email = decoded.get("email")
-                name = decoded.get("name", "")
-            else:
-                email = None
-                name = ""
-    except Exception:
+    decoded = await verify_firebase_token(data.identity_token)
+    if not decoded:
+        import base64 as b64
         parts = data.identity_token.split(".")
         if len(parts) >= 2:
-            import base64
-            payload_str = parts[1] + "=" * (4 - len(parts[1]) % 4)
             try:
-                decoded = json.loads(base64.urlsafe_b64decode(payload_str))
-                email = decoded.get("email")
-                name = decoded.get("name", "")
+                payload_str = parts[1] + "=" * (4 - len(parts[1]) % 4)
+                decoded = json.loads(b64.urlsafe_b64decode(payload_str))
             except Exception:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid Apple token",
-                )
-        else:
+                decoded = None
+        if not decoded:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid Apple token",
             )
+
+    email = decoded.get("email")
+    name = decoded.get("name", "")
 
     if not email:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Apple token does not contain email",
         )
+
+    firebase_uid = decoded.get("uid")
 
     result = await db.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
@@ -305,6 +284,7 @@ async def apple_login(data: AppleLoginRequest, db: AsyncSession = Depends(get_db
             hashed_password=hash_password(secrets.token_urlsafe(16)),
             full_name=name or email.split("@")[0],
             role=_resolve_role(email, None),
+            firebase_uid=firebase_uid,
         )
         db.add(user)
         await db.commit()
@@ -313,11 +293,17 @@ async def apple_login(data: AppleLoginRequest, db: AsyncSession = Depends(get_db
         user.role = UserRole.SUPER_ADMIN
         await db.commit()
 
+    user.firebase_uid = firebase_uid
+    await db.commit()
+
     resp = _issue_tokens(user)
     token_id = decode_access_token(resp.access_token).get("jti")
     if token_id:
         await store_session(user.id, token_id)
     return resp
+
+
+@router.post("/refresh", response_model=TokenResponse)
 async def refresh_token(data: RefreshRequest, db: AsyncSession = Depends(get_db)):
     payload = decode_refresh_token(data.refresh_token)
     if payload is None:
