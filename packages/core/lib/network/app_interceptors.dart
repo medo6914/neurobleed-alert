@@ -14,7 +14,22 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    if (!options.path.contains('/auth/')) {
+    final path = options.path;
+    final isPublicAuth = path.contains('/auth/login') ||
+        path.contains('/auth/register') ||
+        path.contains('/auth/refresh') ||
+        path.contains('/auth/forgot-password') ||
+        path.contains('/auth/reset-password') ||
+        path.contains('/auth/verify-email') ||
+        path.contains('/auth/verify-phone') ||
+        path.contains('/auth/send-otp') ||
+        path.contains('/auth/verify-otp') ||
+        path.contains('/auth/google') ||
+        path.contains('/auth/apple') ||
+        path.contains('/auth/send-phone-verification') ||
+        path.contains('/auth/send-verification-email') ||
+        path.contains('/auth/send-reset-password');
+    if (!isPublicAuth) {
       final token = await _storage.getToken();
       if (token != null && token.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $token';

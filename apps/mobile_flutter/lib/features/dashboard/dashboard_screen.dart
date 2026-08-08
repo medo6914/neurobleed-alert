@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:design_system/design_system.dart';
 import 'package:core/core.dart';
 import '../../core/auth/auth_provider.dart';
@@ -442,7 +443,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   Widget _buildEmergencyCard(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.go('/alerts'),
+      onTap: () => _showEmergencyDialog(context),
       child: Container(
         padding: const EdgeInsets.all(NeuroSpacing.lg),
         decoration: BoxDecoration(
@@ -507,7 +508,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             icon: Icons.phone,
             label: 'اتصال طوارئ',
             color: NeuroColors.critical,
-            onTap: () {},
+            onTap: () => _showEmergencyDialog(context),
           ),
         ),
         const SizedBox(width: NeuroSpacing.sm),
@@ -525,7 +526,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             icon: Icons.share_location_outlined,
             label: 'مشاركة الموقع',
             color: NeuroColors.info,
-            onTap: () {},
+            onTap: () => _shareLocation(context),
           ),
         ),
         const SizedBox(width: NeuroSpacing.sm),
@@ -538,6 +539,56 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showEmergencyDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: NeuroColors.bgCard,
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: NeuroColors.critical),
+            const SizedBox(width: 8),
+            Text('اتصال طوارئ', style: NeuroTypography.h3),
+          ],
+        ),
+        content: Text(
+          'هل تريد الاتصال برقم الطوارئ (123)؟',
+          style: NeuroTypography.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child:
+                Text('إلغاء', style: TextStyle(color: NeuroColors.navInactive)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              final uri = Uri.parse('tel:123');
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: NeuroColors.critical,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('اتصال'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _shareLocation(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('جاري مشاركة الموقع...'),
+        backgroundColor: NeuroColors.info,
+      ),
     );
   }
 }
