@@ -7,7 +7,10 @@ import 'package:core/core.dart';
 final patientListProvider = FutureProvider<List<dynamic>>((ref) async {
   final api = ref.read(apiClientProvider);
   final response = await api.get('/v1/patients/');
-  return response.data as List;
+  final data = response.data;
+  if (data is Map && data['items'] is List) return data['items'] as List;
+  if (data is List) return data;
+  return [];
 });
 
 class PatientSearchScreen extends ConsumerStatefulWidget {

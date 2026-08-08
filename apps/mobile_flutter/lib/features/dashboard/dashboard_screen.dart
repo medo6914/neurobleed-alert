@@ -9,13 +9,19 @@ import '../../core/auth/auth_provider.dart';
 final patientsProvider = FutureProvider<List<dynamic>>((ref) async {
   final api = ref.read(apiClientProvider);
   final response = await api.get('/v1/patients/');
-  return response.data as List;
+  final data = response.data;
+  if (data is Map && data['items'] is List) return data['items'] as List;
+  if (data is List) return data;
+  return [];
 });
 
 final recentAlertsProvider = FutureProvider<List<dynamic>>((ref) async {
   final api = ref.read(apiClientProvider);
-  final response = await api.get('/v1/alerts/?acknowledged=false&per_page=5');
-  return response.data as List;
+  final response = await api.get('/v1/alerts/', queryParameters: {'acknowledged': false, 'per_page': 5});
+  final data = response.data;
+  if (data is Map && data['items'] is List) return data['items'] as List;
+  if (data is List) return data;
+  return [];
 });
 
 final dashboardDevicesProvider = FutureProvider<List<dynamic>>((ref) async {

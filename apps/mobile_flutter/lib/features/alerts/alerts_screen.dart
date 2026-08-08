@@ -6,8 +6,11 @@ import 'package:core/core.dart';
 
 final alertsProvider = FutureProvider<List>((ref) async {
   final api = ref.read(apiClientProvider);
-  final response = await api.get('/v1/alerts/?acknowledged=false');
-  return response.data as List;
+  final response = await api.get('/v1/alerts/', queryParameters: {'acknowledged': false});
+  final data = response.data;
+  if (data is Map && data['items'] is List) return data['items'] as List;
+  if (data is List) return data;
+  return [];
 });
 
 class AlertsScreen extends ConsumerStatefulWidget {

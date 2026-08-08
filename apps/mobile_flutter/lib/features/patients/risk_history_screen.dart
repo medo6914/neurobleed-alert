@@ -8,7 +8,15 @@ final _patientRisksProvider =
     FutureProvider.family<List<RiskRecord>, String>((ref, patientId) async {
   final apiClient = ref.watch(apiClientProvider);
   final response = await apiClient.get('/v1/patients/$patientId/risks');
-  return (response.data['data'] as List)
+  final data = response.data;
+  final list = data is Map && data['items'] is List
+      ? data['items'] as List
+      : data is Map && data['data'] is List
+          ? data['data'] as List
+          : data is List
+              ? data
+              : <dynamic>[];
+  return list
       .map((e) => RiskRecord.fromJson(e as Map<String, dynamic>))
       .toList();
 });

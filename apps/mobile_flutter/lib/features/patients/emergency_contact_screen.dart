@@ -10,7 +10,13 @@ final _emergencyContactsProvider =
   final apiClient = ref.watch(apiClientProvider);
   final response =
       await apiClient.get('/v1/patients/$patientId/emergency-contacts');
-  return (response.data as List)
+  final data = response.data;
+  final list = data is Map && data['items'] is List
+      ? data['items'] as List
+      : data is List
+          ? data
+          : <dynamic>[];
+  return list
       .map((e) => EmergencyContact.fromJson(e as Map<String, dynamic>))
       .toList();
 });
