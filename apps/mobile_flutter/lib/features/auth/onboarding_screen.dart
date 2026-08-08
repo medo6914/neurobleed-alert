@@ -109,7 +109,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         decoration: BoxDecoration(
                           color: _currentPage == index
                               ? NeuroColors.primary
-                              : NeuroColors.primaryLight.withAlpha(100),
+                              : NeuroColors.primaryLight.withValues(alpha: 0.39),
                           borderRadius: BorderRadius.circular(NeuroRadius.full),
                         ),
                       ),
@@ -158,7 +158,7 @@ class _OnboardingPage extends StatelessWidget {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: NeuroColors.primary.withAlpha(20),
+              color: NeuroColors.primary.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(NeuroRadius.xxl),
             ),
             child: Icon(icon, size: 60, color: NeuroColors.primary),

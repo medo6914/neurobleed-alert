@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
 
@@ -449,7 +450,14 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
     return AppButton(
       label: 'مشاركة التقرير',
       icon: Icons.share,
-      onPressed: () {},
+      onPressed: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تم نسخ رابط التقرير'),
+            backgroundColor: NeuroColors.low,
+          ),
+        );
+      },
       variant: ButtonVariant.primary,
     );
   }

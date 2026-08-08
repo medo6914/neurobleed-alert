@@ -674,7 +674,14 @@ class _DocumentsTab extends ConsumerWidget {
             return Padding(
               padding: EdgeInsets.only(bottom: NeuroSpacing.sm),
               child: AppCard(
-                onTap: () {},
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('فتح المستند: ${doc.title}'),
+                      backgroundColor: NeuroColors.info,
+                    ),
+                  );
+                },
                 child: ListTile(
                   leading:
                       Icon(_documentIcon(doc.type), color: NeuroColors.primary),

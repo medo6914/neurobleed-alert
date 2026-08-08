@@ -90,7 +90,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: NeuroColors.primary.withAlpha(20),
+                    color: NeuroColors.primary.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(NeuroRadius.xxl),
                   ),
                   child: const Icon(

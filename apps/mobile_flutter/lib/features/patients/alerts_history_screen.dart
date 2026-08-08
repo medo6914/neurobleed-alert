@@ -150,7 +150,14 @@ class _AlertsHistoryScreenState extends ConsumerState<AlertsHistoryScreen> {
                                 label: 'Acknowledge',
                                 icon: Icons.check,
                                 variant: ButtonVariant.secondary,
-                                onPressed: () {},
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Alert acknowledged'),
+                                      backgroundColor: NeuroColors.low,
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),

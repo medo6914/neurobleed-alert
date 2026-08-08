@@ -419,7 +419,7 @@ class _PatientMonitorScreenState extends ConsumerState<PatientMonitorScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: NeuroColors.primary.withAlpha(12),
+        color: NeuroColors.primary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(

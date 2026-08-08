@@ -46,8 +46,8 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                   height: 100,
                   decoration: BoxDecoration(
                     color: _isVerified
-                        ? NeuroColors.success.withAlpha(20)
-                        : NeuroColors.warning.withAlpha(20),
+                        ? NeuroColors.success.withValues(alpha: 0.08)
+                        : NeuroColors.warning.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(NeuroRadius.xxl),
                   ),
                   child: Icon(

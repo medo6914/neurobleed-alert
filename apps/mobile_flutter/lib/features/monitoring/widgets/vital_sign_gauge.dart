@@ -45,8 +45,8 @@ class VitalSignGauge extends StatelessWidget {
           height: 56,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: statusColor.withAlpha(18),
-            border: Border.all(color: statusColor.withAlpha(80), width: 2),
+            color: statusColor.withValues(alpha: 0.07),
+            border: Border.all(color: statusColor.withValues(alpha: 0.31), width: 2),
           ),
           child: Center(
             child: Column(
@@ -63,7 +63,7 @@ class VitalSignGauge extends StatelessWidget {
                 Text(
                   unit,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: statusColor.withAlpha(180),
+                    color: statusColor.withValues(alpha: 0.71),
                     fontSize: 8,
                   ),
                 ),
