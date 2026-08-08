@@ -24,6 +24,7 @@ from app.core.firebase import (
     create_firebase_user,
 )
 from app.core.twilio import send_otp_sms, send_emergency_alert
+from app.services.email_service import email_service
 from app.core.dependencies import get_current_user, require_permission
 from app.core.rbac import Permission
 from app.core.session_store import (
@@ -339,6 +340,23 @@ async def forgot_password(data: ForgotPasswordRequest):
         "created_at": datetime.now(timezone.utc),
         "attempts": 0,
     }
+    await email_service.send(
+        to=data.email,
+        subject="NeuroBleed Alert - Reset Password",
+        html_body=f"""
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2>NeuroBleed Alert</h2>
+            <p>كود إعادة تعيين كلمة المرور الخاص بك هو:</p>
+            <div style="font-size: 32px; font-weight: bold; color: #0A0E1A;
+                        background: #f0f0f0; padding: 15px; text-align: center;
+                        border-radius: 8px; letter-spacing: 8px; margin: 20px 0;">
+                {code}
+            </div>
+            <p>صالح لمدة 5 دقائق فقط.</p>
+            <p style="color: #666;">إذا لم تطلب إعادة تعيين كلمة المرور، تجاهل هذا البريد الإلكتروني.</p>
+        </div>
+        """,
+    )
     return {
         "message": "If the email exists, a reset code has been sent.",
         "code_length": 6,
@@ -420,6 +438,38 @@ async def verify_email(data: VerifyEmailRequest, db: AsyncSession = Depends(get_
     return {"message": "Email verified successfully"}
 
 
+@router.post("/send-verification-email")
+async def send_verification_email(
+    current_user: User = Depends(get_current_user),
+):
+    _clean_expired_stores()
+    code = _generate_code()
+    _verify_email_store[code] = {
+        "user_id": str(current_user.id),
+        "email": current_user.email,
+        "created_at": datetime.now(timezone.utc),
+        "attempts": 0,
+    }
+    await email_service.send(
+        to=current_user.email,
+        subject="NeuroBleed Alert - Verify Your Email",
+        html_body=f"""
+        <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2>NeuroBleed Alert</h2>
+            <p>كود التحقق من بريدك الإلكتروني هو:</p>
+            <div style="font-size: 32px; font-weight: bold; color: #0A0E1A;
+                        background: #f0f0f0; padding: 15px; text-align: center;
+                        border-radius: 8px; letter-spacing: 8px; margin: 20px 0;">
+                {code}
+            </div>
+            <p>صالح لمدة 5 دقائق فقط.</p>
+            <p style="color: #666;">إذا لم تطلب التحقق من البريد الإلكتروني، تجاهل هذا البريد الإلكتروني.</p>
+        </div>
+        """,
+    )
+    return {"message": "Verification email sent", "code_length": 6}
+
+
 @router.post("/send-phone-verification")
 async def send_phone_verification(data: SendPhoneVerificationRequest):
     _clean_expired_stores()
@@ -429,6 +479,12 @@ async def send_phone_verification(data: SendPhoneVerificationRequest):
         "created_at": datetime.now(timezone.utc),
         "attempts": 0,
     }
+    sent = await send_otp_sms(data.phone, code)
+    if not sent:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send verification SMS",
+        )
     return {
         "message": "Verification code sent",
         "code_length": 6,

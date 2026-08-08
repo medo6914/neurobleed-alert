@@ -82,12 +82,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                   AppButton(
                     label: 'إعادة إرسال رابط التحقق',
                     onPressed: () {
-                      final email = authState.user?.email;
-                      if (email != null) {
-                        ref
-                            .read(authStateProvider.notifier)
-                            .forgotPassword(email);
-                      }
+                      ref
+                          .read(authStateProvider.notifier)
+                          .sendVerificationEmail();
                     },
                     variant: ButtonVariant.secondary,
                     isLoading: authState.isLoading,

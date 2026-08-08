@@ -249,6 +249,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> sendVerificationEmail() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _api.post('/v1/auth/send-verification-email');
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'فشل إرسال بريد التحقق: ${_extractError(e)}',
+      );
+    }
+  }
+
   Future<void> sendPhoneVerification(String phone) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
