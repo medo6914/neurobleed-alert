@@ -105,9 +105,10 @@ app.include_router(v1_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"]
-    if settings.ENVIRONMENT == "development"
-    else [
+    allow_origins=[
+        "http://localhost:8000",
+        "http://localhost:3000",
+        "http://127.0.0.1:8000",
         "https://neurobleed.com",
         "https://*.neurobleed.com",
         "https://app.neurobleed.com",
