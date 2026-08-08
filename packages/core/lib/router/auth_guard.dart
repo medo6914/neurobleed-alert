@@ -39,7 +39,7 @@ class AuthGuard extends ChangeNotifier {
     }
 
     if (_isAuthenticated && isPublicRoute) {
-      return _isSuperAdmin ? '/admin' : '/dashboard';
+      return getHome(role: _role);
     }
 
     if (_isAuthenticated && location == '/admin' && !_isSuperAdmin) {
@@ -57,8 +57,7 @@ class AuthGuard extends ChangeNotifier {
     return location == '/splash' || location == '/' || location.isEmpty;
   }
 
-  String? getHome({String? role}) =>
-      role == 'super_admin' ? '/admin' : '/dashboard';
+  String? getHome({String? role}) => '/dashboard';
 
   bool get _isSuperAdmin => _role == 'super_admin';
 }

@@ -276,6 +276,30 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             ),
           ),
           const SizedBox(height: NeuroSpacing.lg),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'المستخدمون',
+                  style: NeuroTypography.h2,
+                ),
+              ),
+              ElevatedButton.icon(
+                onPressed: () => _showAddAdminDialog(),
+                icon: const Icon(Icons.person_add, size: 18),
+                label: const Text('إضافة مسؤول'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: NeuroColors.primary,
+                  foregroundColor: NeuroColors.textSecondary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: NeuroSpacing.md,
+                    vertical: NeuroSpacing.sm,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: NeuroSpacing.md),
           _buildUserList(),
         ],
       ),
@@ -1252,6 +1276,89 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
           Expanded(child: Text(title, style: NeuroTypography.h3)),
           Text(value,
               style: NeuroTypography.bodyMedium?.copyWith(color: color)),
+        ],
+      ),
+    );
+  }
+
+  void _showAddAdminDialog() {
+    final emailController = TextEditingController();
+    final nameController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: NeuroColors.bgCard,
+        title: Text('إضافة مسؤول جديد', style: NeuroTypography.h3),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(
+                labelText: 'الاسم',
+                labelStyle: NeuroTypography.bodyMedium,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(NeuroRadius.md),
+                ),
+              ),
+            ),
+            const SizedBox(height: NeuroSpacing.md),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                labelText: 'البريد الإلكتروني',
+                labelStyle: NeuroTypography.bodyMedium,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(NeuroRadius.md),
+                ),
+              ),
+              keyboardType: TextInputType.emailAddress,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('إلغاء',
+                style: TextStyle(color: NeuroColors.navInactive)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final email = emailController.text.trim();
+              final name = nameController.text.trim();
+              if (email.isEmpty) return;
+              Navigator.pop(context);
+              try {
+                final api = ref.read(apiClientProvider);
+                await api.post('/v1/auth/promote-to-admin', data: {
+                  'email': email,
+                  if (name.isNotEmpty) 'name': name,
+                });
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('تمت إضافة المسؤول بنجاح'),
+                      backgroundColor: NeuroColors.low,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('فشل: $e'),
+                      backgroundColor: NeuroColors.critical,
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: NeuroColors.primary,
+              foregroundColor: NeuroColors.textSecondary,
+            ),
+            child: const Text('إضافة'),
+          ),
         ],
       ),
     );

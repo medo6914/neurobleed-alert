@@ -852,3 +852,41 @@ async def emergency_sms(data: EmergencySmsRequest):
     if not sent:
         raise HTTPException(status_code=500, detail="Failed to send emergency SMS")
     return {"message": "Emergency SMS sent"}
+
+
+@router.post("/promote-to-admin")
+async def promote_to_admin(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_permission(Permission.MANAGE_USERS)),
+):
+    body = await request.json()
+    email = body.get("email", "").strip().lower()
+    name = body.get("name", "").strip()
+
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user.role == UserRole.SUPER_ADMIN:
+        raise HTTPException(status_code=400, detail="User is already a super admin")
+
+    user.role = UserRole.ADMIN
+    if name:
+        user.full_name = name
+    await db.commit()
+
+    await log_action(
+        db,
+        user_id=current_user.id,
+        action="promote_user",
+        entity_type="user",
+        entity_id=str(user.id),
+        details={"promoted_to": "admin", "email": email},
+    )
+
+    return {"message": f"User {email} promoted to admin successfully"}
