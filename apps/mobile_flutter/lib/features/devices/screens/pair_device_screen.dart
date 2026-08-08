@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
+import 'package:core/core.dart';
 import '../services/ble_service.dart';
 
 final bleServiceProvider = Provider<BleService>((ref) {
@@ -18,6 +19,11 @@ final bleDevicesProvider = StreamProvider<List<BleDevice>>((ref) {
   return service.devicesStream;
 });
 
+final bleConnectionProvider = StreamProvider<bool>((ref) {
+  final service = ref.watch(bleServiceProvider);
+  return service.connectionStream;
+});
+
 class PairDeviceScreen extends ConsumerStatefulWidget {
   final String? deviceId;
 
@@ -31,6 +37,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _scanAnimation;
   String? _pairingDeviceId;
+  bool _isPairing = false;
 
   @override
   void initState() {
@@ -64,44 +71,127 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
   }
 
   Future<void> _pairDevice(BleDevice device) async {
-    setState(() => _pairingDeviceId = device.id);
+    setState(() {
+      _pairingDeviceId = device.id;
+      _isPairing = true;
+    });
+
     final service = ref.read(bleServiceProvider);
-    final success = await service.connectToDevice(device.id);
-    setState(() => _pairingDeviceId = null);
+
+    final success = await service.connectToDevice(
+      device.id,
+      deviceName: device.name,
+    );
+
+    setState(() {
+      _pairingDeviceId = null;
+      _isPairing = false;
+    });
 
     if (!mounted) return;
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Paired with ${device.name} successfully')),
+        SnackBar(
+          content: Text('تم الاتصال بـ ${device.name} بنجاح'),
+          backgroundColor: NeuroColors.low,
+        ),
       );
       context.pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Pairing failed'),
-            backgroundColor: NeuroColors.critical),
+          content: Text('فشل الاتصال بالجهاز'),
+          backgroundColor: NeuroColors.critical,
+        ),
       );
     }
+  }
+
+  void _showDeviceDetails(BleDevice device) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: NeuroColors.bgCard,
+        title: Row(
+          children: [
+            Icon(Icons.bluetooth, color: NeuroColors.primary),
+            SizedBox(width: 8),
+            Text(device.name, style: NeuroTypography.h3),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDetailRow('اسم الجهاز', device.name),
+            _buildDetailRow('الرقم التسلسلي (BLE ID)', device.id),
+            _buildDetailRow('قوة الإشارة', '${device.rssi} dBm'),
+            SizedBox(height: NeuroSpacing.md),
+            Container(
+              padding: EdgeInsets.all(NeuroSpacing.sm),
+              decoration: BoxDecoration(
+                color: NeuroColors.info.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(NeuroRadius.sm),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: NeuroColors.info, size: 16),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'يمكنك استخدام هذا الرقم كرقم تسلسلي للجهاز',
+                      style: NeuroTypography.caption,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('إلغاء', style: TextStyle(color: NeuroColors.navInactive)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _pairDevice(device);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: NeuroColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('إزواج الآن'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('$label: ', style: NeuroTypography.bodyMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Expanded(child: Text(value, style: NeuroTypography.bodyMedium)),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final isScanning = ref.watch(bleScanStateProvider);
     final devicesAsync = ref.watch(bleDevicesProvider);
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pair Device'),
+        title: const Text('إزواج جهاز BLE'),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.vpn_key),
-            tooltip: 'Provision Device',
-            onPressed: () => context.push('/devices/provision'),
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -117,13 +207,13 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                       height: 80 + _scanAnimation.value * 20,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: theme.colorScheme.primary.withValues(
+                        color: NeuroColors.primary.withValues(
                           alpha: isScanning
                               ? 0.3 - (_scanAnimation.value * 0.2)
                               : 0.1,
                         ),
                         border: Border.all(
-                          color: theme.colorScheme.primary.withValues(
+                          color: NeuroColors.primary.withValues(
                             alpha: isScanning
                                 ? 0.6 - (_scanAnimation.value * 0.4)
                                 : 0.3,
@@ -137,7 +227,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                               ? Icons.bluetooth_searching
                               : Icons.bluetooth,
                           size: 36,
-                          color: theme.colorScheme.primary,
+                          color: NeuroColors.primary,
                         ),
                       ),
                     );
@@ -145,18 +235,23 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                 ),
                 SizedBox(height: NeuroSpacing.md),
                 Text(
-                  isScanning ? 'Scanning for devices...' : 'Ready to pair',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+                  isScanning ? 'جاري البحث عن أجهزة...' : 'اضغط للبحث عن أجهزة BLE',
+                  style: NeuroTypography.bodyMedium?.copyWith(
+                    color: NeuroColors.textSecondary,
                   ),
                 ),
                 SizedBox(height: NeuroSpacing.sm),
+                Text(
+                  'تأكد من أن الجهاز مضاء وقريب منك',
+                  style: NeuroTypography.caption,
+                ),
+                SizedBox(height: NeuroSpacing.md),
                 SizedBox(
-                  width: 180,
-                  height: 40,
+                  width: 200,
+                  height: 44,
                   child: AppButton(
-                    label: isScanning ? 'Stop Scan' : 'Scan for Devices',
-                    icon: isScanning ? Icons.stop : Icons.search,
+                    label: isScanning ? 'إيقاف البحث' : 'بحث عن أجهزة',
+                    icon: isScanning ? Icons.stop : Icons.bluetooth_searching,
                     variant: isScanning
                         ? ButtonVariant.secondary
                         : ButtonVariant.primary,
@@ -167,9 +262,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
             ),
           ),
           Divider(height: 1),
-          Expanded(
-            child: _buildDeviceList(context, devicesAsync, isScanning),
-          ),
+          Expanded(child: _buildDeviceList(context, devicesAsync, isScanning)),
         ],
       ),
     );
@@ -180,14 +273,27 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
     AsyncValue<List<BleDevice>> devicesAsync,
     bool isScanning,
   ) {
-    final theme = Theme.of(context);
-
-    if (!isScanning) {
-      return AppEmptyState(
-        icon: Icons.bluetooth_disabled,
-        title: 'Not Scanning',
-        message:
-            'Tap "Scan for Devices" to discover nearby NeuroBleed devices.',
+    if (!isScanning && devicesAsync.valueOrNull == null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.bluetooth_disabled, size: 64, color: NeuroColors.navInactive),
+            SizedBox(height: NeuroSpacing.md),
+            Text(
+              'ابدأ البحث للعثور على أجهزة NeuroBleed',
+              style: NeuroTypography.bodyMedium?.copyWith(
+                color: NeuroColors.textSecondary,
+              ),
+            ),
+            SizedBox(height: NeuroSpacing.sm),
+            Text(
+              '1. شغّل الجهاز\n2. اضغط "بحث عن أجهزة"\n3. اختر الجهاز من القائمة',
+              style: NeuroTypography.caption,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       );
     }
 
@@ -198,23 +304,50 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
           children: [
             CircularProgressIndicator(strokeWidth: 2),
             SizedBox(height: NeuroSpacing.md),
-            Text('Searching for nearby devices...'),
+            Text('جاري البحث...'),
           ],
         ),
       ),
-      error: (e, _) => AppErrorState(
-        title: 'Scan Error',
-        message: e.toString(),
-        onRetry: _startScan,
+      error: (e, _) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline, size: 48, color: NeuroColors.critical),
+            SizedBox(height: NeuroSpacing.md),
+            Text('خطأ في البحث: $e'),
+            SizedBox(height: NeuroSpacing.md),
+            AppButton(
+              label: 'إعادة المحاولة',
+              onPressed: _startScan,
+            ),
+          ],
+        ),
       ),
       data: (devices) {
         if (devices.isEmpty) {
-          return AppEmptyState(
-            icon: Icons.bluetooth_searching,
-            title: 'No Devices Found',
-            message: 'Ensure the device is powered on and nearby.',
-            actionLabel: 'Scan Again',
-            onAction: _startScan,
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.bluetooth_searching, size: 64, color: NeuroColors.navInactive),
+                SizedBox(height: NeuroSpacing.md),
+                Text(
+                  'لم يتم العثور على أجهزة',
+                  style: NeuroTypography.bodyMedium?.copyWith(
+                    color: NeuroColors.textSecondary,
+                  ),
+                ),
+                SizedBox(height: NeuroSpacing.sm),
+                Text(
+                  'تأكد من أن الجهاز مضاء وقريب منك',
+                  style: NeuroTypography.caption,
+                ),
+                if (isScanning) ...[
+                  SizedBox(height: NeuroSpacing.md),
+                  CircularProgressIndicator(strokeWidth: 2),
+                ],
+              ],
+            ),
           );
         }
 
@@ -228,7 +361,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
             return Padding(
               padding: EdgeInsets.only(bottom: NeuroSpacing.sm),
               child: AppCard(
-                onTap: isPairing ? null : () => _pairDevice(device),
+                onTap: isPairing ? null : () => _showDeviceDetails(device),
                 child: Padding(
                   padding: EdgeInsets.all(NeuroSpacing.md),
                   child: Row(
@@ -236,12 +369,10 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                       Container(
                         padding: EdgeInsets.all(NeuroSpacing.sm),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer
-                              .withValues(alpha: 0.3),
+                          color: NeuroColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(NeuroRadius.md),
                         ),
-                        child: Icon(Icons.bluetooth,
-                            size: 24, color: theme.colorScheme.primary),
+                        child: Icon(Icons.bluetooth, size: 24, color: NeuroColors.primary),
                       ),
                       SizedBox(width: NeuroSpacing.md),
                       Expanded(
@@ -250,15 +381,14 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                           children: [
                             Text(
                               device.name,
-                              style: theme.textTheme.titleSmall
-                                  ?.copyWith(fontWeight: FontWeight.w600),
+                              style: NeuroTypography.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             SizedBox(height: 2),
                             Text(
                               'ID: ${device.id}',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
+                              style: NeuroTypography.caption,
                             ),
                           ],
                         ),
@@ -275,8 +405,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           else
-                            Icon(Icons.chevron_right,
-                                color: theme.colorScheme.onSurfaceVariant),
+                            Icon(Icons.chevron_right, color: NeuroColors.navInactive),
                         ],
                       ),
                     ],
@@ -305,7 +434,6 @@ class _SignalStrengthIndicator extends StatelessWidget {
             : strength >= -85
                 ? 2
                 : 1;
-    final theme = Theme.of(context);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -316,8 +444,8 @@ class _SignalStrengthIndicator extends StatelessWidget {
           margin: EdgeInsets.only(right: 1),
           decoration: BoxDecoration(
             color: i < bars
-                ? theme.colorScheme.primary
-                : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
+                ? NeuroColors.primary
+                : NeuroColors.navInactive.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(1),
           ),
         );
