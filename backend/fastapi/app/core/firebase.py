@@ -32,7 +32,10 @@ def init_firebase():
     if cred_obj is None and settings.FIREBASE_CREDENTIALS_PATH:
         try:
             cred_obj = credentials.Certificate(settings.FIREBASE_CREDENTIALS_PATH)
-            logger.info("Firebase credentials loaded from file: %s", settings.FIREBASE_CREDENTIALS_PATH)
+            logger.info(
+                "Firebase credentials loaded from file: %s",
+                settings.FIREBASE_CREDENTIALS_PATH,
+            )
         except FileNotFoundError:
             logger.warning(
                 "Firebase credentials file not found at %s",

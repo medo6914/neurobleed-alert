@@ -29,14 +29,18 @@ def _create_enums():
         "emergency",
         name="userrole",
     ).create(op.get_bind(), checkfirst=True)
-    sa.Enum("male", "female", "other", name="gender").create(op.get_bind(), checkfirst=True)
+    sa.Enum("male", "female", "other", name="gender").create(
+        op.get_bind(), checkfirst=True
+    )
     sa.Enum("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", name="bloodtype").create(
         op.get_bind(), checkfirst=True
     )
     sa.Enum("low", "medium", "high", "critical", "unknown", name="risklevel").create(
         op.get_bind(), checkfirst=True
     )
-    sa.Enum("low", "medium", "high", "critical", name="severity").create(op.get_bind(), checkfirst=True)
+    sa.Enum("low", "medium", "high", "critical", name="severity").create(
+        op.get_bind(), checkfirst=True
+    )
     sa.Enum(
         "icp_elevated",
         "desaturation",
@@ -60,8 +64,12 @@ def _create_enums():
         "herniation_prediction",
         name="reporttype",
     ).create(op.get_bind(), checkfirst=True)
-    sa.Enum("low", "medium", "high", name="icprisk").create(op.get_bind(), checkfirst=True)
-    sa.Enum("low", "medium", "high", name="herniationrisk").create(op.get_bind(), checkfirst=True)
+    sa.Enum("low", "medium", "high", name="icprisk").create(
+        op.get_bind(), checkfirst=True
+    )
+    sa.Enum("low", "medium", "high", name="herniationrisk").create(
+        op.get_bind(), checkfirst=True
+    )
     sa.Enum(
         "general", "specialized", "teaching", "clinic", "research", name="hospitaltype"
     ).create(op.get_bind(), checkfirst=True)
@@ -622,14 +630,18 @@ def upgrade() -> None:
     op.add_column(
         "ai_reports",
         sa.Column(
-            "icp_risk", postgresql.ENUM("low", "medium", "high", name="icprisk", create_type=False), nullable=True
+            "icp_risk",
+            postgresql.ENUM("low", "medium", "high", name="icprisk", create_type=False),
+            nullable=True,
         ),
     )
     op.add_column(
         "ai_reports",
         sa.Column(
             "herniation_risk",
-            postgresql.ENUM("low", "medium", "high", name="herniationrisk", create_type=False),
+            postgresql.ENUM(
+                "low", "medium", "high", name="herniationrisk", create_type=False
+            ),
             nullable=True,
         ),
     )

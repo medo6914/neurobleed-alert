@@ -239,9 +239,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               label: 'تسجيل الدخول بـ Google',
               onPressed: authState.isLoading
                   ? null
-                  : () => ref
-                      .read(authStateProvider.notifier)
-                      .loginWithGoogle(),
+                  : () =>
+                      ref.read(authStateProvider.notifier).loginWithGoogle(),
               isLoading: authState.isLoading,
               icon: Icons.g_mobiledata,
             ),
@@ -250,9 +249,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               label: 'تسجيل الدخول بـ Apple',
               onPressed: authState.isLoading
                   ? null
-                  : () => ref
-                      .read(authStateProvider.notifier)
-                      .loginWithApple(),
+                  : () => ref.read(authStateProvider.notifier).loginWithApple(),
               isLoading: authState.isLoading,
               icon: Icons.apple,
               variant: ButtonVariant.secondary,

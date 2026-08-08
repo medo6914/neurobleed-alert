@@ -57,7 +57,8 @@ class AuthGuard extends ChangeNotifier {
     return location == '/splash' || location == '/' || location.isEmpty;
   }
 
-  String? getHome({String? role}) => role == 'super_admin' ? '/admin' : '/dashboard';
+  String? getHome({String? role}) =>
+      role == 'super_admin' ? '/admin' : '/dashboard';
 
   bool get _isSuperAdmin => _role == 'super_admin';
 }

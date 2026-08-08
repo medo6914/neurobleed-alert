@@ -165,9 +165,7 @@ async def _delete_legacy_demo_users(session) -> int:
         result = await session.execute(select(User.id).where(User.email == email))
         user_ids = [row[0] for row in result.all()]
         for user_id in user_ids:
-            await session.execute(
-                delete(User).where(User.id == user_id)
-            )
+            await session.execute(delete(User).where(User.id == user_id))
             print(f"[seed] demo account removed: {email}")
             deleted += 1
     await session.commit()

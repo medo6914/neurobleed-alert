@@ -396,9 +396,7 @@ class AnalyticsService:
                 await self.db.scalar(
                     select(func.count(Alert.id))
                     .join(Patient, Alert.patient_id == Patient.id)
-                    .where(
-                        Patient.hospital_id == h.id, Alert.is_deleted == False
-                    )
+                    .where(Patient.hospital_id == h.id, Alert.is_deleted == False)
                 )
             ) or 0
 

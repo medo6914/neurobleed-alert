@@ -462,7 +462,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-User _userFromResponse(Map<String, dynamic> data) {
+  User _userFromResponse(Map<String, dynamic> data) {
     final now = DateTime.now();
     return User(
       id: data['user_id'] ?? data['id'] ?? '',

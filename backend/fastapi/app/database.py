@@ -28,9 +28,7 @@ if _url.startswith("postgresql"):
 elif _url.startswith("sqlite"):
     engine = create_async_engine(_url, echo=False)
 else:
-    raise RuntimeError(
-        f"Unsupported DATABASE_URL scheme: {_url.split('://')[0]}"
-    )
+    raise RuntimeError(f"Unsupported DATABASE_URL scheme: {_url.split('://')[0]}")
 
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 

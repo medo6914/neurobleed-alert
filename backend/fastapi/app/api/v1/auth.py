@@ -232,7 +232,10 @@ async def google_login(data: GoogleLoginRequest, db: AsyncSession = Depends(get_
         db.add(user)
         await db.commit()
         await db.refresh(user)
-    elif email.strip().lower() in _super_admin_emails() and user.role != UserRole.SUPER_ADMIN:
+    elif (
+        email.strip().lower() in _super_admin_emails()
+        and user.role != UserRole.SUPER_ADMIN
+    ):
         user.role = UserRole.SUPER_ADMIN
         await db.commit()
 
@@ -251,6 +254,7 @@ async def apple_login(data: AppleLoginRequest, db: AsyncSession = Depends(get_db
     decoded = await verify_firebase_token(data.identity_token)
     if not decoded:
         import base64 as b64
+
         parts = data.identity_token.split(".")
         if len(parts) >= 2:
             try:
@@ -289,7 +293,10 @@ async def apple_login(data: AppleLoginRequest, db: AsyncSession = Depends(get_db
         db.add(user)
         await db.commit()
         await db.refresh(user)
-    elif email.strip().lower() in _super_admin_emails() and user.role != UserRole.SUPER_ADMIN:
+    elif (
+        email.strip().lower() in _super_admin_emails()
+        and user.role != UserRole.SUPER_ADMIN
+    ):
         user.role = UserRole.SUPER_ADMIN
         await db.commit()
 
@@ -590,12 +597,17 @@ async def verify_phone(data: VerifyPhoneRequest, db: AsyncSession = Depends(get_
     return {"message": "Phone verified successfully"}
 
 
-@router.post("/phone-register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-async def phone_register(data: PhoneRegisterRequest, db: AsyncSession = Depends(get_db)):
+@router.post(
+    "/phone-register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED
+)
+async def phone_register(
+    data: PhoneRegisterRequest, db: AsyncSession = Depends(get_db)
+):
     result = await db.execute(select(User).where(User.phone == data.phone))
     if result.scalar_one_or_none():
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Phone number already registered"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Phone number already registered",
         )
 
     _clean_expired_stores()
@@ -628,7 +640,9 @@ async def phone_register(data: PhoneRegisterRequest, db: AsyncSession = Depends(
 
 
 @router.post("/phone-register-verify", response_model=TokenResponse)
-async def phone_register_verify(data: OtpVerifyRequest, db: AsyncSession = Depends(get_db)):
+async def phone_register_verify(
+    data: OtpVerifyRequest, db: AsyncSession = Depends(get_db)
+):
     phone = data.resolved_phone()
     code = data.resolved_code()
     if not phone or not code:

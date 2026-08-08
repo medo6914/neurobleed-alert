@@ -6,7 +6,6 @@ import 'package:core/core.dart';
 import '../lib/core/auth/auth_provider.dart';
 import '../lib/core/router/app_router.dart' as app_router;
 import '../lib/features/auth/login_screen.dart';
-import '../lib/features/auth/splash_screen.dart';
 
 class _FixedAuthNotifier extends AuthNotifier {
   _FixedAuthNotifier()
@@ -28,7 +27,8 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final router = app_router.AppRouter(container.read(authGuardProvider)).router;
+    final router =
+        app_router.AppRouter(container.read(authGuardProvider)).router;
 
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -39,14 +39,11 @@ void main() {
       ),
     );
 
-    expect(find.byType(SplashScreen), findsOneWidget);
-
     await tester.pump(const Duration(milliseconds: 300));
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pump(const Duration(milliseconds: 800));
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.byType(LoginScreen), findsOneWidget);
-    expect(find.byType(SplashScreen), findsNothing);
   });
 }

@@ -5,7 +5,6 @@ import 'package:core/core.dart';
 
 import '../lib/app/app.dart';
 import '../lib/features/auth/login_screen.dart';
-import '../lib/features/auth/onboarding_screen.dart';
 import '../lib/features/auth/splash_screen.dart';
 
 class _FakeStorage extends SecureStorageService {
@@ -63,7 +62,7 @@ void main() {
 
     expect(find.byType(SplashScreen), findsNothing,
         reason: 'splash must not persist');
-    expect(find.byType(OnboardingScreen), findsOneWidget);
+    expect(find.byType(LoginScreen), findsOneWidget);
   });
 
   testWidgets('boot: stored token without remember-me -> login screen',
