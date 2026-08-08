@@ -37,7 +37,7 @@ class DeviceApi {
   }) {
     final params = <String, dynamic>{
       'page': page,
-      'limit': limit,
+      'per_page': limit,
     };
     if (sortBy != null) params['sort_by'] = sortBy;
     if (sortOrder != null) params['sort_order'] = sortOrder;
@@ -45,7 +45,7 @@ class DeviceApi {
     if (deviceType != null) params['device_type'] = deviceType;
     if (hospitalId != null) params['hospital_id'] = hospitalId;
     if (patientId != null) params['patient_id'] = patientId;
-    if (search != null) params['q'] = search;
+    if (search != null) params['search'] = search;
     return _client.get(DeviceEndpoints.base, queryParameters: params);
   }
 

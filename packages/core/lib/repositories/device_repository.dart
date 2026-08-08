@@ -100,7 +100,8 @@ class DeviceRepository {
         search: search,
       );
       final body = response.data as Map<String, dynamic>;
-      final list = (body['data'] as List)
+      final rawList = body['items'] as List? ?? body['data'] as List? ?? [];
+      final list = rawList
           .map((e) => DeviceMapper.toEntity(
               DeviceDto.fromJson(e as Map<String, dynamic>)))
           .toList();
@@ -234,7 +235,8 @@ class DeviceRepository {
         limit: limit,
       );
       final body = response.data as Map<String, dynamic>;
-      final list = (body['data'] as List)
+      final rawList = body['items'] as List? ?? body['data'] as List? ?? [];
+      final list = rawList
           .map((e) => DeviceMapper.toEntity(
               DeviceDto.fromJson(e as Map<String, dynamic>)))
           .toList();

@@ -45,7 +45,7 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Devices'),
+        title: const Text('الأجهزة'),
         centerTitle: true,
         actions: [
           IconButton(
@@ -56,12 +56,13 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
       ),
       body: Column(
         children: [
+          _buildHeaderActions(context),
           Padding(
             padding: EdgeInsets.fromLTRB(
                 NeuroSpacing.md, NeuroSpacing.md, NeuroSpacing.md, 0),
             child: AppInput(
               label: '',
-              hint: 'Search by serial number or name...',
+              hint: 'بحث بالرقم التسلسلي أو الاسم...',
               controller: _searchController,
               prefixIcon: const Icon(Icons.search),
               suffixIcon: _searchController.text.isNotEmpty
@@ -80,9 +81,39 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
           Expanded(child: _buildBody(context, state)),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/devices/register'),
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: const Text('تسجيل جهاز'),
+      ),
+    );
+  }
+
+  Widget _buildHeaderActions(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(NeuroSpacing.md),
+      child: Row(
+        children: [
+          Expanded(
+            child: _ActionCard(
+              icon: Icons.bluetooth_searching,
+              title: 'إزواج جهاز',
+              subtitle: 'البحث عن أجهزة BLE',
+              color: NeuroColors.primary,
+              onTap: () => context.push('/devices/pair'),
+            ),
+          ),
+          SizedBox(width: NeuroSpacing.sm),
+          Expanded(
+            child: _ActionCard(
+              icon: Icons.app_registration,
+              title: 'تسجيل جهاز',
+              subtitle: 'إدخال الرقم التسلسلي',
+              color: NeuroColors.info,
+              onTap: () => context.push('/devices/register'),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -95,7 +126,7 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
         padding: EdgeInsets.symmetric(horizontal: NeuroSpacing.md),
         children: [
           _FilterChip(
-            label: 'All',
+            label: 'الكل',
             selected: state.statusFilter == null && state.typeFilter == null,
             onSelected: () {
               ref.read(deviceListProvider.notifier).filterByStatus(null);
@@ -104,7 +135,7 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
           ),
           SizedBox(width: NeuroSpacing.xs),
           _FilterChip(
-            label: 'Online',
+            label: 'متصل',
             selected: state.statusFilter == DeviceStatus.online,
             onSelected: () =>
                 ref.read(deviceListProvider.notifier).filterByStatus(
@@ -115,7 +146,7 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
           ),
           SizedBox(width: NeuroSpacing.xs),
           _FilterChip(
-            label: 'Offline',
+            label: 'غير متصل',
             selected: state.statusFilter == DeviceStatus.offline,
             onSelected: () =>
                 ref.read(deviceListProvider.notifier).filterByStatus(
@@ -126,7 +157,7 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
           ),
           SizedBox(width: NeuroSpacing.xs),
           _FilterChip(
-            label: 'Error',
+            label: 'خطأ',
             selected: state.statusFilter == DeviceStatus.error,
             onSelected: () =>
                 ref.read(deviceListProvider.notifier).filterByStatus(
@@ -137,7 +168,7 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
           ),
           SizedBox(width: NeuroSpacing.xs),
           _FilterChip(
-            label: 'Maintenance',
+            label: 'صيانة',
             selected: state.statusFilter == DeviceStatus.maintenance,
             onSelected: () =>
                 ref.read(deviceListProvider.notifier).filterByStatus(
@@ -153,12 +184,12 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
 
   Widget _buildBody(BuildContext context, DeviceListState state) {
     if (state.isLoading && state.devices.isEmpty) {
-      return const AppLoading(message: 'Loading devices...');
+      return const AppLoading(message: 'جاري تحميل الأجهزة...');
     }
 
     if (state.error != null && state.devices.isEmpty) {
       return AppErrorState(
-        title: 'Error Loading Devices',
+        title: 'خطأ في تحميل الأجهزة',
         message: state.error!,
         onRetry: () => ref.read(deviceListProvider.notifier).refresh(),
       );
@@ -168,15 +199,15 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
       if (state.searchQuery.isNotEmpty) {
         return AppEmptyState(
           icon: Icons.search_off,
-          title: 'No Results',
-          message: 'No devices found matching your search.',
+          title: 'لا توجد نتائج',
+          message: 'لم يتم العثور على أجهزة مطابقة لبحثك.',
         );
       }
       return AppEmptyState(
-        icon: Icons.devices,
-        title: 'No Devices',
-        message: 'No devices registered yet.',
-        actionLabel: 'Register Device',
+        icon: Icons.devices_other,
+        title: 'لا توجد أجهزة',
+        message: 'لم يتم تسجيل أي أجهزة بعد.\nيمكنك تسجيل جهاز جديد أو إزواج جهاز BLE.',
+        actionLabel: 'تسجيل جهاز',
         onAction: () => context.push('/devices/register'),
       );
     }
@@ -200,6 +231,55 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
             onTap: () => context.push('/devices/${device.id}'),
           );
         },
+      ),
+    );
+  }
+}
+
+class _ActionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ActionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(NeuroSpacing.md),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(NeuroRadius.card),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 32),
+            SizedBox(height: NeuroSpacing.sm),
+            Text(
+              title,
+              style: NeuroTypography.bodyMedium?.copyWith(
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              subtitle,
+              style: NeuroTypography.caption,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
