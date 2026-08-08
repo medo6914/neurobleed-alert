@@ -398,6 +398,33 @@ async def logout(
     return {"message": "Logged out successfully"}
 
 
+@router.post("/change-password")
+async def change_password(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    body = await request.json()
+    current_password = body.get("current_password", "")
+    new_password = body.get("new_password", "")
+
+    if not current_password or not new_password:
+        raise HTTPException(status_code=400, detail="Current and new password are required")
+
+    if not verify_password(current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+
+    errors = validate_password(new_password)
+    if errors:
+        raise HTTPException(status_code=400, detail="; ".join(errors))
+
+    current_user.hashed_password = hash_password(new_password)
+    current_user.last_password_change = datetime.now(timezone.utc)
+    await db.commit()
+
+    return {"message": "Password changed successfully"}
+
+
 @router.post("/forgot-password")
 async def forgot_password(data: ForgotPasswordRequest):
     _clean_expired_stores()
@@ -721,6 +748,8 @@ async def update_me(
         current_user.phone = data.phone
     if data.profile_image_url is not None:
         current_user.profile_image_url = data.profile_image_url
+    if data.notification_preferences is not None:
+        current_user.notification_preferences = data.notification_preferences
     await db.commit()
     await db.refresh(current_user)
     return current_user

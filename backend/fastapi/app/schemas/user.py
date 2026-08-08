@@ -95,6 +95,7 @@ class UserUpdateRequest(BaseModel):
     full_name: str | None = None
     phone: str | None = None
     profile_image_url: str | None = None
+    notification_preferences: dict | None = None
 
 
 class PhoneRegisterRequest(BaseModel):
@@ -117,6 +118,7 @@ class UserResponse(BaseModel):
     hospital_id: UUID | None
     last_login_at: datetime | None
     created_at: datetime
+    notification_preferences: dict | None = None
 
     class Config:
         from_attributes = True

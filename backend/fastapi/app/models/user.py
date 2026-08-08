@@ -52,6 +52,7 @@ class User(TimestampMixin, SoftDeleteMixin, VersionMixin, Base):
     locked_until: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    notification_preferences: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     hospital = relationship(
         "Hospital", back_populates="users", foreign_keys="User.hospital_id"
