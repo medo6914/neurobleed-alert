@@ -31,14 +31,33 @@ class DeviceCreateRequest {
         department: json['department'] as String?,
       );
 
-  Map<String, dynamic> toJson() => {
-        'serial_number': serialNumber,
-        if (deviceName != null) 'device_name': deviceName,
-        if (deviceType != null) 'device_type': deviceType,
-        if (macAddress != null) 'mac_address': macAddress,
-        if (firmwareVersion != null) 'firmware_version': firmwareVersion,
-        if (hardwareVersion != null) 'hardware_version': hardwareVersion,
-        if (hospitalId != null) 'hospital_id': hospitalId,
-        if (department != null) 'department': department,
-      };
+  Map<String, dynamic> toJson() {
+    String? mappedDeviceType;
+    if (deviceType != null) {
+      switch (deviceType!) {
+        case 'headband':
+          mappedDeviceType = 'NB-01';
+          break;
+        case 'wearable':
+          mappedDeviceType = 'NB-02';
+          break;
+        case 'bedside':
+          mappedDeviceType = 'NB-01';
+          break;
+        default:
+          mappedDeviceType = deviceType;
+      }
+    }
+
+    return {
+      'serial_number': serialNumber,
+      if (deviceName != null) 'device_name': deviceName,
+      if (mappedDeviceType != null) 'device_type': mappedDeviceType,
+      if (macAddress != null) 'mac_address': macAddress,
+      if (firmwareVersion != null) 'firmware_version': firmwareVersion,
+      if (hardwareVersion != null) 'hardware_version': hardwareVersion,
+      if (hospitalId != null) 'hospital_id': hospitalId,
+      if (department != null) 'department': department,
+    };
+  }
 }
