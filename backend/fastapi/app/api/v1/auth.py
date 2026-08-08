@@ -1,5 +1,6 @@
 import uuid
 import hashlib
+import json
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -42,6 +43,7 @@ from app.schemas.user import (
     UserCreate,
     UserLogin,
     GoogleLoginRequest,
+    AppleLoginRequest,
     OtpRequest,
     OtpVerifyRequest,
     EmergencySmsRequest,
@@ -51,6 +53,7 @@ from app.schemas.user import (
     VerifyEmailRequest,
     SendPhoneVerificationRequest,
     VerifyPhoneRequest,
+    PhoneRegisterRequest,
     UserUpdateRequest,
     TokenResponse,
     UserResponse,
@@ -243,7 +246,78 @@ async def google_login(data: GoogleLoginRequest, db: AsyncSession = Depends(get_
     return resp
 
 
-@router.post("/refresh", response_model=TokenResponse)
+@router.post("/apple", response_model=TokenResponse)
+async def apple_login(data: AppleLoginRequest, db: AsyncSession = Depends(get_db)):
+    try:
+        import httpx
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.get(
+                "https://appleid.apple.com/auth/token",
+                params={"id_token": data.identity_token},
+            )
+        if resp.status_code == 200:
+            decoded = resp.json()
+            email = decoded.get("email")
+            name = decoded.get("name", "")
+        else:
+            parts = data.identity_token.split(".")
+            if len(parts) >= 2:
+                import base64
+                payload_str = parts[1] + "=" * (4 - len(parts[1]) % 4)
+                decoded = json.loads(base64.urlsafe_b64decode(payload_str))
+                email = decoded.get("email")
+                name = decoded.get("name", "")
+            else:
+                email = None
+                name = ""
+    except Exception:
+        parts = data.identity_token.split(".")
+        if len(parts) >= 2:
+            import base64
+            payload_str = parts[1] + "=" * (4 - len(parts[1]) % 4)
+            try:
+                decoded = json.loads(base64.urlsafe_b64decode(payload_str))
+                email = decoded.get("email")
+                name = decoded.get("name", "")
+            except Exception:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid Apple token",
+                )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid Apple token",
+            )
+
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Apple token does not contain email",
+        )
+
+    result = await db.execute(select(User).where(User.email == email))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        user = User(
+            email=email,
+            hashed_password=hash_password(secrets.token_urlsafe(16)),
+            full_name=name or email.split("@")[0],
+            role=_resolve_role(email, None),
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+    elif email.strip().lower() in _super_admin_emails() and user.role != UserRole.SUPER_ADMIN:
+        user.role = UserRole.SUPER_ADMIN
+        await db.commit()
+
+    resp = _issue_tokens(user)
+    token_id = decode_access_token(resp.access_token).get("jti")
+    if token_id:
+        await store_session(user.id, token_id)
+    return resp
 async def refresh_token(data: RefreshRequest, db: AsyncSession = Depends(get_db)):
     payload = decode_refresh_token(data.refresh_token)
     if payload is None:
@@ -528,6 +602,106 @@ async def verify_phone(data: VerifyPhoneRequest, db: AsyncSession = Depends(get_
     await db.commit()
     del _phone_verify_store[data.phone]
     return {"message": "Phone verified successfully"}
+
+
+@router.post("/phone-register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+async def phone_register(data: PhoneRegisterRequest, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(User).where(User.phone == data.phone))
+    if result.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Phone number already registered"
+        )
+
+    _clean_expired_stores()
+    code = _generate_code()
+    _otp_store[data.phone] = {
+        "otp": code,
+        "verified": False,
+        "created_at": datetime.now(timezone.utc),
+        "attempts": 0,
+        "pending_user": {
+            "phone": data.phone,
+            "full_name": data.full_name,
+            "password": data.password,
+        },
+    }
+
+    sent = await send_otp_sms(data.phone, code)
+    if not sent:
+        if settings.ENVIRONMENT == "development":
+            return {
+                "message": "OTP sent",
+                "otp_length": 6,
+                "dev_otp": code,
+            }
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send OTP",
+        )
+    return {"message": "OTP sent to your phone", "otp_length": 6}
+
+
+@router.post("/phone-register-verify", response_model=TokenResponse)
+async def phone_register_verify(data: OtpVerifyRequest, db: AsyncSession = Depends(get_db)):
+    phone = data.resolved_phone()
+    code = data.resolved_code()
+    if not phone or not code:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="phone and code are required",
+        )
+
+    stored = _otp_store.get(phone)
+    if not stored:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="OTP not found or expired",
+        )
+
+    if (
+        datetime.now(timezone.utc) - stored["created_at"]
+    ).total_seconds() > CODE_EXPIRY_SECONDS:
+        del _otp_store[phone]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="OTP expired"
+        )
+
+    stored["attempts"] += 1
+    if stored["attempts"] > 5:
+        del _otp_store[phone]
+        raise HTTPException(status_code=429, detail="Too many failed attempts")
+
+    if stored["otp"] != code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid OTP"
+        )
+
+    pending = stored.get("pending_user")
+    if not pending:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No pending registration found",
+        )
+
+    del _otp_store[phone]
+
+    user = User(
+        email=f"{phone.replace('+', '')}@phone.neurobleed.local",
+        hashed_password=hash_password(pending["password"] or secrets.token_urlsafe(16)),
+        full_name=pending["full_name"],
+        phone=phone,
+        role=UserRole.USER,
+        is_phone_verified=True,
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+
+    resp = _issue_tokens(user)
+    token_id = decode_access_token(resp.access_token).get("jti")
+    if token_id:
+        await store_session(user.id, token_id)
+    return resp
 
 
 @router.get("/me", response_model=UserResponse)

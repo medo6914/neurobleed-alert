@@ -22,6 +22,11 @@ class GoogleLoginRequest(BaseModel):
     id_token: str
 
 
+class AppleLoginRequest(BaseModel):
+    identity_token: str
+    authorization_code: str | None = None
+
+
 class OtpRequest(BaseModel):
     phone: str | None = None
     identifier: str | None = None
@@ -90,6 +95,12 @@ class UserUpdateRequest(BaseModel):
     full_name: str | None = None
     phone: str | None = None
     profile_image_url: str | None = None
+
+
+class PhoneRegisterRequest(BaseModel):
+    phone: str
+    full_name: str
+    password: str | None = None
 
 
 class UserResponse(BaseModel):

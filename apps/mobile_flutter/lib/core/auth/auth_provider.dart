@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide User, AuthProvider;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:shared/entities/user.dart';
 import 'package:core/core.dart';
 import '../../features/notifications/push_notification_service.dart';
@@ -340,7 +341,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> loginWithGoogle() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final googleUser = await GoogleSignIn().signIn();
+      final googleUser = await GoogleSignIn(scopes: ['email']).signIn();
       if (googleUser == null) {
         state = state.copyWith(isLoading: false);
         return;
@@ -375,6 +376,52 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(
         isLoading: false,
         error: 'فشل تسجيل الدخول بواسطة Google: ${_extractError(e)}',
+      );
+    }
+  }
+
+  Future<void> loginWithApple() async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final oauthCredential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      final userCredential =
+          await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+      final idToken = await userCredential.user!.getIdToken();
+
+      final response = await _api.post('/v1/auth/apple', data: {
+        'identity_token': idToken,
+        'authorization_code': appleCredential.authorizationCode,
+      });
+      final data = response.data;
+      await _storage.saveToken(data['access_token']);
+      if (data['refresh_token'] != null) {
+        await _storage.saveRefreshToken(data['refresh_token']);
+      }
+      await _storage.saveUserId(data['user_id']);
+      await _storage.saveUserRole(data['role']);
+
+      final user = _userFromResponse(data);
+      state = state.copyWith(
+        status: AuthStatus.authenticated,
+        user: user,
+        isLoading: false,
+      );
+      unawaited(_registerPush());
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'فشل تسجيل الدخول بواسطة Apple: ${_extractError(e)}',
       );
     }
   }

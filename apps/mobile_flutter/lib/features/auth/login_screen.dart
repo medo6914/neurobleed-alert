@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:design_system/design_system.dart';
@@ -244,6 +245,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               isLoading: authState.isLoading,
               icon: Icons.g_mobiledata,
             ),
+            const SizedBox(height: NeuroSpacing.sm),
+            if (defaultTargetPlatform == TargetPlatform.iOS ||
+                defaultTargetPlatform == TargetPlatform.macOS)
+              AppButton(
+                label: 'تسجيل الدخول بـ Apple',
+                onPressed: authState.isLoading
+                    ? null
+                    : () => ref
+                        .read(authStateProvider.notifier)
+                        .loginWithApple(),
+                isLoading: authState.isLoading,
+                icon: Icons.apple,
+                variant: ButtonVariant.secondary,
+              ),
           ],
         ),
       ),
