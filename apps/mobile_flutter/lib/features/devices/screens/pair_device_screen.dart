@@ -79,20 +79,6 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
 
     final service = ref.read(bleServiceProvider);
 
-    // Step 1: Auto-register device on backend
-    try {
-      final api = ref.read(apiClientProvider);
-      await api.post('/v1/devices/', data: {
-        'serial_number': device.id,
-        'device_name': device.name,
-        'device_type': 'NB-01',
-        'mac_address': device.id,
-      });
-    } catch (e) {
-      // Device might already exist - that's OK, continue to connect
-    }
-
-    // Step 2: Connect via BLE
     final success = await service.connectToDevice(
       device.id,
       deviceName: device.name,
@@ -108,7 +94,7 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('تم تسجيل واتصال ${device.name} بنجاح'),
+          content: Text('تم الاتصال بـ ${device.name} بنجاح'),
           backgroundColor: NeuroColors.low,
         ),
       );
@@ -116,8 +102,8 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('تم التسجيل لكن فشل الاتصال بالجهاز'),
-          backgroundColor: NeuroColors.warning,
+          content: Text('فشل الاتصال بالجهاز'),
+          backgroundColor: NeuroColors.critical,
         ),
       );
     }
