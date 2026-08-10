@@ -21,7 +21,8 @@ final mapHospitalsProvider =
 
 const _kDefaultLat = 30.0444;
 const _kDefaultLng = 31.2357;
-const _kTileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const _kDarkTileUrl =
+    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -201,24 +202,25 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E1A),
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context),
+            _buildHeader(context, t),
             Expanded(
               child: _loading
                   ? const Center(child: CircularProgressIndicator())
                   : Stack(
                       children: [
                         _buildMap(),
-                        if (_route != null) _buildEtaBanner(),
+                        if (_route != null) _buildEtaBanner(t),
                         Positioned(
                           left: 12,
                           right: 12,
                           bottom: 12,
-                          child: _buildHospitalCard(),
+                          child: _buildHospitalCard(t),
                         ),
                       ],
                     ),
@@ -229,7 +231,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppLocalizations t) {
     return Container(
       padding: EdgeInsets.fromLTRB(
         16,
@@ -244,9 +246,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             onPressed: () => Navigator.pop(context),
           ),
           const Spacer(),
-          const Text(
-            'أقرب المستشفيات',
-            style: TextStyle(
+          Text(
+            t.t('nearest_hospitals'),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -276,7 +278,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       ),
       children: [
         TileLayer(
-          urlTemplate: _kTileUrl,
+          urlTemplate: _kDarkTileUrl,
+          subdomains: const ['a', 'b', 'c'],
           userAgentPackageName: 'com.neurobleed.alert',
         ),
         if (_route != null)
@@ -333,14 +336,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
-  Widget _buildEtaBanner() {
+  Widget _buildEtaBanner(AppLocalizations t) {
     final durationS = _routeDurationS;
     final distanceM = _routeDistanceM;
     final minutes = durationS != null ? (durationS / 60).ceil() : null;
     final distanceKm = distanceM != null
         ? distanceM >= 1000
-            ? '${(distanceM / 1000).toStringAsFixed(1)} كم'
-            : '${distanceM.round()} م'
+            ? '${(distanceM / 1000).toStringAsFixed(1)} ${t.t('unit_km')}'
+            : '${distanceM.round()} ${t.t('unit_m')}'
         : null;
 
     return Positioned(
@@ -362,9 +365,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'الاتجاه إلى أقرب مستشفى',
-                    style: TextStyle(
+                  Text(
+                    t.t('direction_to_nearest_hospital'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -372,8 +375,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   ),
                   Text(
                     minutes != null
-                        ? 'خلال ${minutes == 1 ? 'دقيقة واحدة' : '$minutes دقائق'}'
-                        : 'جاري حساب الوقت...',
+                        ? minutes == 1
+                            ? t.t('eta_one_minute')
+                            : t.tWithParams('eta_minutes', {'minutes': '$minutes'})
+                        : t.t('calculating_eta'),
                     style: const TextStyle(
                       color: Color(0xFF2196F3),
                       fontSize: 12,
@@ -396,13 +401,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
-  Widget _buildHospitalCard() {
+  Widget _buildHospitalCard(AppLocalizations t) {
     final hospital = _nearestHospital();
     if (hospital == null) return const SizedBox.shrink();
 
-    final name = hospital['name'] as String? ?? 'مستشفى';
+    final name = hospital['name'] as String? ?? t.t('hospital_fallback');
     final distance = (hospital['distance_km'] as num?)?.toDouble() ?? 2.3;
     final duration = _routeDurationS != null ? (_routeDurationS! / 60).ceil() : 8;
+    final phone = hospital['phone'] as String?;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -452,7 +458,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             color: Color(0xFF34C759), size: 14),
                         const SizedBox(width: 4),
                         Text(
-                          '${distance.toStringAsFixed(1)} كم',
+                          '${distance.toStringAsFixed(1)} ${t.t('unit_km')}',
                           style: const TextStyle(
                             color: Color(0xFF34C759),
                             fontSize: 12,
@@ -463,7 +469,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             color: Color(0xFF34C759), size: 14),
                         const SizedBox(width: 4),
                         Text(
-                          '$duration دقائق',
+                          '$duration ${t.t('tab_month')}',
                           style: const TextStyle(
                             color: Color(0xFF34C759),
                             fontSize: 12,
@@ -474,19 +480,28 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   ],
                 ),
               ),
-              Container(
-                width: 48,
-                height: 48,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF34C759),
-                  shape: BoxShape.circle,
+              if (phone != null)
+                GestureDetector(
+                  onTap: () async {
+                    final uri = Uri.parse('tel:$phone');
+                    if (await canLaunchUrl(uri)) {
+                      await launchUrl(uri);
+                    }
+                  },
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF34C759),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.phone,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
                 ),
-                child: const Icon(
-                  Icons.phone,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -494,11 +509,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             width: double.infinity,
             height: 48,
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () => _routeToNearest(),
               icon: const Icon(Icons.info_outline, color: Color(0xFF2196F3)),
-              label: const Text(
-                'المزيد من التفاصيل',
-                style: TextStyle(
+              label: Text(
+                t.t('more_details'),
+                style: const TextStyle(
                   color: Color(0xFF2196F3),
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -525,66 +540,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
     if (lat == null || lng == null) return null;
     return LatLng(lat, lng);
-  }
-
-  void _showHospitalSheet(Map<String, dynamic> h) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: NeuroColors.bgSurface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.local_hospital, color: NeuroColors.success),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    h['name'] as String? ?? 'مستشفى',
-                    style: const TextStyle(
-                      color: NeuroColors.textPrimary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            if (h['address'] != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                h['address'] as String,
-                style:
-                    const TextStyle(color: NeuroColors.textBody, fontSize: 13),
-              ),
-            ],
-            if (h['phone'] != null) ...[
-              const SizedBox(height: 4),
-              Text(
-                h['phone'] as String,
-                style: const TextStyle(
-                    color: NeuroColors.textSecondary, fontSize: 12),
-              ),
-            ],
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.icon(
-                onPressed: () => _routeToHospital(h),
-                icon: const Icon(Icons.directions),
-                label: const Text('الاتجاه'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   Future<void> _routeToHospital(Map<String, dynamic> h) async {
@@ -616,112 +571,5 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         });
       }
     } catch (_) {}
-  }
-
-  Widget _buildBottomCards() {
-    final hospitals = _hospitals;
-    final display = hospitals.isEmpty
-        ? const [
-            {
-              'name': 'مستشفى جامعة القاهرة',
-              'latitude': 30.0286,
-              'longitude': 31.2278
-            },
-            {
-              'name': 'مستشفى المنيل التخصصي',
-              'latitude': 30.0339,
-              'longitude': 31.2304
-            },
-            {
-              'name': 'مستشفى الدمرداش',
-              'latitude': 30.0827,
-              'longitude': 31.2904
-            },
-          ]
-        : hospitals;
-
-    final nearest = display.take(3).toList();
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        color: NeuroColors.bgSurface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'أقرب المستشفيات',
-                style: TextStyle(
-                  color: NeuroColors.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.map_outlined,
-                    color: NeuroColors.textPrimary),
-                tooltip: 'فتح OpenStreetMap',
-                onPressed: _openOSM,
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          for (final h in nearest) _HospitalRow(hospital: h),
-        ],
-      ),
-    );
-  }
-}
-
-class _HospitalRow extends StatelessWidget {
-  final Map<String, dynamic> hospital;
-  const _HospitalRow({required this.hospital});
-
-  @override
-  Widget build(BuildContext context) {
-    final name = hospital['name'] as String? ?? 'مستشفى';
-    final lat = (hospital['latitude'] as num?)?.toDouble() ??
-        (hospital['lat'] as num?)?.toDouble();
-    final lng = (hospital['longitude'] as num?)?.toDouble() ??
-        (hospital['lng'] as num?)?.toDouble();
-    final distance = (hospital['distance_km'] as num?)?.toDouble() ?? 2.0;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: NeuroColors.bgElevated,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.local_hospital, color: NeuroColors.success),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              name,
-              style: const TextStyle(
-                color: NeuroColors.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          if (lat != null && lng != null)
-            Text(
-              '${distance.toStringAsFixed(1)} كم',
-              style: const TextStyle(
-                color: NeuroColors.success,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-        ],
-      ),
-    );
   }
 }

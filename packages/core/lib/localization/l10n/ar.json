@@ -333,6 +333,7 @@
   "searching": "جاري البحث...",
   "search_error": "خطأ في البحث",
   "no_devices_found": "لم يتم العثور على أجهزة",
+  "hospital_fallback": "مستشفى",
   "age_value": "18 سنة",
   "weight_value": "63 kg",
   "blood_type_value": "O+",

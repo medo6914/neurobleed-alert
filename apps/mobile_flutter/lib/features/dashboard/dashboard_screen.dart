@@ -127,13 +127,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final devicesAsync = ref.watch(dashboardDevicesProvider);
     final alertsAsync = ref.watch(recentAlertsProvider);
     final vitals = ref.watch(bleVitalsProvider);
+    final t = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E1A),
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context),
+            _buildHeader(context, t),
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async {
@@ -146,15 +147,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   child: Column(
                     children: [
                       const SizedBox(height: 12),
-                      _buildDeviceCard(context, devicesAsync),
+                      _buildDeviceCard(context, devicesAsync, t),
                       const SizedBox(height: 16),
-                      _buildBrainStateCard(context, alertsAsync, vitals),
+                      _buildBrainStateCard(context, alertsAsync, vitals, t),
                       const SizedBox(height: 16),
-                      _buildVitalSignsCard(context, vitals),
+                      _buildVitalSignsCard(context, vitals, t),
                       const SizedBox(height: 16),
-                      _buildEmergencyCard(context),
+                      _buildEmergencyCard(context, t),
                       const SizedBox(height: 16),
-                      _buildQuickActions(context),
+                      _buildQuickActions(context, t),
                       const SizedBox(height: 100),
                     ],
                   ),
@@ -167,7 +168,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, AppLocalizations t) {
     return Container(
       padding: EdgeInsets.fromLTRB(
         16,
@@ -184,31 +185,54 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           const Spacer(),
           Column(
             children: [
-              RichText(
-                text: const TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Neuro',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/images/logo_brain.png',
+                    width: 36,
+                    height: 36,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.psychology,
+                            color: Color(0xFF2196F3), size: 36),
+                  ),
+                  const SizedBox(width: 8),
+                  RichText(
+                    text: const TextSpan(
+                      children: [
+                        TextSpan(
+                          text: 'Neuro',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'Bleed',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFFF3B30),
+                          ),
+                        ),
+                        TextSpan(
+                          text: ' Alert',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
-                    TextSpan(
-                      text: 'Bleed',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFFF3B30),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const Text(
-                'دكاء اصطناعي لحماية دماغك',
-                style: TextStyle(
+              const SizedBox(height: 2),
+              Text(
+                t.t('app_tagline'),
+                style: const TextStyle(
                   fontSize: 12,
                   color: Color(0xFF8E8E93),
                 ),
@@ -242,8 +266,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildDeviceCard(
-      BuildContext context, AsyncValue<List<dynamic>> devicesAsync) {
+  Widget _buildDeviceCard(BuildContext context, AsyncValue<List<dynamic>> devicesAsync, AppLocalizations t) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -275,9 +298,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'متصل بالجهاز',
-                  style: TextStyle(
+                Text(
+                  t.t('device_connected'),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -285,7 +308,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'NBA-HEADBAND-01',
+                  t.t('device_model_name'),
                   style: TextStyle(
                     color: const Color(0xFF2196F3).withValues(alpha: 0.8),
                     fontSize: 14,
@@ -294,17 +317,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ],
             ),
           ),
-          // Device headset image
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.asset(
               'assets/images/device_headset.png',
-              width: 60,
-              height: 60,
-              fit: BoxFit.cover,
+              width: 80,
+              height: 50,
+              fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) => Container(
-                width: 60,
-                height: 60,
+                width: 80,
+                height: 50,
                 decoration: BoxDecoration(
                   color: const Color(0xFF0D47A1),
                   borderRadius: BorderRadius.circular(8),
@@ -327,14 +349,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildBrainStateCard(BuildContext context,
-      AsyncValue<List<dynamic>> alertsAsync, BleVitalsState vitals) {
+      AsyncValue<List<dynamic>> alertsAsync, BleVitalsState vitals, AppLocalizations t) {
     final hasCriticalAlert = alertsAsync.valueOrNull?.any((a) =>
             (a['severity'] as String?)?.toLowerCase() == 'critical') ??
         false;
     final riskPercent = hasCriticalAlert ? 78 : 18;
     final riskColor =
         hasCriticalAlert ? const Color(0xFFFF3B30) : const Color(0xFF34C759);
-    final statusText = hasCriticalAlert ? 'حالة طارئة' : 'الحالة مستقرة';
+    final statusText = hasCriticalAlert ? t.t('status_emergency') : t.t('status_stable');
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -352,16 +374,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         children: [
           Row(
             children: [
-              const Text(
-                'حالة الدماغ الآن',
-                style: TextStyle(
+              Text(
+                t.t('brain_state_now'),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(Icons.show_chart, color: const Color(0xFF2196F3), size: 20),
+              const Icon(Icons.show_chart, color: Color(0xFF2196F3), size: 20),
             ],
           ),
           const SizedBox(height: 16),
@@ -382,11 +404,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       ],
                     ),
                   ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.psychology,
-                      size: 80,
-                      color: Color(0xFF42A5F5),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.asset(
+                      'assets/images/logo_brain.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(
+                        Icons.psychology,
+                        size: 80,
+                        color: Color(0xFF42A5F5),
+                      ),
                     ),
                   ),
                 ),
@@ -426,9 +454,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                                   color: Colors.white,
                                 ),
                               ),
-                              const Text(
-                                'احتمال النزيف',
-                                style: TextStyle(
+                              Text(
+                                t.t('bleed_risk_percentage'),
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Color(0xFF8E8E93),
                                 ),
@@ -481,10 +509,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   color: Color(0xFF8E8E93), size: 14),
               const SizedBox(width: 4),
               Text(
-                'آخر تحديث: منذ 30 ثانية',
-                style: TextStyle(
+                t.t('last_update_30_seconds'),
+                style: const TextStyle(
                   fontSize: 12,
-                  color: const Color(0xFF8E8E93),
+                  color: Color(0xFF8E8E93),
                 ),
               ),
             ],
@@ -494,7 +522,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildVitalSignsCard(BuildContext context, BleVitalsState vitals) {
+  Widget _buildVitalSignsCard(BuildContext context, BleVitalsState vitals, AppLocalizations t) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -509,9 +537,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'المؤشرات الحيوية',
-            style: TextStyle(
+          Text(
+            t.t('vital_signs'),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -523,7 +551,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Expanded(
                 child: _VitalSignTile(
                   icon: Icons.water_drop_outlined,
-                  label: 'تنشيع الأكسجين',
+                  label: t.t('vital_oxygen_saturation'),
                   value: vitals.isConnected ? '${vitals.spo2}%' : '96%',
                   color: const Color(0xFF2196F3),
                   isActive: vitals.isConnected,
@@ -533,7 +561,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Expanded(
                 child: _VitalSignTile(
                   icon: Icons.psychology_outlined,
-                  label: 'تدفق الدم للدماغ',
+                  label: t.t('vital_brain_blood_flow'),
                   value: vitals.isConnected ? '${vitals.brainFlow}%' : '75%',
                   color: const Color(0xFF9C27B0),
                   isActive: vitals.isConnected,
@@ -543,7 +571,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Expanded(
                 child: _VitalSignTile(
                   icon: Icons.favorite_outline,
-                  label: 'معدل النبض',
+                  label: t.t('vital_heart_rate'),
                   value:
                       vitals.isConnected ? '${vitals.heartRate} BPM' : '78 BPM',
                   color: const Color(0xFFFF3B30),
@@ -554,7 +582,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               Expanded(
                 child: _VitalSignTile(
                   icon: Icons.thermostat,
-                  label: 'درجة الحرارة',
+                  label: t.t('vital_temperature'),
                   value: vitals.isConnected
                       ? '${vitals.temperature.toStringAsFixed(1)}°C'
                       : '36.6°C',
@@ -569,9 +597,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildEmergencyCard(BuildContext context) {
+  Widget _buildEmergencyCard(BuildContext context, AppLocalizations t) {
     return GestureDetector(
-      onTap: () => _showEmergencyDialog(context),
+      onTap: () => _showEmergencyDialog(context, t),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -605,19 +633,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'حالة طارئة',
-                    style: TextStyle(
+                  Text(
+                    t.t('emergency_status'),
+                    style: const TextStyle(
                       color: Color(0xFFFF6B6B),
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   Text(
-                    'اضغط إذا شعرت بأي أعراض خطرة',
-                    style: TextStyle(
+                    t.t('emergency_press_if_symptoms'),
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: const Color(0xFF8E8E93),
+                      color: Color(0xFF8E8E93),
                     ),
                   ),
                 ],
@@ -633,13 +661,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildQuickActions(BuildContext context) {
+  Widget _buildQuickActions(BuildContext context, AppLocalizations t) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'إجراءات سريعة',
-          style: TextStyle(
+        Text(
+          t.t('quick_actions'),
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -651,16 +679,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             Expanded(
               child: _QuickAction(
                 icon: Icons.phone,
-                label: 'اتصال طوارئ',
+                label: t.t('emergency_call'),
                 color: const Color(0xFFFF3B30),
-                onTap: () => _showEmergencyDialog(context),
+                onTap: () => _showEmergencyDialog(context, t),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: _QuickAction(
                 icon: Icons.local_hospital_outlined,
-                label: 'أقرب مستشفى',
+                label: t.t('nearest_hospital'),
                 color: const Color(0xFF2196F3),
                 onTap: () => context.go('/map'),
               ),
@@ -669,7 +697,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             Expanded(
               child: _QuickAction(
                 icon: Icons.share_location_outlined,
-                label: 'مشاركة الموقع',
+                label: t.t('share_location'),
                 color: const Color(0xFF00BCD4),
                 onTap: () => _shareLocation(context),
               ),
@@ -678,7 +706,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             Expanded(
               child: _QuickAction(
                 icon: Icons.description_outlined,
-                label: 'سجل التقارير',
+                label: t.t('reports_history'),
                 color: const Color(0xFF9C27B0),
                 onTap: () => context.go('/reports'),
               ),
@@ -689,7 +717,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  void _showEmergencyDialog(BuildContext context) {
+  void _showEmergencyDialog(BuildContext context, AppLocalizations t) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -699,19 +727,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             const Icon(Icons.warning_amber_rounded,
                 color: Color(0xFFFF3B30)),
             const SizedBox(width: 8),
-            const Text('اتصال طوارئ',
-                style: TextStyle(color: Colors.white)),
+            Text(t.t('emergency_call'),
+                style: const TextStyle(color: Colors.white)),
           ],
         ),
-        content: const Text(
-          'هل تريد الاتصال برقم الطوارئ (123)؟',
-          style: TextStyle(color: Color(0xFF8E8E93)),
+        content: Text(
+          t.t('emergency_call_confirm'),
+          style: const TextStyle(color: Color(0xFF8E8E93)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('إلغاء',
-                style: TextStyle(color: Color(0xFF8E8E93))),
+            child: Text(t.t('cancel'),
+                style: const TextStyle(color: Color(0xFF8E8E93))),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -725,7 +753,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               backgroundColor: const Color(0xFFFF3B30),
               foregroundColor: Colors.white,
             ),
-            child: const Text('اتصال'),
+            child: Text(t.t('call')),
           ),
         ],
       ),
@@ -734,9 +762,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   void _shareLocation(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('جاري مشاركة الموقع...'),
-        backgroundColor: Color(0xFF2196F3),
+      SnackBar(
+        content: Text(AppLocalizations.of(context).t('sharing_location')),
+        backgroundColor: const Color(0xFF2196F3),
       ),
     );
   }
