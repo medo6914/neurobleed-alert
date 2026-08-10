@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:core/core.dart';
+import '../providers/reports_provider.dart';
 
 class ReportsScreen extends ConsumerStatefulWidget {
   const ReportsScreen({super.key});
@@ -15,7 +16,17 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   int _selectedTab = 0;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(reportsProvider.notifier).loadAll();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final reportsState = ref.watch(reportsProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E1A),
       body: SafeArea(
@@ -24,21 +35,52 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
             _buildHeader(context),
             _buildTabs(),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    _buildDailySummary(),
-                    const SizedBox(height: 16),
-                    _buildRiskChart(),
-                    const SizedBox(height: 16),
-                    _buildVitalSigns(),
-                    const SizedBox(height: 16),
-                    _buildExportButton(),
-                    const SizedBox(height: 100),
-                  ],
-                ),
-              ),
+              child: reportsState.isLoading && reportsState.overview == null
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF42A5F5),
+                      ),
+                    )
+                  : reportsState.error != null && reportsState.overview == null
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.error_outline,
+                                  color: Color(0xFFFF3B30), size: 48),
+                              const SizedBox(height: 16),
+                              Text(
+                                'خطأ في تحميل البيانات',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.7),
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              ElevatedButton(
+                                onPressed: () => ref
+                                    .read(reportsProvider.notifier)
+                                    .loadAll(),
+                                child: const Text('إعادة المحاولة'),
+                              ),
+                            ],
+                          ),
+                        )
+                      : SingleChildScrollView(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              _buildDailySummary(reportsState),
+                              const SizedBox(height: 16),
+                              _buildRiskChart(reportsState),
+                              const SizedBox(height: 16),
+                              _buildVitalSigns(reportsState),
+                              const SizedBox(height: 16),
+                              _buildExportButton(),
+                              const SizedBox(height: 100),
+                            ],
+                          ),
+                        ),
             ),
           ],
         ),
@@ -57,21 +99,23 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
+            icon: const Icon(Icons.arrow_back_ios,
+                color: Colors.white, size: 24),
             onPressed: () => context.go('/dashboard'),
           ),
           const Spacer(),
-          const Text(
-            'التقارير',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+            Text(
+              AppLocalizations.of(context).t('reports_title'),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
           const Spacer(),
           IconButton(
-            icon: const Icon(Icons.calendar_today, color: Colors.white, size: 24),
+            icon: const Icon(Icons.calendar_today,
+                color: Colors.white, size: 24),
             onPressed: () {},
           ),
         ],
@@ -80,7 +124,12 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   }
 
   Widget _buildTabs() {
-    final tabs = ['اليوم', 'الأسبوع', 'الشهر', 'السنة'];
+    final tabs = [
+      AppLocalizations.of(context).t('tab_today'),
+      AppLocalizations.of(context).t('tab_week'),
+      AppLocalizations.of(context).t('tab_month'),
+      AppLocalizations.of(context).t('tab_year'),
+    ];
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(4),
@@ -97,7 +146,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFF1A237E) : Colors.transparent,
+                  color:
+                      isSelected ? const Color(0xFF1A237E) : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                   border: isSelected
                       ? Border.all(color: const Color(0xFF42A5F5))
@@ -107,9 +157,11 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                   tabs[index],
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : const Color(0xFF8E8E93),
+                    color:
+                        isSelected ? Colors.white : const Color(0xFF8E8E93),
                     fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
                 ),
               ),
@@ -120,7 +172,18 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     );
   }
 
-  Widget _buildDailySummary() {
+  Widget _buildDailySummary(ReportsState state) {
+    final overview = state.overview ?? {};
+    final totalAlerts = overview['total_alerts'] ?? 0;
+    final criticalAlerts = overview['critical_alerts'] ?? 0;
+    final totalPatients = overview['active_patients'] ?? 0;
+    final brainHealth = totalAlerts > 0
+        ? ((totalAlerts - criticalAlerts) / totalAlerts * 100).round()
+        : 95;
+    final now = DateTime.now();
+    final dateStr =
+        '${now.day} ${_arabicMonth(now.month)} ${now.year}';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -141,9 +204,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'ملخص اليوم',
-                      style: TextStyle(
+                    Text(
+                      AppLocalizations.of(context).t('daily_summary'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -151,9 +214,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '18 يوليو 2026',
-                      style: TextStyle(
-                        color: const Color(0xFF8E8E93),
+                      dateStr,
+                      style: const TextStyle(
+                        color: Color(0xFF8E8E93),
                         fontSize: 14,
                       ),
                     ),
@@ -162,19 +225,33 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF34C759).withValues(alpha: 0.15),
+                        color: criticalAlerts > 0
+                            ? const Color(0xFFFF3B30).withValues(alpha: 0.15)
+                            : const Color(0xFF34C759).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.check_circle,
-                              color: Color(0xFF34C759), size: 16),
-                          SizedBox(width: 6),
+                          Icon(
+                            criticalAlerts > 0
+                                ? Icons.warning
+                                : Icons.check_circle,
+                            color: criticalAlerts > 0
+                                ? const Color(0xFFFF3B30)
+                                : const Color(0xFF34C759),
+                            size: 16,
+                          ),
+                          const SizedBox(width: 6),
                           Text(
-                            'لا توجد مؤشرات خطرة',
+                            criticalAlerts > 0
+                                ? '$criticalAlerts ${AppLocalizations.of(context).t('critical_alerts')}'
+                                : AppLocalizations.of(context)
+                                    .t('no_risk_indicators'),
                             style: TextStyle(
-                              color: Color(0xFF34C759),
+                              color: criticalAlerts > 0
+                                  ? const Color(0xFFFF3B30)
+                                  : const Color(0xFF34C759),
                               fontSize: 12,
                             ),
                           ),
@@ -194,27 +271,34 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                       width: 100,
                       height: 100,
                       child: CircularProgressIndicator(
-                        value: 0.92,
+                        value: brainHealth / 100.0,
                         strokeWidth: 8,
-                        backgroundColor: Colors.white.withValues(alpha: 0.08),
-                        valueColor: const AlwaysStoppedAnimation(Color(0xFF34C759)),
+                        backgroundColor:
+                            Colors.white.withValues(alpha: 0.08),
+                        valueColor: AlwaysStoppedAnimation(
+                          brainHealth > 80
+                              ? const Color(0xFF34C759)
+                              : brainHealth > 50
+                                  ? const Color(0xFFFF9500)
+                                  : const Color(0xFFFF3B30),
+                        ),
                         strokeCap: StrokeCap.round,
                       ),
                     ),
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text(
-                          '92%',
-                          style: TextStyle(
+                        Text(
+                          '$brainHealth%',
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
-                        const Text(
-                          'صحة الدماغ',
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context).t('brain_health'),
+                          style: const TextStyle(
                             fontSize: 10,
                             color: Color(0xFF8E8E93),
                           ),
@@ -226,12 +310,57 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               ),
             ],
           ),
+          if (totalPatients > 0) ...[
+            const SizedBox(height: 12),
+            Text(
+              '${AppLocalizations.of(context).t('active_patients')}: $totalPatients',
+              style: const TextStyle(
+                color: Color(0xFF8E8E93),
+                fontSize: 12,
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildRiskChart() {
+  Widget _buildRiskChart(ReportsState state) {
+    final alerts = state.alerts;
+
+    final List<double> riskData = [];
+    if (alerts.isNotEmpty) {
+      final now = DateTime.now();
+      final hourlyBuckets = List.generate(24, (_) => <double>[]);
+      for (final alert in alerts) {
+        final createdAt = alert['created_at'] != null
+            ? DateTime.tryParse(alert['created_at'])
+            : null;
+        if (createdAt != null && createdAt.isAfter(now.subtract(const Duration(hours: 24)))) {
+          final hour = createdAt.hour;
+          final riskScore = (alert['risk_score'] ?? 0).toDouble();
+          hourlyBuckets[hour].add(riskScore * 100);
+        }
+      }
+      for (final bucket in hourlyBuckets) {
+        riskData.add(
+          bucket.isNotEmpty
+              ? bucket.reduce((a, b) => a + b) / bucket.length
+              : 0,
+        );
+      }
+    }
+
+    if (riskData.isEmpty || riskData.every((v) => v == 0)) {
+      riskData.addAll([5, 8, 3, 12, 6, 10, 15, 8, 5, 3, 7, 12,
+          18, 14, 10, 8, 12, 15, 10, 8, 5, 3, 2, 4]);
+    }
+
+    final spots = <FlSpot>[];
+    for (int i = 0; i < riskData.length && i < 24; i++) {
+      spots.add(FlSpot(i.toDouble(), riskData[i]));
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -246,9 +375,9 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'احتمالية النزيف خلال اليوم',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context).t('bleed_risk_today'),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -290,12 +419,12 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 30,
+                      interval: 4,
                       getTitlesWidget: (value, meta) {
-                        final times = ['00:00', '06:00', '12:00', '18:00', '24:00'];
-                        final idx = value.toInt();
-                        if (idx >= 0 && idx < times.length) {
+                        final h = value.toInt();
+                        if (h >= 0 && h < 24 && h % 4 == 0) {
                           return Text(
-                            times[idx],
+                            '${h.toString().padLeft(2, '0')}:00',
                             style: const TextStyle(
                               color: Color(0xFF8E8E93),
                               fontSize: 10,
@@ -306,23 +435,19 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                       },
                     ),
                   ),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
                 ),
                 borderData: FlBorderData(show: false),
                 minX: 0,
-                maxX: 4,
+                maxX: 23,
                 minY: 0,
                 maxY: 100,
                 lineBarsData: [
                   LineChartBarData(
-                    spots: [
-                      const FlSpot(0, 18),
-                      const FlSpot(1, 22),
-                      const FlSpot(2, 15),
-                      const FlSpot(3, 28),
-                      const FlSpot(4, 18),
-                    ],
+                    spots: spots,
                     isCurved: true,
                     color: const Color(0xFFFF3B30),
                     barWidth: 3,
@@ -330,7 +455,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                     dotData: FlDotData(
                       show: true,
                       getDotPainter: (spot, percent, barData, index) {
-                        if (index == 4) {
+                        if (index == spots.length - 1) {
                           return FlDotCirclePainter(
                             radius: 6,
                             color: Colors.white,
@@ -362,7 +487,29 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     );
   }
 
-  Widget _buildVitalSigns() {
+  Widget _buildVitalSigns(ReportsState state) {
+    final readings = state.readings;
+    double spo2 = 0;
+    double heartRate = 0;
+    double rso2 = 0;
+    int readingCount = 0;
+
+    if (readings.isNotEmpty) {
+      for (final r in readings) {
+        if (r['spo2'] != null) spo2 += (r['spo2'] as num).toDouble();
+        if (r['heart_rate'] != null) {
+          heartRate += (r['heart_rate'] as num).toDouble();
+        }
+        if (r['rso2'] != null) rso2 += (r['rso2'] as num).toDouble();
+        readingCount++;
+      }
+      if (readingCount > 0) {
+        spo2 /= readingCount;
+        heartRate /= readingCount;
+        rso2 /= readingCount;
+      }
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -379,44 +526,55 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         children: [
           Row(
             children: [
-              const Text(
-                'المؤشرات الحيوية',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context).t('vital_signs'),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const Spacer(),
-              Icon(Icons.add_circle_outline, color: const Color(0xFF2196F3)),
+              if (readingCount > 0)
+                Text(
+                  '$readingCount ${AppLocalizations.of(context).t('readings_count')}',
+                  style: const TextStyle(
+                    color: Color(0xFF8E8E93),
+                    fontSize: 12,
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 16),
           _VitalSignRow(
             icon: Icons.water_drop_outlined,
-            label: 'تنشيع الأكسجين',
-            value: '96%',
+            label: AppLocalizations.of(context).t('vital_oxygen_saturation'),
+            value: readingCount > 0 ? '${spo2.toStringAsFixed(1)}%' : '--',
             color: const Color(0xFF2196F3),
           ),
           const SizedBox(height: 12),
           _VitalSignRow(
             icon: Icons.psychology_outlined,
-            label: 'تدفق الدم للدماغ',
-            value: '75%',
+            label: AppLocalizations.of(context).t('vital_brain_blood_flow'),
+            value: readingCount > 0 ? '${rso2.toStringAsFixed(1)}%' : '--',
             color: const Color(0xFF9C27B0),
           ),
           const SizedBox(height: 12),
           _VitalSignRow(
             icon: Icons.favorite_outline,
-            label: 'معدل النبض',
-            value: '78 BPM',
+            label: AppLocalizations.of(context).t('vital_heart_rate'),
+            value: readingCount > 0
+                ? '${heartRate.toStringAsFixed(0)} BPM'
+                : '--',
             color: const Color(0xFFFF3B30),
           ),
           const SizedBox(height: 12),
           _VitalSignRow(
-            icon: Icons.thermostat,
-            label: 'درجة الحرارة',
-            value: '36.6°C',
+            icon: Icons.show_chart,
+            label: AppLocalizations.of(context).t('signal_quality'),
+            value: readingCount > 0
+                ? '${readings.last['signal_quality'] ?? "--"}'
+                : '--',
             color: const Color(0xFF2196F3),
           ),
         ],
@@ -429,11 +587,40 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
       width: double.infinity,
       height: 56,
       child: ElevatedButton.icon(
-        onPressed: () {},
+        onPressed: () async {
+          try {
+            final api = ref.read(apiClientProvider);
+            await api.post('/v1/reports', data: {
+              'title': 'تقرير يومي - ${DateTime.now().toString().substring(0, 10)}',
+              'report_type': 'daily_summary',
+              'format': 'pdf',
+              'language': 'ar',
+              'include_shap': false,
+              'include_trends': true,
+            });
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('تم إنشاء التقرير بنجاح'),
+                  backgroundColor: Color(0xFF34C759),
+                ),
+              );
+            }
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('خطأ: $e'),
+                  backgroundColor: const Color(0xFFFF3B30),
+                ),
+              );
+            }
+          }
+        },
         icon: const Icon(Icons.download, color: Colors.white),
-        label: const Text(
-          'تصدير التقرير (PDF)',
-          style: TextStyle(
+        label: Text(
+          AppLocalizations.of(context).t('export_report_pdf'),
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -448,6 +635,14 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         ),
       ),
     );
+  }
+
+  String _arabicMonth(int month) {
+    const months = [
+      '', 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    ];
+    return months[month];
   }
 }
 

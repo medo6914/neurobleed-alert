@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:core/core.dart';
+import 'package:shared/shared.dart';
+import '../providers/device_list_provider.dart';
 
 class DeviceListScreen extends ConsumerStatefulWidget {
   const DeviceListScreen({super.key});
@@ -11,7 +14,17 @@ class DeviceListScreen extends ConsumerStatefulWidget {
 
 class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(deviceListProvider.notifier).loadDevices(refresh: true);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final deviceState = ref.watch(deviceListProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFF0A0E1A),
       body: SafeArea(
@@ -19,23 +32,40 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
           children: [
             _buildHeader(context),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    _buildDeviceStatusCard(),
-                    const SizedBox(height: 16),
-                    _buildConnectionStatus(),
-                    const SizedBox(height: 16),
-                    _buildDeviceInfo(),
-                    const SizedBox(height: 16),
-                    _buildSensorStatus(),
-                    const SizedBox(height: 16),
-                    _buildDiagnoseButton(),
-                    const SizedBox(height: 100),
-                  ],
-                ),
-              ),
+              child: deviceState.isLoading && deviceState.devices.isEmpty
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF42A5F5),
+                      ),
+                    )
+                  : deviceState.error != null && deviceState.devices.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.error_outline,
+                                  color: Color(0xFFFF3B30), size: 48),
+                              const SizedBox(height: 16),
+                              Text(
+                                'خطأ في تحميل الأجهزة',
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.7),
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              ElevatedButton(
+                                onPressed: () => ref
+                                    .read(deviceListProvider.notifier)
+                                    .refresh(),
+                                child: const Text('إعادة المحاولة'),
+                              ),
+                            ],
+                          ),
+                        )
+                      : deviceState.devices.isEmpty
+                          ? _buildEmptyState()
+                          : _buildDeviceList(deviceState),
             ),
           ],
         ),
@@ -58,9 +88,9 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
             onPressed: () {},
           ),
           const Spacer(),
-          const Text(
-            'الجهاز',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context).t('device_title'),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -69,15 +99,95 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white, size: 24),
-            onPressed: () {},
+            onPressed: () =>
+                ref.read(deviceListProvider.notifier).refresh(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDeviceStatusCard() {
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.devices_other,
+              color: Colors.white.withValues(alpha: 0.3), size: 64),
+          const SizedBox(height: 16),
+          Text(
+            'لا توجد أجهزة مسجلة',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.5),
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'قم بتركيب جهاز NeuroBleed للبدء',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.3),
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () => context.push('/device/pair'),
+            icon: const Icon(Icons.bluetooth_searching, color: Colors.white),
+            label: const Text(
+              'زوج جهاز جديد',
+              style: TextStyle(color: Colors.white),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1A237E),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: Color(0xFF42A5F5)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeviceList(DeviceListState state) {
+    return RefreshIndicator(
+      onRefresh: () => ref.read(deviceListProvider.notifier).refresh(),
+      color: const Color(0xFF42A5F5),
+      backgroundColor: const Color(0xFF1A1F35),
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: state.devices.length + (state.hasMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index == state.devices.length) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: CircularProgressIndicator(color: Color(0xFF42A5F5)),
+              ),
+            );
+          }
+
+          final device = state.devices[index];
+          return _buildDeviceCard(device);
+        },
+      ),
+    );
+  }
+
+  Widget _buildDeviceCard(dynamic device) {
+    final deviceName = device.name ?? device.serialNumber;
+    final serialNumber = device.serialNumber;
+    final batteryLevel = device.batteryLevel.round();
+    final status = device.status;
+    final firmwareVersion = device.firmwareVersion;
+    final lastSeen = device.lastHeartbeat;
+    final signalStrength = device.signalStrength;
+    final isActive = device.isConnected;
+
     return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -93,30 +203,78 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
         children: [
           Row(
             children: [
-              const Text(
-                'حالة الجهاز',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  'assets/images/device_headset.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A237E).withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.headset_mic,
+                      color: Color(0xFF90CAF9),
+                      size: 30,
+                    ),
+                  ),
                 ),
               ),
-              const Spacer(),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      deviceName,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      serialNumber,
+                      style: const TextStyle(
+                        color: Color(0xFF8E8E93),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF34C759).withValues(alpha: 0.15),
+                  color: isActive
+                      ? const Color(0xFF34C759).withValues(alpha: 0.15)
+                      : const Color(0xFFFF3B30).withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.circle, color: Color(0xFF34C759), size: 8),
-                    SizedBox(width: 6),
+                    Icon(
+                      Icons.circle,
+                      color: isActive
+                          ? const Color(0xFF34C759)
+                          : const Color(0xFFFF3B30),
+                      size: 8,
+                    ),
+                    const SizedBox(width: 6),
                     Text(
-                      'متصل',
+                      isActive ? 'متصل' : 'غير متصل',
                       style: TextStyle(
-                        color: Color(0xFF34C759),
+                        color: isActive
+                            ? const Color(0xFF34C759)
+                            : const Color(0xFFFF3B30),
                         fontSize: 12,
                       ),
                     ),
@@ -126,127 +284,81 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
             ],
           ),
           const SizedBox(height: 16),
+          _buildInfoRow('نوع الجهاز', _deviceTypeLabel(device.type)),
+          const SizedBox(height: 8),
+          _buildInfoRow('الإصدار', firmwareVersion),
+          const SizedBox(height: 8),
+          _buildInfoRow('البطارية', '$batteryLevel%'),
+          if (lastSeen != null) ...[
+            const SizedBox(height: 8),
+            _buildInfoRow('آخر اتصال', _formatLastSeen(lastSeen)),
+          ],
+          if (signalStrength > 0) ...[
+            const SizedBox(height: 8),
+            _buildInfoRow('قوة الإشارة', '$signalStrength dBm'),
+          ],
+          const SizedBox(height: 12),
           Row(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  'assets/images/device_headset.png',
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1A237E).withValues(alpha: 0.3),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => context.push('/device/detail/${device.id}'),
+                  icon: const Icon(Icons.info_outline,
+                      color: Color(0xFF42A5F5), size: 18),
+                  label: const Text(
+                    'تفاصيل',
+                    style: TextStyle(color: Color(0xFF42A5F5)),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFF42A5F5)),
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.headset_mic,
-                      color: Color(0xFF90CAF9),
-                      size: 40,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'NBA-HEADBAND-01',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    try {
+                      final api = ref.read(apiClientProvider);
+                      await api.get('/v1/devices/${device.id}/diagnostics');
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('تم فحص الجهاز بنجاح'),
+                            backgroundColor: Color(0xFF34C759),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('خطأ في الفحص: $e'),
+                            backgroundColor: const Color(0xFFFF3B30),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  icon: const Icon(Icons.build_outlined,
+                      color: Color(0xFF9C27B0), size: 18),
+                  label: const Text(
+                    'فحص',
+                    style: TextStyle(color: Color(0xFF9C27B0)),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFF9C27B0)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '78%',
-                      style: TextStyle(
-                        color: const Color(0xFF34C759),
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildConnectionStatus() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _ConnectionItem(
-            icon: Icons.bluetooth,
-            label: 'BLE',
-            isConnected: true,
-          ),
-          _ConnectionItem(
-            icon: Icons.phone_android,
-            label: 'الهاتف',
-            isConnected: true,
-          ),
-          _ConnectionItem(
-            icon: Icons.cloud_queue,
-            label: 'السحابة',
-            isConnected: true,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDeviceInfo() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'معلومات الجهاز',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildInfoRow('إصدار الجهاز', 'v1.2.3'),
-          const SizedBox(height: 12),
-          _buildInfoRow('رقم الجهاز', 'NBA-2026-001'),
-          const SizedBox(height: 12),
-          _buildInfoRow('آخر مرافقة', 'اليوم 10:30 AM'),
-          const SizedBox(height: 12),
-          _buildInfoRow('حالة البطارية', '78%'),
         ],
       ),
     );
@@ -274,145 +386,32 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
     );
   }
 
-  Widget _buildSensorStatus() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'حالة الحساسات',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildSensorRow('NIRS Sensor', true),
-          const SizedBox(height: 12),
-          _buildSensorRow('Temperature Sensor', true),
-          const SizedBox(height: 12),
-          _buildSensorRow('Motion Sensor', true),
-          const SizedBox(height: 12),
-          _buildSensorRow('Battery', true),
-        ],
-      ),
-    );
+  String _deviceTypeLabel(dynamic type) {
+    switch (type) {
+      case DeviceType.headband:
+        return 'Headband';
+      case DeviceType.wearable:
+        return 'Wearable';
+      case DeviceType.bedside:
+        return 'Bedside';
+      default:
+        return type?.toString() ?? '--';
+    }
   }
 
-  Widget _buildSensorRow(String name, bool isActive) {
-    return Row(
-      children: [
-        Icon(
-          Icons.circle,
-          color: isActive ? const Color(0xFF34C759) : const Color(0xFFFF3B30),
-          size: 8,
-        ),
-        const SizedBox(width: 12),
-        Text(
-          name,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
-        ),
-        const Spacer(),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: isActive
-                ? const Color(0xFF34C759).withValues(alpha: 0.15)
-                : const Color(0xFFFF3B30).withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            isActive ? 'نشط' : 'غير نشط',
-            style: TextStyle(
-              color: isActive ? const Color(0xFF34C759) : const Color(0xFFFF3B30),
-              fontSize: 12,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDiagnoseButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton.icon(
-        onPressed: () {},
-        icon: const Icon(Icons.build_outlined, color: Colors.white),
-        label: const Text(
-          'فحص الجهاز الآن',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF1A237E),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0xFF42A5F5)),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ConnectionItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isConnected;
-
-  const _ConnectionItem({
-    required this.icon,
-    required this.label,
-    required this.isConnected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: isConnected
-                ? const Color(0xFF2196F3).withValues(alpha: 0.15)
-                : const Color(0xFF8E8E93).withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            icon,
-            color: isConnected ? const Color(0xFF2196F3) : const Color(0xFF8E8E93),
-            size: 24,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            color: isConnected ? Colors.white : const Color(0xFF8E8E93),
-            fontSize: 12,
-          ),
-        ),
-      ],
-    );
+  String _formatLastSeen(dynamic lastSeen) {
+    try {
+      final dt = lastSeen is DateTime
+          ? lastSeen
+          : DateTime.parse(lastSeen.toString());
+      final now = DateTime.now();
+      final diff = now.difference(dt);
+      if (diff.inMinutes < 1) return 'الآن';
+      if (diff.inMinutes < 60) return 'منذ ${diff.inMinutes} دقيقة';
+      if (diff.inHours < 24) return 'منذ ${diff.inHours} ساعة';
+      return 'منذ ${diff.inDays} يوم';
+    } catch (_) {
+      return '--';
+    }
   }
 }

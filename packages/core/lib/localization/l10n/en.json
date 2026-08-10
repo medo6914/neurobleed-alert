@@ -340,5 +340,16 @@
   "join_date_value": "May 10, 2026",
   "language_arabic": "العربية",
   "language_english": "English",
-  "english_under_development": "English is under development"
+  "english_under_development": "English is under development",
+  "signal_quality": "Signal Quality",
+  "readings_count": "readings",
+  "active_patients": "Active Patients",
+  "critical_alerts": "Critical Alerts",
+  "today": "Today",
+  "this_week": "This Week",
+  "this_month": "This Month",
+  "this_year": "This Year",
+  "device": "Device",
+  "all": "All",
+  "events": "Events"
 }
