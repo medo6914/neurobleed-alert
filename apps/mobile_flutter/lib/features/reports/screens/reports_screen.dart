@@ -1,27 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:design_system/design_system.dart';
 import 'package:core/core.dart';
-
-final reportsProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
-  final api = ref.read(apiClientProvider);
-  final response = await api.get('/v1/reports/', queryParameters: {
-    'per_page': 200,
-  });
-  final data = response.data;
-  if (data is List) return data.cast<Map<String, dynamic>>();
-  if (data is Map && data['items'] is List) {
-    return (data['items'] as List).cast<Map<String, dynamic>>();
-  }
-  return [];
-});
-
-enum ReportPeriod { all, daily, weekly, monthly }
 
 class ReportsScreen extends ConsumerStatefulWidget {
   const ReportsScreen({super.key});
@@ -31,216 +12,30 @@ class ReportsScreen extends ConsumerStatefulWidget {
 }
 
 class _ReportsScreenState extends ConsumerState<ReportsScreen> {
-  ReportPeriod _period = ReportPeriod.all;
+  int _selectedTab = 0;
 
   @override
   Widget build(BuildContext context) {
-    final reportsAsync = ref.watch(reportsProvider);
-    final theme = Theme.of(context);
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('التقارير السريرية'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.invalidate(reportsProvider),
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async => ref.invalidate(reportsProvider),
-        child: reportsAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline,
-                      size: 64, color: theme.colorScheme.error),
-                  const SizedBox(height: 16),
-                  Text('تعذر تحميل التقارير',
-                      style: theme.textTheme.titleMedium),
-                  const SizedBox(height: 8),
-                  Text('$err', style: theme.textTheme.bodySmall),
-                  const SizedBox(height: 24),
-                  FilledButton.icon(
-                    onPressed: () => ref.invalidate(reportsProvider),
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('إعادة المحاولة'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          data: (reports) {
-            final filtered = _filterByPeriod(reports);
-            if (reports.isEmpty) {
-              return _buildEmpty(theme);
-            }
-            return ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _buildPeriodChips(),
-                const SizedBox(height: 16),
-                _buildReportChart(filtered, theme),
-                const SizedBox(height: 16),
-                ...filtered.map((report) => _buildReportCard(report, theme)),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmpty(ThemeData theme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.description_outlined,
-              size: 80,
-              color: theme.colorScheme.primary.withValues(alpha: 0.4)),
-          const SizedBox(height: 16),
-          Text('لا توجد تقارير بعد', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Text('ستظهر التقارير السريرية هنا',
-              style: theme.textTheme.bodySmall
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-        ],
-      ),
-    );
-  }
-
-  List<Map<String, dynamic>> _filterByPeriod(
-      List<Map<String, dynamic>> reports) {
-    if (_period == ReportPeriod.all) return reports;
-    final now = DateTime.now();
-    final cutoff = switch (_period) {
-      ReportPeriod.daily => now.subtract(const Duration(days: 1)),
-      ReportPeriod.weekly => now.subtract(const Duration(days: 7)),
-      ReportPeriod.monthly => now.subtract(const Duration(days: 30)),
-      ReportPeriod.all => now,
-    };
-    return reports.where((r) {
-      final created = DateTime.tryParse(r['created_at'] as String? ?? '');
-      return created != null && created.isAfter(cutoff);
-    }).toList();
-  }
-
-  Widget _buildPeriodChips() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          for (final p in ReportPeriod.values) ...[
-            ChoiceChip(
-              label: Text(_periodLabel(p)),
-              selected: _period == p,
-              onSelected: (_) => setState(() => _period = p),
-            ),
-            const SizedBox(width: 8),
-          ],
-        ],
-      ),
-    );
-  }
-
-  String _periodLabel(ReportPeriod p) {
-    switch (p) {
-      case ReportPeriod.all:
-        return 'الكل';
-      case ReportPeriod.daily:
-        return 'يومي';
-      case ReportPeriod.weekly:
-        return 'أسبوعي';
-      case ReportPeriod.monthly:
-        return 'شهري';
-    }
-  }
-
-  Widget _buildReportChart(
-      List<Map<String, dynamic>> reports, ThemeData theme) {
-    if (reports.isEmpty) return const SizedBox.shrink();
-    final now = DateTime.now();
-    final days = <DateTime>[];
-    for (int i = 6; i >= 0; i--) {
-      days.add(
-          DateTime(now.year, now.month, now.day).subtract(Duration(days: i)));
-    }
-    final counts = days
-        .map((d) => reports.where((r) {
-              final created =
-                  DateTime.tryParse(r['created_at'] as String? ?? '');
-              return created != null &&
-                  created.year == d.year &&
-                  created.month == d.month &&
-                  created.day == d.day;
-            }).length)
-        .toList();
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      backgroundColor: const Color(0xFF0A0E1A),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('التقارير خلال آخر 7 أيام',
-                style: theme.textTheme.titleSmall
-                    ?.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 120,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceAround,
-                  maxY: counts.isEmpty
-                      ? 1
-                      : (counts.reduce((a, b) => a > b ? a : b) + 1).toDouble(),
-                  gridData: const FlGridData(show: false),
-                  borderData: FlBorderData(show: false),
-                  titlesData: FlTitlesData(
-                    leftTitles:
-                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles:
-                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles:
-                        AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: (value, meta) {
-                          final idx = value.toInt();
-                          if (idx < 0 || idx >= days.length) {
-                            return const SizedBox.shrink();
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              '${days[idx].day}',
-                              style: const TextStyle(fontSize: 10),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  barGroups: [
-                    for (int i = 0; i < counts.length; i++)
-                      BarChartGroupData(
-                        x: i,
-                        barRods: [
-                          BarChartRodData(
-                            toY: counts[i].toDouble(),
-                            color: NeuroColors.primary,
-                            width: 14,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ],
-                      ),
+            _buildHeader(context),
+            _buildTabs(),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    _buildDailySummary(),
+                    const SizedBox(height: 16),
+                    _buildRiskChart(),
+                    const SizedBox(height: 16),
+                    _buildVitalSigns(),
+                    const SizedBox(height: 16),
+                    _buildExportButton(),
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
@@ -251,152 +46,458 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     );
   }
 
-  Widget _buildReportCard(Map<String, dynamic> report, ThemeData theme) {
-    final title = report['title'] as String? ?? 'تقرير بدون عنوان';
-    final status = report['status'] as String? ?? 'unknown';
-    final format = report['format'] as String? ?? 'PDF';
-    final createdAt = report['created_at'] as String? ?? '';
-    final patientId = report['patient_id'] as String? ?? '';
-    final riskScore = report['risk_score'];
-
-    IconData icon;
-    Color statusColor;
-    switch (format.toUpperCase()) {
-      case 'HTML':
-        icon = Icons.code;
-        break;
-      case 'DOCX':
-        icon = Icons.description;
-        break;
-      default:
-        icon = Icons.picture_as_pdf;
-    }
-    switch (status.toLowerCase()) {
-      case 'completed':
-        statusColor = NeuroColors.success;
-        break;
-      case 'generating':
-        statusColor = NeuroColors.high;
-        break;
-      case 'failed':
-        statusColor = NeuroColors.critical;
-        break;
-      default:
-        statusColor = NeuroColors.textSecondary;
-    }
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        onTap: patientId.isNotEmpty
-            ? () => context.push('/patients/$patientId')
-            : null,
-        leading: CircleAvatar(
-          backgroundColor: statusColor.withValues(alpha: 0.1),
-          child: Icon(icon, color: statusColor),
-        ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(status,
-                      style: TextStyle(fontSize: 12, color: statusColor)),
-                ),
-                const SizedBox(width: 8),
-                Text(format, style: const TextStyle(fontSize: 12)),
-                if (riskScore != null) ...[
-                  const SizedBox(width: 8),
-                  Text(
-                    'Risk: ${((riskScore as num) * 100).toStringAsFixed(0)}%',
-                    style:
-                        const TextStyle(fontSize: 12, color: NeuroColors.high),
-                  ),
-                ],
-              ],
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        16,
+        MediaQuery.of(context).padding.top + 8,
+        16,
+        16,
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
+            onPressed: () => context.go('/dashboard'),
+          ),
+          const Spacer(),
+          const Text(
+            'التقارير',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-            if (createdAt.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(createdAt, style: const TextStyle(fontSize: 11)),
-            ],
-            if (patientId.isNotEmpty) ...[
-              const SizedBox(height: 2),
-              const Text('اضغط لفتح ملف المريض',
-                  style: TextStyle(fontSize: 11, color: NeuroColors.info)),
-            ],
-          ],
-        ),
-        isThreeLine: true,
-        trailing: PopupMenuButton<String>(
-          onSelected: (action) async {
-            if (action == 'download') {
-              await _downloadReport(report, title);
-            } else if (action == 'preview') {
-              await _previewReport(report);
-            }
-          },
-          itemBuilder: (context) => [
-            const PopupMenuItem(
-                value: 'download',
-                child: ListTile(
-                    leading: Icon(Icons.download), title: Text('تنزيل PDF'))),
-            const PopupMenuItem(
-                value: 'preview',
-                child: ListTile(
-                    leading: Icon(Icons.visibility), title: Text('معاينة'))),
-          ],
-        ),
+          ),
+          const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.calendar_today, color: Colors.white, size: 24),
+            onPressed: () {},
+          ),
+        ],
       ),
     );
   }
 
-  Future<void> _downloadReport(
-      Map<String, dynamic> report, String title) async {
-    final id = report['id'];
-    if (id == null) {
-      _showSnack('التقرير لا يحتوي على معرّف');
-      return;
-    }
-    try {
-      final api = ref.read(apiClientProvider);
-      final tempDir = await Directory.systemTemp.createTemp('neurobleed_');
-      final ext = (report['format'] as String? ?? 'pdf').toLowerCase();
-      final savePath =
-          '${tempDir.path}/report_${id}_${DateTime.now().millisecondsSinceEpoch}.$ext';
-      await api.download('/v1/reports/$id/download', savePath);
-      if (!mounted) return;
-      _showSnack('تم تنزيل التقرير، جارٍ الفتح...');
-      final result = await OpenFilex.open(savePath);
-      if (result.type != ResultType.done) {
-        _showSnack('تم التنزيل إلى: $savePath');
-      }
-    } catch (e) {
-      _showSnack('فشل تنزيل التقرير: $e');
-    }
+  Widget _buildTabs() {
+    final tabs = ['اليوم', 'الأسبوع', 'الشهر', 'السنة'];
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1F35),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: List.generate(tabs.length, (index) {
+          final isSelected = _selectedTab == index;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _selectedTab = index),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: isSelected ? const Color(0xFF1A237E) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                  border: isSelected
+                      ? Border.all(color: const Color(0xFF42A5F5))
+                      : null,
+                ),
+                child: Text(
+                  tabs[index],
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : const Color(0xFF8E8E93),
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
   }
 
-  Future<void> _previewReport(Map<String, dynamic> report) async {
-    final id = report['id'];
-    final api = ref.read(apiClientProvider);
-    final baseUrl = api.dio.options.baseUrl;
-    final uri = Uri.parse('$baseUrl/v1/reports/$id/html');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+  Widget _buildDailySummary() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'ملخص اليوم',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '18 يوليو 2026',
+                      style: TextStyle(
+                        color: const Color(0xFF8E8E93),
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF34C759).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.check_circle,
+                              color: Color(0xFF34C759), size: 16),
+                          SizedBox(width: 6),
+                          Text(
+                            'لا توجد مؤشرات خطرة',
+                            style: TextStyle(
+                              color: Color(0xFF34C759),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: 100,
+                height: 100,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      height: 100,
+                      child: CircularProgressIndicator(
+                        value: 0.92,
+                        strokeWidth: 8,
+                        backgroundColor: Colors.white.withValues(alpha: 0.08),
+                        valueColor: const AlwaysStoppedAnimation(Color(0xFF34C759)),
+                        strokeCap: StrokeCap.round,
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          '92%',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const Text(
+                          'صحة الدماغ',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Color(0xFF8E8E93),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
-  void _showSnack(String message) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+  Widget _buildRiskChart() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'احتمالية النزيف خلال اليوم',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 200,
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: 25,
+                  getDrawingHorizontalLine: (value) {
+                    return FlLine(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      strokeWidth: 1,
+                    );
+                  },
+                ),
+                titlesData: FlTitlesData(
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 40,
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          '${value.toInt()}%',
+                          style: const TextStyle(
+                            color: Color(0xFF8E8E93),
+                            fontSize: 10,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 30,
+                      getTitlesWidget: (value, meta) {
+                        final times = ['00:00', '06:00', '12:00', '18:00', '24:00'];
+                        final idx = value.toInt();
+                        if (idx >= 0 && idx < times.length) {
+                          return Text(
+                            times[idx],
+                            style: const TextStyle(
+                              color: Color(0xFF8E8E93),
+                              fontSize: 10,
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                ),
+                borderData: FlBorderData(show: false),
+                minX: 0,
+                maxX: 4,
+                minY: 0,
+                maxY: 100,
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: [
+                      const FlSpot(0, 18),
+                      const FlSpot(1, 22),
+                      const FlSpot(2, 15),
+                      const FlSpot(3, 28),
+                      const FlSpot(4, 18),
+                    ],
+                    isCurved: true,
+                    color: const Color(0xFFFF3B30),
+                    barWidth: 3,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) {
+                        if (index == 4) {
+                          return FlDotCirclePainter(
+                            radius: 6,
+                            color: Colors.white,
+                            strokeWidth: 3,
+                            strokeColor: const Color(0xFFFF3B30),
+                          );
+                        }
+                        return FlDotCirclePainter(radius: 0);
+                      },
+                    ),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          const Color(0xFFFF3B30).withValues(alpha: 0.3),
+                          const Color(0xFFFF3B30).withValues(alpha: 0.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVitalSigns() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text(
+                'المؤشرات الحيوية',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              Icon(Icons.add_circle_outline, color: const Color(0xFF2196F3)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _VitalSignRow(
+            icon: Icons.water_drop_outlined,
+            label: 'تنشيع الأكسجين',
+            value: '96%',
+            color: const Color(0xFF2196F3),
+          ),
+          const SizedBox(height: 12),
+          _VitalSignRow(
+            icon: Icons.psychology_outlined,
+            label: 'تدفق الدم للدماغ',
+            value: '75%',
+            color: const Color(0xFF9C27B0),
+          ),
+          const SizedBox(height: 12),
+          _VitalSignRow(
+            icon: Icons.favorite_outline,
+            label: 'معدل النبض',
+            value: '78 BPM',
+            color: const Color(0xFFFF3B30),
+          ),
+          const SizedBox(height: 12),
+          _VitalSignRow(
+            icon: Icons.thermostat,
+            label: 'درجة الحرارة',
+            value: '36.6°C',
+            color: const Color(0xFF2196F3),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExportButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton.icon(
+        onPressed: () {},
+        icon: const Icon(Icons.download, color: Colors.white),
+        label: const Text(
+          'تصدير التقرير (PDF)',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF1A237E),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Color(0xFF42A5F5)),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _VitalSignRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _VitalSignRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+            ),
+          ),
+        ),
+        Icon(Icons.show_chart, color: color, size: 20),
+        const SizedBox(width: 8),
+        Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
   }
 }

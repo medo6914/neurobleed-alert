@@ -14,6 +14,7 @@ class SecureStorageService {
   static const _themeModeKey = 'theme_mode';
   static const _localeKey = 'app_locale';
   static const _rememberMeKey = 'remember_me';
+  static const _fontSizeKey = 'font_size';
 
   Future<void> saveToken(String token) async {
     await _storage.write(key: _tokenKey, value: token);
@@ -113,5 +114,14 @@ class SecureStorageService {
   Future<bool> getRememberMe() async {
     final value = await _storage.read(key: _rememberMeKey);
     return value == 'true';
+  }
+
+  Future<void> saveFontSize(String size) async {
+    await _storage.write(key: _fontSizeKey, value: size);
+  }
+
+  Future<String> getFontSize() async {
+    final value = await _storage.read(key: _fontSizeKey);
+    return value ?? 'medium';
   }
 }

@@ -13,8 +13,21 @@ class NeuroBleedApp extends ConsumerWidget {
     debugPrint('[APP] NeuroBleedApp.build');
     final router = ref.watch(routerProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final fontSize = ref.watch(fontSizeProvider);
     final locale = ref.watch(localeProvider);
     debugPrint('[APP] router + theme ready, themeMode=$themeMode');
+
+    double textScaleFactor;
+    switch (fontSize) {
+      case 'small':
+        textScaleFactor = 0.85;
+        break;
+      case 'large':
+        textScaleFactor = 1.25;
+        break;
+      default:
+        textScaleFactor = 1.0;
+    }
 
     return MaterialApp.router(
       title: 'NeuroBleed Alert',
@@ -30,6 +43,14 @@ class NeuroBleedApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler: TextScaler.linear(textScaleFactor),
+          ),
+          child: child!,
+        );
+      },
       routerConfig: router,
     );
   }

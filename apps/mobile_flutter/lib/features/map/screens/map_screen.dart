@@ -202,167 +202,134 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('الخريطة - أقرب المستشفيات'),
-        actions: [
-          IconButton(
-            icon:
-                Icon(_locating ? Icons.my_location : Icons.location_searching),
-            tooltip: 'موقعي',
-            onPressed: _locateUser,
-          ),
-          IconButton(icon: const Icon(Icons.refresh), onPressed: _load),
-        ],
-      ),
-      body: _loading
-          ? const Center(child: AppLoading())
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          onChanged: (v) => _searchQuery = v,
-                          onSubmitted: (_) => _search(),
-                          decoration: InputDecoration(
-                            hintText: 'ابحث عن مستشفى أو مكان...',
-                            isDense: true,
-                            prefixIcon: const Icon(Icons.search, size: 20),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding:
-                                const EdgeInsets.symmetric(vertical: 8),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(Icons.directions,
-                            color: NeuroColors.success),
-                        tooltip: 'الاتجاه إلى أقرب مستشفى',
-                        onPressed: _routeToNearest,
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Stack(
-                    children: [
-                      FlutterMap(
-                        mapController: _mapController,
-                        options: MapOptions(
-                          initialCenter: _userLocation,
-                          initialZoom: 13,
-                          onTap: (_, __) => setState(() {
-                            _route = null;
-                            _routeDistanceM = null;
-                            _routeDurationS = null;
-                            _searchResult = null;
-                          }),
-                        ),
-                        children: [
-                          TileLayer(
-                            urlTemplate: _kTileUrl,
-                            userAgentPackageName: 'com.neurobleed.alert',
-                          ),
-                          if (_route != null)
-                            PolylineLayer(
-                              polylines: [
-                                Polyline(
-                                  points: _route!,
-                                  strokeWidth: 5,
-                                  color: NeuroColors.success,
-                                ),
-                              ],
-                            ),
-                          MarkerLayer(
-                            markers: [
-                              for (final h in _hospitals)
-                                if (_hospitalLatLng(h) != null)
-                                  Marker(
-                                    point: _hospitalLatLng(h)!,
-                                    width: 34,
-                                    height: 34,
-                                    child: GestureDetector(
-                                      onTap: () => _showHospitalSheet(h),
-                                      child: const Icon(
-                                        Icons.local_hospital,
-                                        color: NeuroColors.success,
-                                        size: 32,
-                                        shadows: [
-                                          Shadow(
-                                            color: NeuroColors.bgPrimary,
-                                            blurRadius: 6,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                              if (_searchResult != null)
-                                Marker(
-                                  point: _searchResult!,
-                                  width: 30,
-                                  height: 30,
-                                  child: const Icon(
-                                    Icons.place,
-                                    color: NeuroColors.info,
-                                    size: 30,
-                                  ),
-                                ),
-                              Marker(
-                                point: _userLocation,
-                                width: 32,
-                                height: 32,
-                                child: const Icon(
-                                  Icons.navigation,
-                                  color: NeuroColors.critical,
-                                  size: 32,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      if (_locating)
-                        const Positioned(
-                          top: 12,
-                          left: 12,
-                          child: Card(
-                            child: Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(
-                                    width: 14,
-                                    height: 14,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text('جاري تحديد الموقع...',
-                                      style: TextStyle(fontSize: 12)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      if (_route != null)
+      backgroundColor: const Color(0xFF0A0E1A),
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(context),
+            Expanded(
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : Stack(
+                      children: [
+                        _buildMap(),
+                        if (_route != null) _buildEtaBanner(),
                         Positioned(
                           left: 12,
                           right: 12,
                           bottom: 12,
-                          child: _buildEtaBanner(),
+                          child: _buildHospitalCard(),
                         ),
-                    ],
+                      ],
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        16,
+        MediaQuery.of(context).padding.top + 8,
+        16,
+        16,
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
+            onPressed: () => Navigator.pop(context),
+          ),
+          const Spacer(),
+          const Text(
+            'أقرب المستشفيات',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.navigation_outlined, color: Colors.white, size: 24),
+            onPressed: _locateUser,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMap() {
+    return FlutterMap(
+      mapController: _mapController,
+      options: MapOptions(
+        initialCenter: _userLocation,
+        initialZoom: 13,
+        onTap: (_, __) => setState(() {
+          _route = null;
+          _routeDistanceM = null;
+          _routeDurationS = null;
+        }),
+      ),
+      children: [
+        TileLayer(
+          urlTemplate: _kTileUrl,
+          userAgentPackageName: 'com.neurobleed.alert',
+        ),
+        if (_route != null)
+          PolylineLayer(
+            polylines: [
+              Polyline(
+                points: _route!,
+                strokeWidth: 5,
+                color: const Color(0xFF2196F3),
+              ),
+            ],
+          ),
+        MarkerLayer(
+          markers: [
+            for (final h in _hospitals)
+              if (_hospitalLatLng(h) != null)
+                Marker(
+                  point: _hospitalLatLng(h)!,
+                  width: 40,
+                  height: 40,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF3B30),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'H',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                _buildBottomCards(),
-              ],
+            Marker(
+              point: _userLocation,
+              width: 32,
+              height: 32,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2196F3),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 3),
+                ),
+              ),
             ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -376,49 +343,176 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             : '${distanceM.round()} م'
         : null;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: NeuroColors.bgElevated,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: NeuroColors.success.withValues(alpha: 0.4)),
-        boxShadow: const [NeuroShadows.elevated],
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.emergency, color: NeuroColors.critical, size: 22),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'الوصول المتوقع للمستشفى',
-                  style: NeuroTypography.caption?.copyWith(
-                    color: NeuroColors.textSecondary,
+    return Positioned(
+      top: 12,
+      left: 12,
+      right: 12,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1F35),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFF2196F3).withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.directions, color: Color(0xFF2196F3), size: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'الاتجاه إلى أقرب مستشفى',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  minutes != null
-                      ? 'خلال ${minutes == 1 ? 'دقيقة واحدة' : '$minutes دقائق'}'
-                      : 'جاري حساب وقت الوصول...',
-                  style: NeuroTypography.h3?.copyWith(
-                    color: NeuroColors.success,
-                    fontWeight: FontWeight.bold,
+                  Text(
+                    minutes != null
+                        ? 'خلال ${minutes == 1 ? 'دقيقة واحدة' : '$minutes دقائق'}'
+                        : 'جاري حساب الوقت...',
+                    style: const TextStyle(
+                      color: Color(0xFF2196F3),
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          if (distanceKm != null)
-            Text(
-              distanceKm,
-              style: NeuroTypography.caption?.copyWith(
-                color: NeuroColors.textPrimary,
-                fontWeight: FontWeight.w600,
+                ],
               ),
             ),
+            if (distanceKm != null)
+              Text(
+                distanceKm,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHospitalCard() {
+    final hospital = _nearestHospital();
+    if (hospital == null) return const SizedBox.shrink();
+
+    final name = hospital['name'] as String? ?? 'مستشفى';
+    final distance = (hospital['distance_km'] as num?)?.toDouble() ?? 2.3;
+    final duration = _routeDurationS != null ? (_routeDurationS! / 60).ceil() : 8;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2196F3).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.local_hospital,
+                  color: Color(0xFF2196F3),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined,
+                            color: Color(0xFF34C759), size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${distance.toStringAsFixed(1)} كم',
+                          style: const TextStyle(
+                            color: Color(0xFF34C759),
+                            fontSize: 12,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Icon(Icons.access_time,
+                            color: Color(0xFF34C759), size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$duration دقائق',
+                          style: const TextStyle(
+                            color: Color(0xFF34C759),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 48,
+                height: 48,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF34C759),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.phone,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.info_outline, color: Color(0xFF2196F3)),
+              label: const Text(
+                'المزيد من التفاصيل',
+                style: TextStyle(
+                  color: Color(0xFF2196F3),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2196F3).withValues(alpha: 0.1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: const BorderSide(color: Color(0xFF2196F3)),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

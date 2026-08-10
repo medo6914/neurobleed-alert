@@ -58,6 +58,7 @@ import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/admin/screens/admin_panel_screen.dart';
 import '../../features/map/screens/map_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
+import '../../features/history/history_screen.dart';
 
 class AppRouter {
   final AuthGuard _authGuard;
@@ -457,6 +458,11 @@ class AppRouter {
             path: '/profile',
             name: 'profile',
             builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/history',
+            name: 'history',
+            builder: (context, state) => const HistoryScreen(),
           ),
           GoRoute(
             path: '/settings',

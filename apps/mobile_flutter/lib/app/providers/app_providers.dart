@@ -5,6 +5,7 @@ import 'package:core/core.dart';
 import '../../core/auth/auth_provider.dart';
 import '../../core/router/app_router.dart' as app_router;
 import '../../core/theme/theme_notifier.dart';
+import '../../core/theme/font_size_notifier.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authGuard = ref.watch(authGuardProvider);
@@ -14,6 +15,11 @@ final routerProvider = Provider<GoRouter>((ref) {
 final themeModeProvider =
     StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
   return ThemeModeNotifier(ref.watch(secureStorageProvider));
+});
+
+final fontSizeProvider =
+    StateNotifierProvider<FontSizeNotifier, String>((ref) {
+  return FontSizeNotifier(ref.watch(secureStorageProvider));
 });
 
 final patientRepositoryProvider = Provider<PatientRepository>((ref) {

@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:design_system/design_system.dart';
 import 'package:core/core.dart';
 import '../../app/providers/app_providers.dart';
-
-final userSettingsProvider =
-    FutureProvider<Map<String, dynamic>>((ref) async {
-  final api = ref.read(apiClientProvider);
-  final response = await api.get('/v1/auth/me');
-  return response.data is Map
-      ? Map<String, dynamic>.from(response.data as Map)
-      : {};
-});
+import '../../core/auth/biometric_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -28,65 +19,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _biometricEnabled = false;
   bool _bluetoothEnabled = true;
   bool _locationEnabled = true;
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadPreferences();
-  }
-
-  Future<void> _loadPreferences() async {
-    final userAsync = ref.read(userSettingsProvider);
-    final user = userAsync.valueOrNull;
-    if (user != null) {
-      final prefs = user['notification_preferences'];
-      if (prefs is Map) {
-        setState(() {
-          _pushEnabled = prefs['push'] ?? true;
-          _emailEnabled = prefs['email'] ?? false;
-          _smsEnabled = prefs['sms'] ?? false;
-        });
-      }
-      setState(() {
-        _biometricEnabled = user['is_mfa_enabled'] ?? false;
-      });
-    }
-  }
-
-  Future<void> _savePreferences() async {
-    setState(() => _isLoading = true);
-    try {
-      final api = ref.read(apiClientProvider);
-      await api.put('/v1/auth/me', data: {
-        'notification_preferences': {
-          'push': _pushEnabled,
-          'email': _emailEnabled,
-          'sms': _smsEnabled,
-        },
-      });
-      ref.invalidate(userSettingsProvider);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم حفظ التفضيلات'),
-            backgroundColor: NeuroColors.low,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('فشل الحفظ: $e'),
-            backgroundColor: NeuroColors.critical,
-          ),
-        );
-      }
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,25 +26,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final isDark = themeMode == ThemeMode.dark;
 
     return Scaffold(
-      backgroundColor: NeuroColors.bgPrimary,
+      backgroundColor: const Color(0xFF0A0E1A),
       body: SafeArea(
         child: Column(
           children: [
             _buildHeader(context),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(NeuroSpacing.lg),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     _buildNotificationsSection(),
-                    const SizedBox(height: NeuroSpacing.xl),
+                    const SizedBox(height: 16),
                     _buildSecuritySection(),
-                    const SizedBox(height: NeuroSpacing.xl),
+                    const SizedBox(height: 16),
                     _buildDeviceSection(),
-                    const SizedBox(height: NeuroSpacing.xl),
+                    const SizedBox(height: 16),
                     _buildAppearanceSection(isDark),
-                    const SizedBox(height: NeuroSpacing.xl),
+                    const SizedBox(height: 16),
                     _buildAboutSection(),
+                    const SizedBox(height: 16),
+                    _buildDangerZone(),
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
@@ -126,32 +61,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        NeuroSpacing.lg,
-        MediaQuery.of(context).padding.top + NeuroSpacing.sm,
-        NeuroSpacing.lg,
-        NeuroSpacing.sm,
-      ),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [NeuroColors.headerGradTop, NeuroColors.headerGradBottom],
-        ),
+        16,
+        MediaQuery.of(context).padding.top + 8,
+        16,
+        16,
       ),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios,
-                color: NeuroColors.textPrimary),
-            onPressed: () => context.pop(),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
+            onPressed: () => context.go('/profile'),
           ),
-          Expanded(
-            child: Text(
-              'الإعدادات',
-              style: NeuroTypography.h1,
-              textAlign: TextAlign.center,
+          const Spacer(),
+          const Text(
+            'الإعدادات',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
           ),
+          const Spacer(),
           const SizedBox(width: 48),
         ],
       ),
@@ -159,248 +89,81 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildNotificationsSection() {
-    return Container(
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
-      decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('الإشعارات', style: NeuroTypography.h3),
-          const SizedBox(height: NeuroSpacing.md),
-          _buildSwitchTile(
-            Icons.notifications,
-            'إشعارات الدفع',
-            'استلام إشعارات فورية',
-            _pushEnabled,
-            (value) {
-              setState(() => _pushEnabled = value);
-              _savePreferences();
-            },
-          ),
-          _buildSwitchTile(
-            Icons.email,
-            'إشعارات البريد الإلكتروني',
-            'استلام تنبيقات عبر البريد',
-            _emailEnabled,
-            (value) {
-              setState(() => _emailEnabled = value);
-              _savePreferences();
-            },
-          ),
-          _buildSwitchTile(
-            Icons.sms,
-            'رسائل SMS',
-            'استلام رسائل نصية للطوارئ',
-            _smsEnabled,
-            (value) {
-              setState(() => _smsEnabled = value);
-              _savePreferences();
-            },
-          ),
-        ],
-      ),
+    return _buildSection(
+      title: 'الإشعارات',
+      children: [
+        _buildSwitchTile(
+          Icons.notifications_outlined,
+          'إشعارات الدفع',
+          'استلام إشعارات فورية',
+          _pushEnabled,
+          (value) => setState(() => _pushEnabled = value),
+        ),
+        _buildSwitchTile(
+          Icons.email_outlined,
+          'إشعارات البريد الإلكتروني',
+          'استلام تنبيقات عبر البريد',
+          _emailEnabled,
+          (value) => setState(() => _emailEnabled = value),
+        ),
+        _buildSwitchTile(
+          Icons.sms_outlined,
+          'رسائل SMS',
+          'استلام رسائل نصية للطوارئ',
+          _smsEnabled,
+          (value) => setState(() => _smsEnabled = value),
+        ),
+      ],
     );
   }
 
   Widget _buildSecuritySection() {
-    return Container(
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
-      decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('الأمان', style: NeuroTypography.h3),
-          const SizedBox(height: NeuroSpacing.md),
-          _buildSwitchTile(
-            Icons.fingerprint,
-            'المصادقة البيومترية',
-            'تسجيل الدخول بالبصمة',
-            _biometricEnabled,
-            (value) {
-              setState(() => _biometricEnabled = value);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    value
-                        ? 'تم تفعيل المصادقة البيومترية'
-                        : 'تم تعطيل المصادقة البيومترية',
-                  ),
-                  backgroundColor: NeuroColors.low,
-                ),
-              );
-            },
-          ),
-          _buildSettingsTile(Icons.lock, 'تغيير كلمة المرور', () {
-            _showChangePasswordDialog();
-          }),
-          _buildSettingsTile(Icons.shield, 'التحقق من الهوية', () {
-            _showComingSoonDialog('التحقق من الهوية');
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDeviceSection() {
-    return Container(
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
-      decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('الجهاز', style: NeuroTypography.h3),
-          const SizedBox(height: NeuroSpacing.md),
-          _buildSwitchTile(
-            Icons.bluetooth,
-            'البلوتوث',
-            'تفعيل الاتصال بالجهاز',
-            _bluetoothEnabled,
-            (value) => setState(() => _bluetoothEnabled = value),
-          ),
-          _buildSwitchTile(
-            Icons.location_on,
-            'خدمات الموقع',
-            'مشاركة الموقع للطوارئ',
-            _locationEnabled,
-            (value) => setState(() => _locationEnabled = value),
-          ),
-          _buildSettingsTile(Icons.devices_other, 'الأجهزة المتصلة', () {
-            context.go('/devices');
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAppearanceSection(bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
-      decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('المظهر', style: NeuroTypography.h3),
-          const SizedBox(height: NeuroSpacing.md),
-          _buildSwitchTile(
-            Icons.dark_mode,
-            'الوضع الداكن',
-            'تفعيل المظهر الداكن',
-            isDark,
-            (value) {
-              ref.read(themeModeProvider.notifier).setThemeMode(
-                    value ? ThemeMode.dark : ThemeMode.light,
+    return _buildSection(
+      title: 'الأمان',
+      children: [
+        _buildSwitchTile(
+          Icons.fingerprint,
+          'المصادقة البيومترية',
+          'تسجيل الدخول بالبصمة',
+          _biometricEnabled,
+          (value) async {
+            if (value) {
+              final available = await biometricService.isAvailable();
+              if (!available) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('المصادقة البيومترية غير متاحة على هذا الجهاز'),
+                      backgroundColor: Color(0xFFFF3B30),
+                    ),
                   );
-            },
-          ),
-          _buildSettingsTile(Icons.language, 'اللغة', () {
-            _showLanguageDialog();
-          }),
-          _buildSettingsTile(Icons.format_size, 'حجم الخط', () {
-            _showFontSizeDialog();
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAboutSection() {
-    return Container(
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
-      decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('حول التطبيق', style: NeuroTypography.h3),
-          const SizedBox(height: NeuroSpacing.md),
-          _buildSettingsTile(Icons.info, 'معلومات التطبيق', () {
-            _showAboutDialog();
-          }),
-          _buildSettingsTile(Icons.description, 'شروط الاستخدام', () {
-            _showTermsDialog();
-          }),
-          _buildSettingsTile(Icons.privacy_tip, 'سياسة الخصوصية', () {
-            _showPrivacyDialog();
-          }),
-          _buildSettingsTile(Icons.update, 'التحقق من التحديثات', () {
-            _showUpdateDialog();
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSwitchTile(
-    IconData icon,
-    String title,
-    String subtitle,
-    bool value,
-    ValueChanged<bool> onChanged,
-  ) {
-    return ListTile(
-      leading: Icon(icon, color: NeuroColors.navInactive),
-      title: Text(title, style: NeuroTypography.bodyMedium),
-      subtitle: Text(subtitle, style: NeuroTypography.caption),
-      trailing: Switch(
-        value: value,
-        onChanged: onChanged,
-        activeColor: NeuroColors.primary,
-      ),
-    );
-  }
-
-  Widget _buildSettingsTile(IconData icon, String title, VoidCallback? onTap) {
-    return ListTile(
-      leading: Icon(icon, color: NeuroColors.navInactive),
-      title: Text(title, style: NeuroTypography.bodyMedium),
-      trailing:
-          const Icon(Icons.chevron_right, color: NeuroColors.navInactive),
-      onTap: onTap,
-    );
-  }
-
-  void _showComingSoonDialog(String feature) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: NeuroColors.bgCard,
-        title: Text('قريباً', style: NeuroTypography.h3),
-        content: Text(
-          'ميزة "$feature" قيد التطوير وستكون متاحة قريباً.',
-          style: NeuroTypography.bodyMedium,
+                }
+                return;
+              }
+              final authenticated = await biometricService.authenticate(
+                reason: 'يرجى المصادقة لتفعيل البصمة',
+              );
+              if (authenticated) {
+                setState(() => _biometricEnabled = true);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('تم تفعيل المصادقة البيومترية'),
+                      backgroundColor: Color(0xFF34C759),
+                    ),
+                  );
+                }
+              }
+            } else {
+              setState(() => _biometricEnabled = false);
+            }
+          },
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child:
-                Text('حسناً', style: TextStyle(color: NeuroColors.primary)),
-          ),
-        ],
-      ),
+        _buildSettingsTile(Icons.lock_outlined, 'تغيير كلمة المرور', () {
+          _showChangePasswordDialog();
+        }),
+        _buildSettingsTile(Icons.shield_outlined, 'التحقق من الهوية', () {}),
+      ],
     );
   }
 
@@ -408,46 +171,62 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final currentController = TextEditingController();
     final newController = TextEditingController();
     final confirmController = TextEditingController();
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: NeuroColors.bgCard,
-        title: Text('تغيير كلمة المرور', style: NeuroTypography.h3),
+        backgroundColor: const Color(0xFF1A1F35),
+        title: const Text('تغيير كلمة المرور', style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: currentController,
               obscureText: true,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'كلمة المرور الحالية',
-                labelStyle: NeuroTypography.bodyMedium,
+                labelStyle: const TextStyle(color: Color(0xFF8E8E93)),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(NeuroRadius.md),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFF42A5F5)),
                 ),
               ),
             ),
-            const SizedBox(height: NeuroSpacing.md),
+            const SizedBox(height: 16),
             TextField(
               controller: newController,
               obscureText: true,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'كلمة المرور الجديدة',
-                labelStyle: NeuroTypography.bodyMedium,
+                labelStyle: const TextStyle(color: Color(0xFF8E8E93)),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(NeuroRadius.md),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFF42A5F5)),
                 ),
               ),
             ),
-            const SizedBox(height: NeuroSpacing.md),
+            const SizedBox(height: 16),
             TextField(
               controller: confirmController,
               obscureText: true,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'تأكيد كلمة المرور',
-                labelStyle: NeuroTypography.bodyMedium,
+                labelStyle: const TextStyle(color: Color(0xFF8E8E93)),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(NeuroRadius.md),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFF42A5F5)),
                 ),
               ),
             ),
@@ -456,8 +235,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('إلغاء',
-                style: TextStyle(color: NeuroColors.navInactive)),
+            child: const Text('إلغاء', style: TextStyle(color: Color(0xFF8E8E93))),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -465,7 +243,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('كلمتا المرور غير متطابقتين'),
-                    backgroundColor: NeuroColors.critical,
+                    backgroundColor: Color(0xFFFF3B30),
                   ),
                 );
                 return;
@@ -481,7 +259,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('تم تغيير كلمة المرور بنجاح'),
-                      backgroundColor: NeuroColors.low,
+                      backgroundColor: Color(0xFF34C759),
                     ),
                   );
                 }
@@ -490,15 +268,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('فشل: $e'),
-                      backgroundColor: NeuroColors.critical,
+                      backgroundColor: const Color(0xFFFF3B30),
                     ),
                   );
                 }
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: NeuroColors.primary,
-              foregroundColor: NeuroColors.textSecondary,
+              backgroundColor: const Color(0xFF2196F3),
             ),
             child: const Text('تغيير'),
           ),
@@ -507,31 +284,85 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  Widget _buildDeviceSection() {
+    return _buildSection(
+      title: 'الجهاز',
+      children: [
+        _buildSwitchTile(
+          Icons.bluetooth_outlined,
+          'البلوتوث',
+          'تفعيل الاتصال بالجهاز',
+          _bluetoothEnabled,
+          (value) => setState(() => _bluetoothEnabled = value),
+        ),
+        _buildSwitchTile(
+          Icons.location_on_outlined,
+          'خدمات الموقع',
+          'مشاركة الموقع للطوارئ',
+          _locationEnabled,
+          (value) => setState(() => _locationEnabled = value),
+        ),
+        _buildSettingsTile(Icons.devices_outlined, 'الأجهزة المتصلة', () {}),
+      ],
+    );
+  }
+
+  Widget _buildAppearanceSection(bool isDark) {
+    final fontSize = ref.watch(fontSizeProvider);
+    return _buildSection(
+      title: 'المظهر',
+      children: [
+        _buildSwitchTile(
+          Icons.dark_mode_outlined,
+          'الوضع الداكن',
+          'تفعيل المظهر الداكن',
+          isDark,
+          (value) {
+            ref.read(themeModeProvider.notifier).setThemeMode(
+                  value ? ThemeMode.dark : ThemeMode.light,
+                );
+          },
+        ),
+        _buildSettingsTile(Icons.language, 'اللغة', () {
+          _showLanguageDialog();
+        }),
+        _buildSettingsTile(Icons.format_size, 'حجم الخط ($fontSize)', () {
+          _showFontSizeDialog(fontSize);
+        }),
+      ],
+    );
+  }
+
   void _showLanguageDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: NeuroColors.bgCard,
-        title: Text('اللغة', style: NeuroTypography.h3),
+        backgroundColor: const Color(0xFF1A1F35),
+        title: const Text('اللغة', style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<String>(
-              title: Text('العربية', style: NeuroTypography.bodyMedium),
+              title: const Text('العربية', style: TextStyle(color: Colors.white)),
               value: 'ar',
               groupValue: 'ar',
               onChanged: (value) => Navigator.pop(context),
-              activeColor: NeuroColors.primary,
+              activeColor: const Color(0xFF2196F3),
             ),
             RadioListTile<String>(
-              title: Text('English', style: NeuroTypography.bodyMedium),
+              title: const Text('English', style: TextStyle(color: Colors.white)),
               value: 'en',
               groupValue: 'ar',
               onChanged: (value) {
                 Navigator.pop(context);
-                _showComingSoonDialog('اللغة الإنجليزية');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('اللغة الإنجليزية قيد التطوير'),
+                    backgroundColor: Color(0xFF2196F3),
+                  ),
+                );
               },
-              activeColor: NeuroColors.primary,
+              activeColor: const Color(0xFF2196F3),
             ),
           ],
         ),
@@ -539,45 +370,44 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  void _showFontSizeDialog() {
+  void _showFontSizeDialog(String currentSize) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: NeuroColors.bgCard,
-        title: Text('حجم الخط', style: NeuroTypography.h3),
+        backgroundColor: const Color(0xFF1A1F35),
+        title: const Text('حجم الخط', style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<String>(
-              title: Text('صغير', style: NeuroTypography.bodyMedium),
+              title: const Text('صغير', style: TextStyle(color: Colors.white)),
               value: 'small',
-              groupValue: 'medium',
+              groupValue: currentSize,
               onChanged: (value) {
+                ref.read(fontSizeProvider.notifier).setFontSize(value!);
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('تم تغيير حجم الخط')),
-                );
               },
-              activeColor: NeuroColors.primary,
+              activeColor: const Color(0xFF2196F3),
             ),
             RadioListTile<String>(
-              title: Text('متوسط', style: NeuroTypography.bodyMedium),
+              title: const Text('متوسط', style: TextStyle(color: Colors.white)),
               value: 'medium',
-              groupValue: 'medium',
-              onChanged: (value) => Navigator.pop(context),
-              activeColor: NeuroColors.primary,
+              groupValue: currentSize,
+              onChanged: (value) {
+                ref.read(fontSizeProvider.notifier).setFontSize(value!);
+                Navigator.pop(context);
+              },
+              activeColor: const Color(0xFF2196F3),
             ),
             RadioListTile<String>(
-              title: Text('كبير', style: NeuroTypography.bodyMedium),
+              title: const Text('كبير', style: TextStyle(color: Colors.white)),
               value: 'large',
-              groupValue: 'medium',
+              groupValue: currentSize,
               onChanged: (value) {
+                ref.read(fontSizeProvider.notifier).setFontSize(value!);
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('تم تغيير حجم الخط')),
-                );
               },
-              activeColor: NeuroColors.primary,
+              activeColor: const Color(0xFF2196F3),
             ),
           ],
         ),
@@ -585,116 +415,155 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  void _showAboutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: NeuroColors.bgCard,
-        title: Text('معلومات التطبيق', style: NeuroTypography.h3),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildAboutSection() {
+    return _buildSection(
+      title: 'حول التطبيق',
+      children: [
+        _buildSettingsTile(Icons.info_outlined, 'معلومات التطبيق', () {}),
+        _buildSettingsTile(Icons.description_outlined, 'شروط الاستخدام', () {}),
+        _buildSettingsTile(Icons.privacy_tip_outlined, 'سياسة الخصوصية', () {}),
+        _buildSettingsTile(Icons.update, 'التحقق من التحديثات', () {}),
+      ],
+    );
+  }
+
+  Widget _buildDangerZone() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFF3B30).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFF3B30).withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'منطقة الخطر',
+            style: TextStyle(
+              color: Color(0xFFFF3B30),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildSettingsTile(
+            Icons.delete_forever_outlined,
+            'حذف البيانات',
+            () {},
+            color: const Color(0xFFFF3B30),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSection({
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSwitchTile(
+    IconData icon,
+    String title,
+    String subtitle,
+    bool value,
+    ValueChanged<bool> onChanged,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFF8E8E93), size: 22),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Color(0xFF8E8E93),
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: const Color(0xFF2196F3),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsTile(
+    IconData icon,
+    String title,
+    VoidCallback onTap, {
+    Color? color,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
           children: [
-            Text('NeuroBleed Alert', style: NeuroTypography.h2),
-            const SizedBox(height: NeuroSpacing.sm),
-            Text('الإصدار: 1.0.0', style: NeuroTypography.bodyMedium),
-            const SizedBox(height: NeuroSpacing.md),
-            Text(
-              'نظام مراقبة الدماغ الذكي للكشف المبكر عن نزيف الدماغ',
-              style: NeuroTypography.bodyMedium,
+            Icon(icon, color: color ?? const Color(0xFF8E8E93), size: 22),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: color ?? Colors.white,
+                  fontSize: 14,
+                ),
+              ),
             ),
-            const SizedBox(height: NeuroSpacing.md),
-            Text(
-              ' developed with ❤️ for brain health',
-              style: NeuroTypography.caption,
+            Icon(
+              Icons.chevron_right,
+              color: color ?? const Color(0xFF8E8E93),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child:
-                Text('إغلاق', style: TextStyle(color: NeuroColors.primary)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showTermsDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: NeuroColors.bgCard,
-        title: Text('شروط الاستخدام', style: NeuroTypography.h3),
-        content: SingleChildScrollView(
-          child: Text(
-            'شروط الاستخدام\n\n'
-            '1. استخدام التطبيق على مسؤوليتك الخاصة\n'
-            '2. لا يحل التطبيق استشارة الطبيب المختص\n'
-            '3. بياناتك محمية وفقاً لسياسة الخصوصية\n'
-            '4. يُحظر استخدام التطبيق لأغراض غير قانونية\n'
-            '5. نحتفظ بحق تعليق الحساب في حالة الإساءة',
-            style: NeuroTypography.bodyMedium,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child:
-                Text('إغلاق', style: TextStyle(color: NeuroColors.primary)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showPrivacyDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: NeuroColors.bgCard,
-        title: Text('سياسة الخصوصية', style: NeuroTypography.h3),
-        content: SingleChildScrollView(
-          child: Text(
-            'سياسة الخصوصية\n\n'
-            'نحترم خصوصيتك ونلتزم بحماية بياناتك:\n\n'
-            '• نجمع فقط البيانات الضرورية لتشغيل التطبيق\n'
-            '• لا نشارك بياناتك مع أطراف ثالثة\n'
-            '• نستخدم تشفير البيانات أثناء النقل والتخزين\n'
-            '• يمكنك حذف حسابك في أي وقت\n'
-            '• نلتزم بقوانين حماية البيانات المعمول بها',
-            style: NeuroTypography.bodyMedium,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child:
-                Text('إغلاق', style: TextStyle(color: NeuroColors.primary)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showUpdateDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: NeuroColors.bgCard,
-        title: Text('التحقق من التحديثات', style: NeuroTypography.h3),
-        content: Text(
-          'أنت تستخدم أحدث إصدار من التطبيق (v1.0.0).',
-          style: NeuroTypography.bodyMedium,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child:
-                Text('حسناً', style: TextStyle(color: NeuroColors.primary)),
-          ),
-        ],
       ),
     );
   }

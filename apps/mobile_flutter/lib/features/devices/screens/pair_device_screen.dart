@@ -6,12 +6,7 @@ import 'package:design_system/design_system.dart';
 import 'package:core/core.dart';
 import '../services/ble_service.dart';
 import '../../../app/providers/app_providers.dart';
-
-final bleServiceProvider = Provider<BleService>((ref) {
-  final service = BleService();
-  ref.onDispose(() => service.dispose());
-  return service;
-});
+import '../../dashboard/dashboard_screen.dart' show bleServiceProvider;
 
 final bleScanStateProvider = StateProvider<bool>((ref) => false);
 
@@ -190,9 +185,11 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
     final devicesAsync = ref.watch(bleDevicesProvider);
 
     return Scaffold(
+      backgroundColor: const Color(0xFF0A0E1A),
       appBar: AppBar(
         title: const Text('إزواج جهاز BLE'),
         centerTitle: true,
+        backgroundColor: const Color(0xFF0A0E1A),
       ),
       body: Column(
         children: [
@@ -259,6 +256,26 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
                     onPressed: isScanning ? _stopScan : _startScan,
                   ),
                 ),
+                SizedBox(height: NeuroSpacing.md),
+                // Manual connect by serial number
+                SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: OutlinedButton.icon(
+                    onPressed: _showManualConnectDialog,
+                    icon: const Icon(Icons.edit, color: Color(0xFF2196F3)),
+                    label: const Text(
+                      'اتصال برقم تسلسلي',
+                      style: TextStyle(color: Color(0xFF2196F3)),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color(0xFF2196F3)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -267,6 +284,102 @@ class _PairDeviceScreenState extends ConsumerState<PairDeviceScreen>
         ],
       ),
     );
+  }
+
+  void _showManualConnectDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1F35),
+        title: const Text(
+          'اتصال برقم تسلسلي',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'أدخل رقم ID الجهاز أو الرقم التسلسلي',
+              style: TextStyle(color: Color(0xFF8E8E93)),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'مثال: XX:XX:XX:XX:XX:XX',
+                hintStyle: const TextStyle(color: Color(0xFF8E8E93)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFF42A5F5)),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('إلغاء', style: TextStyle(color: Color(0xFF8E8E93))),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              if (controller.text.isNotEmpty) {
+                _connectBySerial(controller.text.trim());
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF2196F3),
+            ),
+            child: const Text('اتصال'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _connectBySerial(String serial) async {
+    setState(() {
+      _isPairing = true;
+      _pairingDeviceId = serial;
+    });
+
+    final service = ref.read(bleServiceProvider);
+    await service.initialize();
+
+    final success = await service.connectToDevice(
+      serial,
+      deviceName: 'BLE Device',
+    );
+
+    setState(() {
+      _isPairing = false;
+      _pairingDeviceId = null;
+    });
+
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('تم الاتصال بالجهاز بنجاح'),
+          backgroundColor: Color(0xFF34C759),
+        ),
+      );
+      context.pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('فشل الاتصال - تأكد من أن الجهاز مضاء وقريب'),
+          backgroundColor: Color(0xFFFF3B30),
+        ),
+      );
+    }
   }
 
   Widget _buildDeviceList(
