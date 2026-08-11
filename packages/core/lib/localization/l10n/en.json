@@ -334,6 +334,7 @@
   "search_error": "Search error",
   "no_devices_found": "No devices found",
   "hospital_fallback": "Hospital",
+  "no_hospitals_found": "No nearby hospitals found",
   "age_value": "18 years",
   "weight_value": "63 kg",
   "blood_type_value": "O+",

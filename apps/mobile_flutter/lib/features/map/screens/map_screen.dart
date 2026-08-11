@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:design_system/design_system.dart';
 import 'package:core/core.dart';
 
 final mapHospitalsProvider =
@@ -21,8 +20,6 @@ final mapHospitalsProvider =
 
 const _kDefaultLat = 30.0444;
 const _kDefaultLng = 31.2357;
-const _kDarkTileUrl =
-    'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -40,8 +37,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   List<LatLng>? _route;
   double? _routeDistanceM;
   int? _routeDurationS;
-  String _searchQuery = '';
-  LatLng? _searchResult;
 
   @override
   void initState() {
@@ -57,9 +52,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Future<void> _load() async {
-    setState(() {
-      _loading = true;
-    });
+    setState(() => _loading = true);
     try {
       final api = ref.read(apiClientProvider);
       final response = await api.get('/v1/analytics/hospitals');
@@ -118,28 +111,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
-  Future<void> _search() async {
-    final q = _searchQuery.trim();
-    if (q.isEmpty) return;
-    try {
-      final api = ref.read(apiClientProvider);
-      final response = await api
-          .get('/v1/maps/geocode', queryParameters: {'q': q, 'limit': 1});
-      final data = response.data;
-      if (data is List && data.isNotEmpty) {
-        final place = data.first as Map<String, dynamic>;
-        final result = LatLng(
-          (place['lat'] as num).toDouble(),
-          (place['lng'] as num).toDouble(),
-        );
-        setState(() {
-          _searchResult = result;
-          _mapController.move(result, 15);
-        });
-      }
-    } catch (_) {}
-  }
-
   Future<void> _routeToNearest() async {
     final hospital = _nearestHospital();
     if (hospital == null) return;
@@ -191,13 +162,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     return nearest;
   }
 
-  Future<void> _openOSM() async {
-    final uri = Uri.parse(
-      'https://www.openstreetmap.org/?mlat=${_userLocation.latitude}&mlon=${_userLocation.longitude}#map=15/${_userLocation.latitude}/${_userLocation.longitude}',
-    );
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+  LatLng? _hospitalLatLng(Map<String, dynamic> h) {
+    final lat =
+        (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
+    final lng =
+        (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
+    if (lat == null || lng == null) return null;
+    return LatLng(lat, lng);
   }
 
   @override
@@ -211,20 +182,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             _buildHeader(context, t),
             Expanded(
               child: _loading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(
+                      child:
+                          CircularProgressIndicator(color: Color(0xFF2196F3)))
                   : Stack(
                       children: [
                         _buildMap(),
-                        if (_route != null) _buildEtaBanner(t),
-                        Positioned(
-                          left: 12,
-                          right: 12,
-                          bottom: 12,
-                          child: _buildHospitalCard(t),
-                        ),
+                        _buildMapControls(),
+                        if (_route != null) _buildRouteBanner(t),
                       ],
                     ),
             ),
+            _buildHospitalInfoCard(t),
           ],
         ),
       ),
@@ -237,12 +206,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         16,
         MediaQuery.of(context).padding.top + 8,
         16,
-        16,
+        12,
       ),
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 24),
+            icon: const Icon(Icons.arrow_back_ios,
+                color: Colors.white, size: 24),
             onPressed: () => Navigator.pop(context),
           ),
           const Spacer(),
@@ -250,92 +220,192 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             t.t('nearest_hospitals'),
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 20,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.navigation_outlined, color: Colors.white, size: 24),
-            onPressed: _locateUser,
-          ),
+          const SizedBox(width: 48),
         ],
       ),
     );
   }
 
   Widget _buildMap() {
-    return FlutterMap(
-      mapController: _mapController,
-      options: MapOptions(
-        initialCenter: _userLocation,
-        initialZoom: 13,
-        onTap: (_, __) => setState(() {
-          _route = null;
-          _routeDistanceM = null;
-          _routeDurationS = null;
-        }),
-      ),
-      children: [
-        TileLayer(
-          urlTemplate: _kDarkTileUrl,
-          userAgentPackageName: 'com.neurobleed.alert',
-        ),
-        if (_route != null)
-          PolylineLayer(
-            polylines: [
-              Polyline(
-                points: _route!,
-                strokeWidth: 5,
-                color: const Color(0xFF2196F3),
-              ),
-            ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: FlutterMap(
+          mapController: _mapController,
+          options: MapOptions(
+            initialCenter: _userLocation,
+            initialZoom: 13,
+            onTap: (_, __) => setState(() {
+              _route = null;
+              _routeDistanceM = null;
+              _routeDurationS = null;
+            }),
           ),
-        MarkerLayer(
-          markers: [
-            for (final h in _hospitals)
-              if (_hospitalLatLng(h) != null)
-                Marker(
-                  point: _hospitalLatLng(h)!,
-                  width: 40,
-                  height: 40,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFF3B30),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'H',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+          children: [
+            TileLayer(
+              urlTemplate:
+                  'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+              subdomains: const ['a', 'b', 'c', 'd'],
+              userAgentPackageName: 'com.neurobleed.alert',
+            ),
+            if (_route != null)
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: _route!,
+                    strokeWidth: 5,
+                    color: const Color(0xFF2196F3),
+                  ),
+                ],
+              ),
+            MarkerLayer(
+              markers: [
+                for (final h in _hospitals)
+                  if (_hospitalLatLng(h) != null)
+                    Marker(
+                      point: _hospitalLatLng(h)!,
+                      width: 36,
+                      height: 36,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF3B30),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'H',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
                         ),
                       ),
                     ),
+                Marker(
+                  point: _userLocation,
+                  width: 36,
+                  height: 44,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF3B30),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Text(
+                          'A',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      CustomPaint(
+                        size: const Size(12, 8),
+                        painter: _TrianglePainter(
+                          color: const Color(0xFFFF3B30),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-            Marker(
-              point: _userLocation,
-              width: 32,
-              height: 32,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2196F3),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 3),
-                ),
-              ),
+              ],
             ),
           ],
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildEtaBanner(AppLocalizations t) {
+  Widget _buildMapControls() {
+    return Positioned(
+      right: 24,
+      top: 80,
+      child: Column(
+        children: [
+          _buildControlButton(
+            icon: Icons.my_location,
+            onTap: _locateUser,
+          ),
+          const SizedBox(height: 8),
+          _buildControlButton(
+            icon: Icons.add,
+            onTap: () {
+              final currentZoom = _mapController.camera.zoom;
+              _mapController.move(
+                  _mapController.camera.center, currentZoom + 1);
+            },
+          ),
+          const SizedBox(height: 8),
+          _buildControlButton(
+            icon: Icons.remove,
+            onTap: () {
+              final currentZoom = _mapController.camera.zoom;
+              _mapController.move(
+                  _mapController.camera.center, currentZoom - 1);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildControlButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1F35),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.15),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
+    );
+  }
+
+  Widget _buildRouteBanner(AppLocalizations t) {
     final durationS = _routeDurationS;
     final distanceM = _routeDistanceM;
     final minutes = durationS != null ? (durationS / 60).ceil() : null;
@@ -346,29 +416,31 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         : null;
 
     return Positioned(
-      top: 12,
-      left: 12,
-      right: 12,
+      top: 8,
+      left: 24,
+      right: 70,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: const Color(0xFF1A1F35),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF2196F3).withValues(alpha: 0.3)),
+          border:
+              Border.all(color: const Color(0xFF2196F3).withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
-            const Icon(Icons.directions, color: Color(0xFF2196F3), size: 24),
-            const SizedBox(width: 12),
+            const Icon(Icons.directions, color: Color(0xFF2196F3), size: 20),
+            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     t.t('direction_to_nearest_hospital'),
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -380,7 +452,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         : t.t('calculating_eta'),
                     style: const TextStyle(
                       color: Color(0xFF2196F3),
-                      fontSize: 12,
+                      fontSize: 11,
                     ),
                   ),
                 ],
@@ -392,6 +464,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+                  fontSize: 12,
                 ),
               ),
           ],
@@ -400,16 +473,39 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
-  Widget _buildHospitalCard(AppLocalizations t) {
+  Widget _buildHospitalInfoCard(AppLocalizations t) {
     final hospital = _nearestHospital();
-    if (hospital == null) return const SizedBox.shrink();
+    if (hospital == null) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.local_hospital_outlined,
+                  color: Colors.white.withValues(alpha: 0.3), size: 48),
+              const SizedBox(height: 12),
+              Text(
+                t.t('no_hospitals_found'),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.5),
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     final name = hospital['name'] as String? ?? t.t('hospital_fallback');
     final distance = (hospital['distance_km'] as num?)?.toDouble() ?? 2.3;
-    final duration = _routeDurationS != null ? (_routeDurationS! / 60).ceil() : 8;
+    final duration =
+        _routeDurationS != null ? (_routeDurationS! / 60).ceil() : 8;
     final phone = hospital['phone'] as String?;
 
     return Container(
+      margin: const EdgeInsets.fromLTRB(12, 0, 12, 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -421,24 +517,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
                   color: const Color(0xFF2196F3).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(
                   Icons.local_hospital,
                   color: Color(0xFF2196F3),
-                  size: 24,
+                  size: 28,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -451,6 +546,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+                    const SizedBox(height: 6),
                     Row(
                       children: [
                         const Icon(Icons.location_on_outlined,
@@ -479,50 +575,52 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   ],
                 ),
               ),
-              if (phone != null)
-                GestureDetector(
-                  onTap: () async {
-                    final uri = Uri.parse('tel:$phone');
+              GestureDetector(
+                onTap: () async {
+                  final phoneNum =
+                      phone ?? hospital['phone_number'] as String?;
+                  if (phoneNum != null) {
+                    final uri = Uri.parse('tel:$phoneNum');
                     if (await canLaunchUrl(uri)) {
                       await launchUrl(uri);
                     }
-                  },
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF34C759),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.phone,
-                      color: Colors.white,
-                      size: 24,
-                    ),
+                  }
+                },
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF34C759),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.phone,
+                    color: Colors.white,
+                    size: 24,
                   ),
                 ),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           SizedBox(
             width: double.infinity,
             height: 48,
             child: ElevatedButton.icon(
               onPressed: () => _routeToNearest(),
-              icon: const Icon(Icons.info_outline, color: Color(0xFF2196F3)),
+              icon: const Icon(Icons.info_outline, color: Colors.white),
               label: Text(
                 t.t('more_details'),
                 style: const TextStyle(
-                  color: Color(0xFF2196F3),
-                  fontSize: 14,
+                  color: Colors.white,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2196F3).withValues(alpha: 0.1),
+                backgroundColor: const Color(0xFF2196F3),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: const BorderSide(color: Color(0xFF2196F3)),
                 ),
               ),
             ),
@@ -531,44 +629,28 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       ),
     );
   }
+}
 
-  LatLng? _hospitalLatLng(Map<String, dynamic> h) {
-    final lat =
-        (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
-    final lng =
-        (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
-    if (lat == null || lng == null) return null;
-    return LatLng(lat, lng);
+class _TrianglePainter extends CustomPainter {
+  final Color color;
+
+  _TrianglePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..close();
+
+    canvas.drawPath(path, paint);
   }
 
-  Future<void> _routeToHospital(Map<String, dynamic> h) async {
-    final lat =
-        (h['latitude'] as num?)?.toDouble() ?? (h['lat'] as num?)?.toDouble();
-    final lng =
-        (h['longitude'] as num?)?.toDouble() ?? (h['lng'] as num?)?.toDouble();
-    if (lat == null || lng == null) return;
-    Navigator.of(context).pop();
-    try {
-      final api = ref.read(apiClientProvider);
-      final response = await api.get('/v1/maps/route', queryParameters: {
-        'from_lat': _userLocation.latitude,
-        'from_lng': _userLocation.longitude,
-        'to_lat': lat,
-        'to_lng': lng,
-      });
-      final data = response.data;
-      if (data is Map && data['geometry'] is Map) {
-        final coords = (data['geometry'] as Map)['coordinates'] as List;
-        setState(() {
-          _route = coords
-              .map((c) =>
-                  LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
-              .toList();
-          _routeDistanceM = (data['distance_m'] as num?)?.toDouble();
-          _routeDurationS = (data['duration_s'] as num?)?.toInt();
-          _mapController.move(LatLng(lat, lng), 14);
-        });
-      }
-    } catch (_) {}
-  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
