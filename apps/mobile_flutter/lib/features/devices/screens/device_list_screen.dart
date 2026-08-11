@@ -98,6 +98,10 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
           ),
           const Spacer(),
           IconButton(
+            icon: const Icon(Icons.bluetooth_searching, color: Colors.white, size: 24),
+            onPressed: () => context.push('/devices/pair'),
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white, size: 24),
             onPressed: () =>
                 ref.read(deviceListProvider.notifier).refresh(),
@@ -132,7 +136,7 @@ class _DeviceListScreenState extends ConsumerState<DeviceListScreen> {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () => context.push('/device/pair'),
+            onPressed: () => context.push('/devices/pair'),
             icon: const Icon(Icons.bluetooth_searching, color: Colors.white),
             label: const Text(
               'زوج جهاز جديد',

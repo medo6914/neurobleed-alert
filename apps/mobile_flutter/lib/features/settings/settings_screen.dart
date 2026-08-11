@@ -19,6 +19,45 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _biometricEnabled = false;
   bool _bluetoothEnabled = true;
   bool _locationEnabled = true;
+  bool _loadedPrefs = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPreferences();
+  }
+
+  Future<void> _loadPreferences() async {
+    try {
+      final api = ref.read(apiClientProvider);
+      final response = await api.get('/v1/auth/me');
+      final data = response.data;
+      if (data is Map && mounted) {
+        final prefs = data['notification_preferences'];
+        if (prefs is Map) {
+          setState(() {
+            _pushEnabled = prefs['push'] ?? true;
+            _emailEnabled = prefs['email'] ?? false;
+            _smsEnabled = prefs['sms'] ?? false;
+            _loadedPrefs = true;
+          });
+        }
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _saveNotificationPreferences() async {
+    try {
+      final api = ref.read(apiClientProvider);
+      await api.put('/v1/auth/me', data: {
+        'notification_preferences': {
+          'push': _pushEnabled,
+          'email': _emailEnabled,
+          'sms': _smsEnabled,
+        },
+      });
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,21 +139,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           t.t('push_notifications'),
           t.t('push_notifications_desc'),
           _pushEnabled,
-          (value) => setState(() => _pushEnabled = value),
+          (value) async {
+            setState(() => _pushEnabled = value);
+            await _saveNotificationPreferences();
+          },
         ),
         _buildSwitchTile(
           Icons.email_outlined,
           t.t('email_notifications'),
           t.t('email_notifications_desc'),
           _emailEnabled,
-          (value) => setState(() => _emailEnabled = value),
+          (value) async {
+            setState(() => _emailEnabled = value);
+            await _saveNotificationPreferences();
+          },
         ),
         _buildSwitchTile(
           Icons.sms_outlined,
           t.t('sms_messages'),
           t.t('sms_messages_desc'),
           _smsEnabled,
-          (value) => setState(() => _smsEnabled = value),
+          (value) async {
+            setState(() => _smsEnabled = value);
+            await _saveNotificationPreferences();
+          },
         ),
       ],
     );

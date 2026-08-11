@@ -28,6 +28,18 @@ final recentAlertsProvider = FutureProvider<List<dynamic>>((ref) async {
   return [];
 });
 
+final latestReadingsProvider = FutureProvider<List<dynamic>>((ref) async {
+  final api = ref.read(apiClientProvider);
+  final response = await api.get('/v1/readings', queryParameters: {
+    'limit': 10,
+    'hours': 24,
+  });
+  final data = response.data;
+  if (data is List) return data;
+  if (data is Map && data['items'] is List) return data['items'] as List;
+  return [];
+});
+
 class BleVitalsState {
   final bool isConnected;
   final int heartRate;
@@ -126,6 +138,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final devicesAsync = ref.watch(dashboardDevicesProvider);
     final alertsAsync = ref.watch(recentAlertsProvider);
+    final readingsAsync = ref.watch(latestReadingsProvider);
     final vitals = ref.watch(bleVitalsProvider);
     final t = AppLocalizations.of(context);
 
@@ -149,9 +162,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       const SizedBox(height: 12),
                       _buildDeviceCard(context, devicesAsync, t),
                       const SizedBox(height: 16),
-                      _buildBrainStateCard(context, alertsAsync, vitals, t),
+                      _buildBrainStateCard(context, alertsAsync, readingsAsync, vitals, t),
                       const SizedBox(height: 16),
-                      _buildVitalSignsCard(context, vitals, t),
+                      _buildVitalSignsCard(context, readingsAsync, vitals, t),
                       const SizedBox(height: 16),
                       _buildEmergencyCard(context, t),
                       const SizedBox(height: 16),
@@ -349,11 +362,42 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildBrainStateCard(BuildContext context,
-      AsyncValue<List<dynamic>> alertsAsync, BleVitalsState vitals, AppLocalizations t) {
-    final hasCriticalAlert = alertsAsync.valueOrNull?.any((a) =>
-            (a['severity'] as String?)?.toLowerCase() == 'critical') ??
-        false;
-    final riskPercent = hasCriticalAlert ? 78 : 18;
+      AsyncValue<List<dynamic>> alertsAsync, AsyncValue<List<dynamic>> readingsAsync, BleVitalsState vitals, AppLocalizations t) {
+    final readings = readingsAsync.valueOrNull ?? [];
+    final alerts = alertsAsync.valueOrNull ?? [];
+    final hasCriticalAlert = alerts.any((a) =>
+            (a['severity'] as String?)?.toLowerCase() == 'critical');
+
+    int riskPercent = 18;
+    if (hasCriticalAlert) {
+      riskPercent = 78;
+    } else if (readings.isNotEmpty) {
+      final latestReading = readings.first;
+      final riskScore = (latestReading['risk_score'] as num?)?.toDouble();
+      if (riskScore != null) {
+        riskPercent = (riskScore * 100).round().clamp(0, 100);
+      }
+    }
+
+    String lastUpdateText = t.t('last_update_30_seconds');
+    if (readings.isNotEmpty) {
+      final latestTimestamp = readings.first['timestamp'] as String?;
+      if (latestTimestamp != null) {
+        try {
+          final dt = DateTime.parse(latestTimestamp).toLocal();
+          final diff = DateTime.now().difference(dt);
+          if (diff.inSeconds < 60) {
+            lastUpdateText = 'آخر تحديث منذ ${diff.inSeconds} ثانية';
+          } else if (diff.inMinutes < 60) {
+            lastUpdateText = 'آخر تحديث منذ ${diff.inMinutes} دقيقة';
+          } else if (diff.inHours < 24) {
+            lastUpdateText = 'آخر تحديث منذ ${diff.inHours} ساعة';
+          } else {
+            lastUpdateText = 'آخر تحديث منذ ${diff.inDays} يوم';
+          }
+        } catch (_) {}
+      }
+    }
     final riskColor =
         hasCriticalAlert ? const Color(0xFFFF3B30) : const Color(0xFF34C759);
     final statusText = hasCriticalAlert ? t.t('status_emergency') : t.t('status_stable');
@@ -509,7 +553,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   color: Color(0xFF8E8E93), size: 14),
               const SizedBox(width: 4),
               Text(
-                t.t('last_update_30_seconds'),
+                lastUpdateText,
                 style: const TextStyle(
                   fontSize: 12,
                   color: Color(0xFF8E8E93),
@@ -522,7 +566,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildVitalSignsCard(BuildContext context, BleVitalsState vitals, AppLocalizations t) {
+  Widget _buildVitalSignsCard(BuildContext context, AsyncValue<List<dynamic>> readingsAsync, BleVitalsState vitals, AppLocalizations t) {
+    final readings = readingsAsync.valueOrNull ?? [];
+    double spo2 = 96;
+    double heartRate = 78;
+    double temperature = 36.6;
+    double brainFlow = 75;
+
+    if (readings.isNotEmpty) {
+      final latest = readings.first;
+      spo2 = (latest['spo2'] as num?)?.toDouble() ?? 96;
+      heartRate = (latest['heart_rate'] as num?)?.toDouble() ?? 78;
+      brainFlow = (latest['rso2'] as num?)?.toDouble() ?? 75;
+    }
+
+    final displaySpo2 = vitals.isConnected ? vitals.spo2 : spo2.round();
+    final displayHeartRate = vitals.isConnected ? vitals.heartRate : heartRate.round();
+    final displayBrainFlow = vitals.isConnected ? vitals.brainFlow : brainFlow.round();
+    final displayTemp = vitals.isConnected ? vitals.temperature : temperature;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -552,7 +613,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 child: _VitalSignTile(
                   icon: Icons.water_drop_outlined,
                   label: t.t('vital_oxygen_saturation'),
-                  value: vitals.isConnected ? '${vitals.spo2}%' : '96%',
+                  value: '$displaySpo2%',
                   color: const Color(0xFF2196F3),
                   isActive: vitals.isConnected,
                 ),
@@ -562,7 +623,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 child: _VitalSignTile(
                   icon: Icons.psychology_outlined,
                   label: t.t('vital_brain_blood_flow'),
-                  value: vitals.isConnected ? '${vitals.brainFlow}%' : '75%',
+                  value: '$displayBrainFlow%',
                   color: const Color(0xFF9C27B0),
                   isActive: vitals.isConnected,
                 ),
@@ -573,7 +634,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   icon: Icons.favorite_outline,
                   label: t.t('vital_heart_rate'),
                   value:
-                      vitals.isConnected ? '${vitals.heartRate} BPM' : '78 BPM',
+                      '$displayHeartRate BPM',
                   color: const Color(0xFFFF3B30),
                   isActive: vitals.isConnected,
                 ),
@@ -583,9 +644,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 child: _VitalSignTile(
                   icon: Icons.thermostat,
                   label: t.t('vital_temperature'),
-                  value: vitals.isConnected
-                      ? '${vitals.temperature.toStringAsFixed(1)}°C'
-                      : '36.6°C',
+                  value: '${displayTemp.toStringAsFixed(1)}°C',
                   color: const Color(0xFF2196F3),
                   isActive: vitals.isConnected,
                 ),

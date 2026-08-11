@@ -22,7 +22,7 @@ final mapHospitalsProvider =
 const _kDefaultLat = 30.0444;
 const _kDefaultLng = 31.2357;
 const _kDarkTileUrl =
-    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -279,7 +279,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       children: [
         TileLayer(
           urlTemplate: _kDarkTileUrl,
-          subdomains: const ['a', 'b', 'c'],
           userAgentPackageName: 'com.neurobleed.alert',
         ),
         if (_route != null)
