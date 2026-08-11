@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:design_system/design_system.dart';
+// design_system removed — using inline colors for consistency
 import 'package:core/core.dart';
 
 final adminStatsProvider = FutureProvider<Map<String, dynamic>>((ref) async {
@@ -87,7 +87,7 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     final statsAsync = ref.watch(adminStatsProvider);
 
     return Scaffold(
-      backgroundColor: NeuroColors.bgPrimary,
+      backgroundColor: const Color(0xFF0A0E1A),
       body: SafeArea(
         child: Column(
           children: [
@@ -117,34 +117,30 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-        NeuroSpacing.lg,
-        MediaQuery.of(context).padding.top + NeuroSpacing.sm,
-        NeuroSpacing.lg,
-        NeuroSpacing.sm,
-      ),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [NeuroColors.headerGradTop, NeuroColors.headerGradBottom],
-        ),
+        16,
+        MediaQuery.of(context).padding.top + 8,
+        16,
+        16,
       ),
       child: Row(
         children: [
           IconButton(
             icon: const Icon(Icons.arrow_back_ios,
-                color: NeuroColors.textPrimary),
+                color: Colors.white, size: 24),
             onPressed: () => context.pop(),
           ),
-          Expanded(
-            child: Text(
-              'لوحة التحكم الإدارية',
-              style: NeuroTypography.h1,
-              textAlign: TextAlign.center,
+          const Spacer(),
+          const Text(
+            'لوحة التحكم الإدارية',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
           ),
+          const Spacer(),
           IconButton(
-            icon: const Icon(Icons.refresh, color: NeuroColors.textPrimary),
+            icon: const Icon(Icons.refresh, color: Colors.white, size: 24),
             onPressed: () {
               ref.invalidate(adminStatsProvider);
               ref.invalidate(adminHospitalsProvider);
@@ -164,25 +160,24 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
   Widget _buildTabBar() {
     return Container(
       height: 52,
-      padding: const EdgeInsets.symmetric(
-          horizontal: NeuroSpacing.sm, vertical: NeuroSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _tabs.length,
-        separatorBuilder: (_, __) => const SizedBox(width: NeuroSpacing.sm),
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final isSelected = _selectedTab == index;
           return GestureDetector(
             onTap: () => setState(() => _selectedTab = index),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: NeuroSpacing.md),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: isSelected ? NeuroColors.primary : Colors.transparent,
-                borderRadius: BorderRadius.circular(NeuroRadius.chip),
+                color: isSelected ? const Color(0xFF1A237E) : Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: isSelected
-                      ? NeuroColors.primary
-                      : NeuroColors.navInactive,
+                      ? const Color(0xFF42A5F5)
+                      : const Color(0xFF2A2F45),
                 ),
               ),
               child: Row(
@@ -191,16 +186,17 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                     _tabs[index].$2,
                     size: 16,
                     color: isSelected
-                        ? NeuroColors.textPrimary
-                        : NeuroColors.textSecondary,
+                        ? Colors.white
+                        : const Color(0xFF8E8E93),
                   ),
                   const SizedBox(width: 6),
                   Text(
                     _tabs[index].$1,
-                    style: NeuroTypography.caption?.copyWith(
+                    style: TextStyle(
+                      fontSize: 12,
                       color: isSelected
-                          ? NeuroColors.textPrimary
-                          : NeuroColors.textSecondary,
+                          ? Colors.white
+                          : const Color(0xFF8E8E93),
                     ),
                   ),
                 ],
@@ -239,15 +235,15 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
   Widget _buildUsersTab(AsyncValue<Map<String, dynamic>> statsAsync) {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           _buildSearchBar(),
-          const SizedBox(height: NeuroSpacing.lg),
+          const SizedBox(height: 16),
           statsAsync.when(
             loading: () => const SizedBox(
               height: 120,
-              child: Center(child: AppLoading()),
+              child: Center(child: const CircularProgressIndicator(color: Color(0xFF2196F3))),
             ),
             error: (err, _) => _buildErrorCard(err),
             data: (stats) => Row(
@@ -256,32 +252,32 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                   Icons.people,
                   'إجمالي المستخدمين',
                   '${stats['total_users'] ?? '-'}',
-                  NeuroColors.primary,
+                  const Color(0xFF2196F3),
                 ),
-                const SizedBox(width: NeuroSpacing.md),
+                const SizedBox(width: 12),
                 _buildStatCard(
                   Icons.devices_other,
                   'الأجهزة',
                   '${stats['total_devices'] ?? '-'}',
-                  NeuroColors.low,
+                  const Color(0xFF34C759),
                 ),
-                const SizedBox(width: NeuroSpacing.md),
+                const SizedBox(width: 12),
                 _buildStatCard(
                   Icons.person,
                   'المرضى',
                   '${stats['total_patients'] ?? '-'}',
-                  NeuroColors.medium,
+                  const Color(0xFFFFCC00),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: NeuroSpacing.lg),
+          const SizedBox(height: 16),
           Row(
             children: [
               Expanded(
                 child: Text(
                   'المستخدمون',
-                  style: NeuroTypography.h2,
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
               ElevatedButton.icon(
@@ -289,17 +285,17 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                 icon: const Icon(Icons.person_add, size: 18),
                 label: const Text('إضافة مسؤول'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: NeuroColors.primary,
-                  foregroundColor: NeuroColors.textSecondary,
+                  backgroundColor: const Color(0xFF2196F3),
+                  foregroundColor: const Color(0xFF8E8E93),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: NeuroSpacing.md,
-                    vertical: NeuroSpacing.sm,
+                    horizontal: 12,
+                    vertical: 8,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: NeuroSpacing.md),
+          const SizedBox(height: 12),
           _buildUserList(),
         ],
       ),
@@ -310,17 +306,28 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border: Border.all(color: NeuroColors.critical.withValues(alpha: 0.3)),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFF3B30).withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
-          const Icon(Icons.cloud_off, size: 48, color: NeuroColors.critical),
+          const Icon(Icons.cloud_off, size: 48, color: Color(0xFFFF3B30)),
           const SizedBox(height: 8),
-          Text('تعذر تحميل الإحصائيات', style: NeuroTypography.bodyMedium),
+          Text('تعذر تحميل الإحصائيات', style: TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          )),
           const SizedBox(height: 4),
-          Text('$err', style: NeuroTypography.caption),
+          Text('$err', style: const TextStyle(
+            color: Color(0xFF8E8E93),
+            fontSize: 12,
+          )),
         ],
       ),
     );
@@ -328,19 +335,18 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
 
   Widget _buildSearchBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: NeuroSpacing.lg),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: NeuroColors.bgInput,
-        borderRadius: BorderRadius.circular(NeuroRadius.input),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        color: const Color(0xFF1A1F35),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: const TextField(
         decoration: InputDecoration(
           hintText: 'بحث عن مستخدم...',
-          hintStyle: TextStyle(color: NeuroColors.navInactive),
+          hintStyle: TextStyle(color: Color(0xFF8E8E93)),
           border: InputBorder.none,
-          icon: Icon(Icons.search, color: NeuroColors.navInactive),
+          icon: Icon(Icons.search, color: Color(0xFF8E8E93)),
         ),
       ),
     );
@@ -350,25 +356,31 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
       IconData icon, String label, String value, Color color) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(NeuroSpacing.md),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(NeuroRadius.card),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
             Icon(icon, color: color, size: 28),
-            const SizedBox(height: NeuroSpacing.sm),
+            const SizedBox(height: 8),
             Text(
               value,
-              style:
-                  NeuroTypography.display?.copyWith(fontSize: 24, color: color),
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-            const SizedBox(height: NeuroSpacing.xs),
+            const SizedBox(height: 4),
             Text(
               label,
-              style: NeuroTypography.caption?.copyWith(color: color),
+              style: TextStyle(
+                fontSize: 11,
+                color: color,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -380,7 +392,7 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
   Widget _buildUserList() {
     final activityAsync = ref.watch(adminActivityProvider);
     return activityAsync.when(
-      loading: () => const Center(child: AppLoading()),
+      loading: () => const Center(child: const CircularProgressIndicator(color: Color(0xFF2196F3))),
       error: (err, _) => _buildErrorCard(err),
       data: (items) {
         final users = items.where((i) {
@@ -388,10 +400,17 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
           return t.contains('user') || t.contains('auth');
         }).toList();
         if (users.isEmpty) {
-          return const AppEmptyState(
-            icon: Icons.people_outline,
-            title: 'لا توجد بيانات مستخدمين',
-            message: 'ستظهر أنشطة المستخدمين هنا',
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.people_outline, color: Colors.white.withValues(alpha: 0.3), size: 64),
+                const SizedBox(height: 16),
+                Text('لا توجد بيانات مستخدمين', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 16)),
+                const SizedBox(height: 8),
+                Text('ستظهر أنشطة المستخدمين هنا', style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 14)),
+              ],
+            ),
           );
         }
         return Column(
@@ -409,53 +428,63 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
 
   Widget _buildUserCard(String name, String detail, String time) {
     return Container(
-      margin: const EdgeInsets.only(bottom: NeuroSpacing.md),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: NeuroColors.primary.withValues(alpha: 0.3),
+            backgroundColor: const Color(0xFF2196F3).withValues(alpha: 0.3),
             child: Text(
               name.isNotEmpty ? name[0] : '؟',
-              style: const TextStyle(color: NeuroColors.textPrimary),
+              style: const TextStyle(color: Colors.white),
             ),
           ),
-          const SizedBox(width: NeuroSpacing.md),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: NeuroTypography.h3),
+                Text(name, style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                )),
                 const SizedBox(height: 2),
-                Text(detail, style: NeuroTypography.caption, maxLines: 2),
+                Text(detail, style: const TextStyle(
+                  color: Color(0xFF8E8E93),
+                  fontSize: 12,
+                ), maxLines: 2),
                 if (time.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
                     _formatTime(time),
-                    style: NeuroTypography.caption?.copyWith(fontSize: 10),
+                    style: const TextStyle(
+                      color: Color(0xFF8E8E93),
+                      fontSize: 10,
+                    ),
                   ),
                 ],
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: NeuroSpacing.sm,
-              vertical: NeuroSpacing.xs,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: NeuroColors.low.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(NeuroRadius.badge),
+              color: const Color(0xFF34C759).withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(
+            child: const Text(
               'نشط',
-              style: NeuroTypography.badge?.copyWith(color: NeuroColors.low),
+              style: TextStyle(color: Color(0xFF34C759), fontSize: 12),
             ),
           ),
         ],
@@ -468,9 +497,9 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     final hospitalsAsync = ref.watch(adminHospitalsProvider);
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      padding: const EdgeInsets.all(16),
       child: hospitalsAsync.when(
-        loading: () => const Center(child: AppLoading()),
+        loading: () => const Center(child: const CircularProgressIndicator(color: Color(0xFF2196F3))),
         error: (err, _) => _buildErrorCard(err),
         data: (data) {
           final total = data['total_hospitals'] ?? 0;
@@ -482,21 +511,28 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
               Row(
                 children: [
                   _buildStatCard(Icons.business, 'المستشفيات', '$total',
-                      NeuroColors.primary),
-                  const SizedBox(width: NeuroSpacing.md),
+                      const Color(0xFF2196F3)),
+                  const SizedBox(width: 12),
                   _buildStatCard(
-                      Icons.hotel, 'الأسرة', '$beds', NeuroColors.info),
-                  const SizedBox(width: NeuroSpacing.md),
+                      Icons.hotel, 'الأسرة', '$beds', const Color(0xFF2196F3)),
+                  const SizedBox(width: 12),
                   _buildStatCard(Icons.meeting_room, 'مشغول', '$occupied',
-                      NeuroColors.medium),
+                      const Color(0xFFFFCC00)),
                 ],
               ),
-              const SizedBox(height: NeuroSpacing.lg),
+              const SizedBox(height: 16),
               if (hospitals.isEmpty)
-                const AppEmptyState(
-                  icon: Icons.local_hospital_outlined,
-                  title: 'لا توجد مستشفيات',
-                  message: 'ستظهر المستشفيات هنا',
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.local_hospital_outlined, color: Colors.white.withValues(alpha: 0.3), size: 64),
+                      const SizedBox(height: 16),
+                      Text('لا توجد مستشفيات', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 16)),
+                      const SizedBox(height: 8),
+                      Text('ستظهر المستشفيات هنا', style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 14)),
+                    ],
+                  ),
                 )
               else
                 ...hospitals.map((h) => _buildHospitalCard(h)),
@@ -515,49 +551,52 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     final occupancy = (h['bed_occupancy'] as num?)?.toDouble() ?? 0;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: NeuroSpacing.md),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.local_hospital, color: NeuroColors.primary, size: 32),
-              const SizedBox(width: NeuroSpacing.md),
+              Icon(Icons.local_hospital, color: const Color(0xFF2196F3), size: 32),
+              const SizedBox(width: 12),
               Expanded(
-                child: Text(name, style: NeuroTypography.h3),
+                child: Text(name, style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                )),
               ),
               if (alerts is int && alerts > 0)
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: NeuroSpacing.sm,
-                    vertical: NeuroSpacing.xs,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: NeuroColors.critical.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(NeuroRadius.badge),
+                    color: const Color(0xFFFF3B30).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '$alerts تنبيه',
-                    style: NeuroTypography.badge
-                        ?.copyWith(color: NeuroColors.critical),
+                    style: const TextStyle(color: Color(0xFFFF3B30), fontSize: 12),
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: NeuroSpacing.md),
+          const SizedBox(height: 12),
           Row(
             children: [
               _buildMiniMetric(Icons.person, 'المرضى', '$patients'),
-              const SizedBox(width: NeuroSpacing.lg),
+              const SizedBox(width: 16),
               _buildMiniMetric(Icons.devices_other, 'الأجهزة', '$devices'),
-              const SizedBox(width: NeuroSpacing.lg),
+              const SizedBox(width: 16),
               _buildMiniMetric(Icons.meeting_room, 'الإشغال',
                   '${(occupancy * 100).toStringAsFixed(0)}%'),
             ],
@@ -570,11 +609,18 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
   Widget _buildMiniMetric(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: NeuroColors.textSecondary),
+        Icon(icon, size: 14, color: const Color(0xFF8E8E93)),
         const SizedBox(width: 4),
-        Text(value, style: NeuroTypography.h3?.copyWith(fontSize: 14)),
+        Text(value, style: const TextStyle(
+          color: Colors.white,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        )),
         const SizedBox(width: 4),
-        Text(label, style: NeuroTypography.caption?.copyWith(fontSize: 10)),
+        Text(label, style: const TextStyle(
+          color: Color(0xFF8E8E93),
+          fontSize: 10,
+        )),
       ],
     );
   }
@@ -584,9 +630,9 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     final alertsAsync = ref.watch(adminAlertsProvider);
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      padding: const EdgeInsets.all(16),
       child: alertsAsync.when(
-        loading: () => const Center(child: AppLoading()),
+        loading: () => const Center(child: const CircularProgressIndicator(color: Color(0xFF2196F3))),
         error: (err, _) => _buildErrorCard(err),
         data: (data) {
           final severity = data['by_severity'] as List? ?? [];
@@ -595,37 +641,44 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
               Row(
                 children: [
                   _buildStatCard(Icons.notifications, 'إجمالي',
-                      '${data['total'] ?? '-'}', NeuroColors.primary),
-                  const SizedBox(width: NeuroSpacing.md),
+                      '${data['total'] ?? '-'}', const Color(0xFF2196F3)),
+                  const SizedBox(width: 12),
                   _buildStatCard(Icons.error, 'حرج',
-                      '${data['critical'] ?? '-'}', NeuroColors.critical),
-                  const SizedBox(width: NeuroSpacing.md),
+                      '${data['critical'] ?? '-'}', const Color(0xFFFF3B30)),
+                  const SizedBox(width: 12),
                   _buildStatCard(Icons.pending, 'غير معالجة',
-                      '${data['unacknowledged'] ?? '-'}', NeuroColors.high),
+                      '${data['unacknowledged'] ?? '-'}', const Color(0xFFFF9500)),
                 ],
               ),
-              const SizedBox(height: NeuroSpacing.lg),
+              const SizedBox(height: 16),
               Text(
                 'التنبيهات حسب الخطورة',
-                style: NeuroTypography.h2,
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.start,
               ),
-              const SizedBox(height: NeuroSpacing.md),
+              const SizedBox(height: 12),
               if (severity.isEmpty)
-                const AppEmptyState(
-                  icon: Icons.notifications_none,
-                  title: 'لا توجد بيانات تنبيهات',
-                  message: 'ستظهر إحصائيات التنبيهات هنا',
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.notifications_none, color: Colors.white.withValues(alpha: 0.3), size: 64),
+                      const SizedBox(height: 16),
+                      Text('لا توجد بيانات تنبيهات', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 16)),
+                      const SizedBox(height: 8),
+                      Text('ستظهر إحصائيات التنبيهات هنا', style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 14)),
+                    ],
+                  ),
                 )
               else
                 ...severity.map((s) {
                   final label = s['severity'] as String? ?? 'غير معروف';
                   final count = s['count'] ?? 0;
                   final color = switch (label.toLowerCase()) {
-                    'critical' => NeuroColors.critical,
-                    'high' => NeuroColors.high,
-                    'medium' => NeuroColors.medium,
-                    _ => NeuroColors.low,
+                    'critical' => const Color(0xFFFF3B30),
+                    'high' => const Color(0xFFFF9500),
+                    'medium' => const Color(0xFFFFCC00),
+                    _ => const Color(0xFF34C759),
                   };
                   return _buildMetricRow(
                     icon: Icons.warning_amber_rounded,
@@ -658,22 +711,31 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     required Color color,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: NeuroSpacing.md),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
           Icon(icon, color: color, size: 28),
-          const SizedBox(width: NeuroSpacing.lg),
-          Expanded(child: Text(label, style: NeuroTypography.h3)),
-          Text(value,
-              style: NeuroTypography.display
-                  ?.copyWith(fontSize: 24, color: color)),
+          const SizedBox(width: 16),
+          Expanded(child: Text(label, style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ))),
+          Text(value, style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: color,
+          )),
         ],
       ),
     );
@@ -684,13 +746,13 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     final patientsAsync = ref.watch(adminPatientsProvider);
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           statsAsync.when(
             loading: () => const SizedBox(
               height: 120,
-              child: Center(child: AppLoading()),
+              child: Center(child: const CircularProgressIndicator(color: Color(0xFF2196F3))),
             ),
             error: (err, _) => _buildErrorCard(err),
             data: (stats) => Column(
@@ -698,59 +760,59 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                 Row(
                   children: [
                     _buildStatCard(Icons.people, 'مستخدمون',
-                        '${stats['total_users'] ?? '-'}', NeuroColors.primary),
-                    const SizedBox(width: NeuroSpacing.md),
+                        '${stats['total_users'] ?? '-'}', const Color(0xFF2196F3)),
+                    const SizedBox(width: 12),
                     _buildStatCard(Icons.person, 'مرضى',
-                        '${stats['total_patients'] ?? '-'}', NeuroColors.info),
+                        '${stats['total_patients'] ?? '-'}', const Color(0xFF2196F3)),
                   ],
                 ),
-                const SizedBox(height: NeuroSpacing.md),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     _buildStatCard(Icons.devices_other, 'أجهزة',
-                        '${stats['total_devices'] ?? '-'}', NeuroColors.low),
-                    const SizedBox(width: NeuroSpacing.md),
+                        '${stats['total_devices'] ?? '-'}', const Color(0xFF34C759)),
+                    const SizedBox(width: 12),
                     _buildStatCard(Icons.notifications, 'إنذارات',
-                        '${stats['total_alerts'] ?? '-'}', NeuroColors.medium),
+                        '${stats['total_alerts'] ?? '-'}', const Color(0xFFFFCC00)),
                   ],
                 ),
-                const SizedBox(height: NeuroSpacing.md),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     _buildStatCard(
                         Icons.description,
                         'تقارير',
                         '${stats['reports_generated'] ?? '-'}',
-                        NeuroColors.high),
-                    const SizedBox(width: NeuroSpacing.md),
+                        const Color(0xFFFF9500)),
+                    const SizedBox(width: 12),
                     _buildStatCard(
                         Icons.meeting_room,
                         'إشغال',
                         '${_percent(stats['bed_occupancy_rate'])}%',
-                        NeuroColors.criticalBright),
+                        const Color(0xFFFF3B30)Bright),
                   ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: NeuroSpacing.lg),
+          const SizedBox(height: 16),
           patientsAsync.when(
             loading: () =>
-                const SizedBox(height: 100, child: Center(child: AppLoading())),
+                const SizedBox(height: 100, child: Center(child: const CircularProgressIndicator(color: Color(0xFF2196F3)))),
             error: (err, _) => _buildErrorCard(err),
             data: (p) => Column(
               children: [
                 _buildAnalyticsCard('إجمالي المرضى', '${p['total'] ?? '-'}',
-                    Icons.person, NeuroColors.primary),
+                    Icons.person, const Color(0xFF2196F3)),
                 _buildAnalyticsCard('مرضى نشطون', '${p['active'] ?? '-'}',
-                    Icons.person_outline, NeuroColors.low),
+                    Icons.person_outline, const Color(0xFF34C759)),
                 _buildAnalyticsCard(
                     'مقبولون اليوم',
                     '${p['admitted_today'] ?? '-'}',
                     Icons.arrow_downward,
-                    NeuroColors.info),
+                    const Color(0xFF2196F3)),
                 _buildAnalyticsCard('متوسط العمر', _dec(p['average_age']),
-                    Icons.cake_outlined, NeuroColors.medium),
+                    Icons.cake_outlined, const Color(0xFFFFCC00)),
               ],
             ),
           ),
@@ -772,22 +834,31 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
   Widget _buildAnalyticsCard(
       String title, String value, IconData icon, Color color) {
     return Container(
-      margin: const EdgeInsets.only(bottom: NeuroSpacing.md),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
           Icon(icon, color: color, size: 32),
-          const SizedBox(width: NeuroSpacing.lg),
-          Expanded(child: Text(title, style: NeuroTypography.h3)),
-          Text(value,
-              style: NeuroTypography.display
-                  ?.copyWith(fontSize: 24, color: color)),
+          const SizedBox(width: 16),
+          Expanded(child: Text(title, style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ))),
+          Text(value, style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: color,
+          )),
         ],
       ),
     );
@@ -798,9 +869,9 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     final devicesAsync = ref.watch(adminDevicesProvider);
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      padding: const EdgeInsets.all(16),
       child: devicesAsync.when(
-        loading: () => const Center(child: AppLoading()),
+        loading: () => const Center(child: const CircularProgressIndicator(color: Color(0xFF2196F3))),
         error: (err, _) => _buildErrorCard(err),
         data: (devices) {
           final online = devices.where((d) {
@@ -812,18 +883,25 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
               Row(
                 children: [
                   _buildStatCard(Icons.devices_other, 'إجمالي',
-                      '${devices.length}', NeuroColors.primary),
-                  const SizedBox(width: NeuroSpacing.md),
+                      '${devices.length}', const Color(0xFF2196F3)),
+                  const SizedBox(width: 12),
                   _buildStatCard(
-                      Icons.wifi, 'متصل', '$online', NeuroColors.low),
+                      Icons.wifi, 'متصل', '$online', const Color(0xFF34C759)),
                 ],
               ),
-              const SizedBox(height: NeuroSpacing.lg),
+              const SizedBox(height: 16),
               if (devices.isEmpty)
-                const AppEmptyState(
-                  icon: Icons.sensors_off,
-                  title: 'لا توجد أجهزة',
-                  message: 'ستظهر الأجهزة المسجلة هنا',
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.sensors_off, color: Colors.white.withValues(alpha: 0.3), size: 64),
+                      const SizedBox(height: 16),
+                      Text('لا توجد أجهزة', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 16)),
+                      const SizedBox(height: 8),
+                      Text('ستظهر الأجهزة المسجلة هنا', style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 14)),
+                    ],
+                  ),
                 )
               else
                 ...devices.map((d) {
@@ -855,13 +933,16 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     double? battery,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: NeuroSpacing.md),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
@@ -869,25 +950,31 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: (online ? NeuroColors.low : NeuroColors.critical)
+              color: (online ? const Color(0xFF34C759) : const Color(0xFFFF3B30))
                   .withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(NeuroRadius.md),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               Icons.sensors,
-              color: online ? NeuroColors.low : NeuroColors.critical,
+              color: online ? const Color(0xFF34C759) : const Color(0xFFFF3B30),
               size: 24,
             ),
           ),
-          const SizedBox(width: NeuroSpacing.md),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: NeuroTypography.h3),
+                Text(name, style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                )),
                 if (serial.isNotEmpty)
-                  Text('SN: $serial',
-                      style: NeuroTypography.caption?.copyWith(fontSize: 10)),
+                  Text('SN: $serial', style: const TextStyle(
+                    color: Color(0xFF8E8E93),
+                    fontSize: 10,
+                  )),
               ],
             ),
           ),
@@ -896,18 +983,20 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             children: [
               Text(
                 online ? 'متصل' : 'غير متصل',
-                style: NeuroTypography.badge?.copyWith(
-                  color: online ? NeuroColors.low : NeuroColors.critical,
+                style: TextStyle(
+                  color: online ? const Color(0xFF34C759) : const Color(0xFFFF3B30),
+                  fontSize: 12,
                 ),
               ),
               if (battery != null) ...[
                 const SizedBox(height: 4),
                 Text(
                   '${battery.toStringAsFixed(0)}%',
-                  style: NeuroTypography.caption?.copyWith(
+                  style: TextStyle(
                     color: battery < 20
-                        ? NeuroColors.critical
-                        : NeuroColors.textSecondary,
+                        ? const Color(0xFFFF3B30)
+                        : const Color(0xFF8E8E93),
+                    fontSize: 12,
                   ),
                 ),
               ],
@@ -923,16 +1012,23 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     final activityAsync = ref.watch(adminActivityProvider);
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      padding: const EdgeInsets.all(16),
       child: activityAsync.when(
-        loading: () => const Center(child: AppLoading()),
+        loading: () => const Center(child: const CircularProgressIndicator(color: Color(0xFF2196F3))),
         error: (err, _) => _buildErrorCard(err),
         data: (items) {
           if (items.isEmpty) {
-            return const AppEmptyState(
-              icon: Icons.history,
-              title: 'لا توجد سجلات تدقيق',
-              message: 'ستظهر جميع أنشطة النظام هنا',
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.history, color: Colors.white.withValues(alpha: 0.3), size: 64),
+                  const SizedBox(height: 16),
+                  Text('لا توجد سجلات تدقيق', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 16)),
+                  const SizedBox(height: 8),
+                  Text('ستظهر جميع أنشطة النظام هنا', style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 14)),
+                ],
+              ),
             );
           }
           return Column(
@@ -952,13 +1048,16 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     final time = item['timestamp'] as String? ?? '';
     final color = _eventColor(type);
     return Container(
-      margin: const EdgeInsets.only(bottom: NeuroSpacing.sm),
-      padding: const EdgeInsets.all(NeuroSpacing.md),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.md),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -968,29 +1067,33 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             height: 36,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(NeuroRadius.sm),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(_eventIcon(type), size: 18, color: color),
           ),
-          const SizedBox(width: NeuroSpacing.md),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   desc.isNotEmpty ? desc : type.replaceAll('_', ' '),
-                  style: NeuroTypography.bodyMedium,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                   maxLines: 2,
                 ),
                 if (user.isNotEmpty) ...[
                   const SizedBox(height: 2),
-                  Text(user,
-                      style: NeuroTypography.caption?.copyWith(fontSize: 10)),
+                  Text(user, style: const TextStyle(
+                    color: Color(0xFF8E8E93),
+                    fontSize: 10,
+                  )),
                 ],
                 if (time.isNotEmpty) ...[
                   const SizedBox(height: 2),
-                  Text(_formatTime(time),
-                      style: NeuroTypography.caption?.copyWith(fontSize: 10)),
+                  Text(_formatTime(time), style: const TextStyle(
+                    color: Color(0xFF8E8E93),
+                    fontSize: 10,
+                  )),
                 ],
               ],
             ),
@@ -1013,13 +1116,13 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
 
   Color _eventColor(String type) {
     final t = type.toLowerCase();
-    if (t.contains('alert') || t.contains('error')) return NeuroColors.critical;
-    if (t.contains('device')) return NeuroColors.info;
-    if (t.contains('patient')) return NeuroColors.primary;
-    if (t.contains('auth') || t.contains('login')) return NeuroColors.medium;
-    if (t.contains('report')) return NeuroColors.high;
-    if (t.contains('ai')) return NeuroColors.low;
-    return NeuroColors.textSecondary;
+    if (t.contains('alert') || t.contains('error')) return const Color(0xFFFF3B30);
+    if (t.contains('device')) return const Color(0xFF2196F3);
+    if (t.contains('patient')) return const Color(0xFF2196F3);
+    if (t.contains('auth') || t.contains('login')) return const Color(0xFFFFCC00);
+    if (t.contains('report')) return const Color(0xFFFF9500);
+    if (t.contains('ai')) return const Color(0xFF34C759);
+    return const Color(0xFF8E8E93);
   }
 
   String _formatTime(String iso) {
@@ -1038,59 +1141,59 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     final activityAsync = ref.watch(adminActivityProvider);
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           aiAsync.when(
             loading: () =>
-                const SizedBox(height: 120, child: Center(child: AppLoading())),
+                const SizedBox(height: 120, child: Center(child: const CircularProgressIndicator(color: Color(0xFF2196F3)))),
             error: (err, _) => _buildErrorCard(err),
             data: (health) => Column(
               children: [
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(NeuroSpacing.lg),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        NeuroColors.cardGradTop,
-                        NeuroColors.cardGradBottom
+                        const Color(0xFF1A1F35),
+                        const Color(0xFF0D1220)
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(NeuroRadius.card),
-                    boxShadow: const [NeuroShadows.card],
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: const BoxShadow(color: Color(0x22000000), blurRadius: 8, offset: Offset(0, 2)),
                   ),
                   child: Column(
                     children: [
                       const Icon(Icons.psychology,
-                          size: 56, color: NeuroColors.primaryLight),
-                      const SizedBox(height: NeuroSpacing.md),
+                          size: 56, color: const Color(0xFF2196F3)Light),
+                      const SizedBox(height: 12),
                       Text(
                         health['status'] == 'ok'
                             ? 'الخدمة تعمل'
                             : 'خدمة غير متاحة',
-                        style: NeuroTypography.h2?.copyWith(
+                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)?.copyWith(
                           color: health['status'] == 'ok'
-                              ? NeuroColors.low
-                              : NeuroColors.critical,
+                              ? const Color(0xFF34C759)
+                              : const Color(0xFFFF3B30),
                         ),
                       ),
-                      const SizedBox(height: NeuroSpacing.sm),
+                      const SizedBox(height: 8),
                       Text(
                         'إصدار النموذج: ${health['model_version'] ?? '-'}',
-                        style: NeuroTypography.caption,
+                        style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
                       ),
-                      const SizedBox(height: NeuroSpacing.md),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           _buildAiStatusChip(
                               'النموذج', health['model_trained'] == true),
-                          const SizedBox(width: NeuroSpacing.sm),
+                          const SizedBox(width: 8),
                           _buildAiStatusChip(
                               'القواعد', health['rules_loaded'] == true),
-                          const SizedBox(width: NeuroSpacing.sm),
+                          const SizedBox(width: 8),
                           _buildAiStatusChip(
                               'RAG', health['rag_loaded'] == true),
                         ],
@@ -1098,15 +1201,15 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: NeuroSpacing.lg),
-                Text('نشاط محرك الذكاء الاصطناعي', style: NeuroTypography.h2),
-                const SizedBox(height: NeuroSpacing.md),
+                const SizedBox(height: 16),
+                Text('نشاط محرك الذكاء الاصطناعي', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
               ],
             ),
           ),
           activityAsync.when(
             loading: () =>
-                const SizedBox(height: 80, child: Center(child: AppLoading())),
+                const SizedBox(height: 80, child: Center(child: const CircularProgressIndicator(color: Color(0xFF2196F3)))),
             error: (err, _) => _buildErrorCard(err),
             data: (items) {
               final aiItems = items.where((i) {
@@ -1119,10 +1222,17 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                   ? items.take(10).toList()
                   : aiItems.take(10).toList();
               if (display.isEmpty) {
-                return const AppEmptyState(
-                  icon: Icons.psychology_outlined,
-                  title: 'لا توجد سجلات AI',
-                  message: 'ستظهر أنشطة محرك الذكاء الاصطناعي هنا',
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.psychology_outlined, color: Colors.white.withValues(alpha: 0.3), size: 64),
+                      const SizedBox(height: 16),
+                      Text('لا توجد سجلات AI', style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 16)),
+                      const SizedBox(height: 8),
+                      Text('ستظهر أنشطة محرك الذكاء الاصطناعي هنا', style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 14)),
+                    ],
+                  ),
                 );
               }
               return Column(
@@ -1138,13 +1248,13 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
   Widget _buildAiStatusChip(String label, bool ok) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: NeuroSpacing.sm),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: (ok ? NeuroColors.low : NeuroColors.critical)
+          color: (ok ? const Color(0xFF34C759) : const Color(0xFFFF3B30))
               .withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(NeuroRadius.md),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: (ok ? NeuroColors.low : NeuroColors.critical)
+            color: (ok ? const Color(0xFF34C759) : const Color(0xFFFF3B30))
                 .withValues(alpha: 0.3),
           ),
         ),
@@ -1153,12 +1263,15 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
             Icon(
               ok ? Icons.check_circle : Icons.cancel,
               size: 18,
-              color: ok ? NeuroColors.low : NeuroColors.critical,
+              color: ok ? const Color(0xFF34C759) : const Color(0xFFFF3B30),
             ),
             const SizedBox(height: 4),
             Text(
               label,
-              style: NeuroTypography.caption?.copyWith(fontSize: 10),
+              style: const TextStyle(
+                color: Color(0xFF8E8E93),
+                fontSize: 10,
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -1172,9 +1285,9 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     final healthAsync = ref.watch(adminSystemHealthProvider);
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      padding: const EdgeInsets.all(16),
       child: healthAsync.when(
-        loading: () => const Center(child: AppLoading()),
+        loading: () => const Center(child: const CircularProgressIndicator(color: Color(0xFF2196F3))),
         error: (err, _) => _buildErrorCard(err),
         data: (data) {
           final services = data['service_status'] as List? ?? [];
@@ -1187,35 +1300,35 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                       Icons.speed,
                       'متوسط الاستجابة',
                       '${data['avg_response_time_ms'] ?? '-'}ms',
-                      NeuroColors.info),
-                  const SizedBox(width: NeuroSpacing.md),
+                      const Color(0xFF2196F3)),
+                  const SizedBox(width: 12),
                   _buildStatCard(
                       Icons.error_outline,
                       'معدل الخطأ',
                       '${_percent(data['error_rate_24h'])}%',
-                      NeuroColors.critical),
+                      const Color(0xFFFF3B30)),
                 ],
               ),
-              const SizedBox(height: NeuroSpacing.md),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   _buildStatCard(
                       Icons.timer,
                       'وقت التشغيل',
                       '${(data['uptime_hours'] as num?)?.toStringAsFixed(0) ?? '-'}h',
-                      NeuroColors.low),
-                  const SizedBox(width: NeuroSpacing.md),
+                      const Color(0xFF34C759)),
+                  const SizedBox(width: 12),
                   _buildStatCard(
                       Icons.cloud_done,
                       'الطلبات (24h)',
                       '${data['total_requests_24h'] ?? '-'}',
-                      NeuroColors.medium),
+                      const Color(0xFFFFCC00)),
                 ],
               ),
-              const SizedBox(height: NeuroSpacing.lg),
+              const SizedBox(height: 16),
               if (services.isNotEmpty) ...[
-                Text('حالة الخدمات', style: NeuroTypography.h2),
-                const SizedBox(height: NeuroSpacing.md),
+                Text('حالة الخدمات', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
                 ...services.map((s) {
                   final name = s['service'] ?? s['name'] ?? 'خدمة';
                   final status =
@@ -1223,25 +1336,25 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                   final ok =
                       status == 'ok' || status == 'healthy' || status == 'up';
                   return _buildSystemRow('$name', ok ? 'يعمل' : status,
-                      ok ? NeuroColors.low : NeuroColors.critical);
+                      ok ? const Color(0xFF34C759) : const Color(0xFFFF3B30));
                 }),
-                const SizedBox(height: NeuroSpacing.lg),
+                const SizedBox(height: 16),
               ],
               if (errors.isNotEmpty) ...[
-                Text('أحدث الأخطاء', style: NeuroTypography.h2),
-                const SizedBox(height: NeuroSpacing.md),
+                Text('أحدث الأخطاء', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
                 ...errors.take(5).map((e) {
                   final msg = e['message'] ?? e['error'] ?? '$e';
                   return Container(
-                    margin: const EdgeInsets.only(bottom: NeuroSpacing.sm),
-                    padding: const EdgeInsets.all(NeuroSpacing.md),
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: NeuroColors.critical.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(NeuroRadius.md),
+                      color: const Color(0xFFFF3B30).withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                          color: NeuroColors.critical.withValues(alpha: 0.2)),
+                          color: const Color(0xFFFF3B30).withValues(alpha: 0.2)),
                     ),
-                    child: Text('$msg', style: NeuroTypography.caption),
+                    child: Text('$msg', style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12)),
                   );
                 }),
               ],
@@ -1254,13 +1367,16 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
 
   Widget _buildSystemRow(String title, String value, Color color) {
     return Container(
-      margin: const EdgeInsets.only(bottom: NeuroSpacing.md),
-      padding: const EdgeInsets.all(NeuroSpacing.lg),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: NeuroColors.bgCard,
-        borderRadius: BorderRadius.circular(NeuroRadius.card),
-        border:
-            Border.all(color: NeuroColors.textPrimary.withValues(alpha: 0.06)),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A1F35), Color(0xFF0D1220)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: Row(
         children: [
@@ -1272,10 +1388,13 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
               color: color,
             ),
           ),
-          const SizedBox(width: NeuroSpacing.md),
-          Expanded(child: Text(title, style: NeuroTypography.h3)),
-          Text(value,
-              style: NeuroTypography.bodyMedium?.copyWith(color: color)),
+          const SizedBox(width: 12),
+          Expanded(child: Text(title, style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ))),
+          Text(value, style: TextStyle(color: color, fontSize: 14)),
         ],
       ),
     );
@@ -1287,29 +1406,31 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: NeuroColors.bgCard,
-        title: Text('إضافة مسؤول جديد', style: NeuroTypography.h3),
+        backgroundColor: const Color(0xFF1A1F35),
+        title: const Text('إضافة مسؤول جديد', style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'الاسم',
-                labelStyle: NeuroTypography.bodyMedium,
+                labelStyle: const TextStyle(color: Color(0xFF8E8E93)),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(NeuroRadius.md),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
-            const SizedBox(height: NeuroSpacing.md),
+            const SizedBox(height: 12),
             TextField(
               controller: emailController,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 labelText: 'البريد الإلكتروني',
-                labelStyle: NeuroTypography.bodyMedium,
+                labelStyle: const TextStyle(color: Color(0xFF8E8E93)),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(NeuroRadius.md),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
               keyboardType: TextInputType.emailAddress,
@@ -1319,8 +1440,7 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('إلغاء',
-                style: TextStyle(color: NeuroColors.navInactive)),
+            child: const Text('إلغاء', style: TextStyle(color: Color(0xFF8E8E93))),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -1338,7 +1458,7 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('تمت إضافة المسؤول بنجاح'),
-                      backgroundColor: NeuroColors.low,
+                      backgroundColor: Color(0xFF34C759),
                     ),
                   );
                 }
@@ -1347,15 +1467,14 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('فشل: $e'),
-                      backgroundColor: NeuroColors.critical,
+                      backgroundColor: const Color(0xFFFF3B30),
                     ),
                   );
                 }
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: NeuroColors.primary,
-              foregroundColor: NeuroColors.textSecondary,
+              backgroundColor: const Color(0xFF2196F3),
             ),
             child: const Text('إضافة'),
           ),
