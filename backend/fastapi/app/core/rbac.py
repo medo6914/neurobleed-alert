@@ -81,7 +81,9 @@ def _get_role_permissions() -> dict[str, set[Permission]]:
             Permission.DEVICE_UPDATE,
             Permission.MONITORING_VIEW,
         },
-        "patient": set(),
+        "patient": {
+            Permission.PATIENT_VIEW,
+        },
         "emergency": {
             Permission.PATIENT_VIEW,
             Permission.MONITORING_VIEW,
