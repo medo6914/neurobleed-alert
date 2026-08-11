@@ -352,5 +352,11 @@
   "this_year": "This Year",
   "device": "Device",
   "all": "All",
-  "events": "Events"
+  "events": "Events",
+  "edit_profile": "Edit Profile",
+  "profile_image": "Profile Image",
+  "personal_info": "Personal Information",
+  "blood_type": "Blood Type",
+  "help_support": "Help & Support",
+  "full_name": "Full Name"
 }

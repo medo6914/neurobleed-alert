@@ -352,5 +352,11 @@
   "this_year": "هذا العام",
   "device": "الجهاز",
   "all": "الكل",
-  "events": "أحداث"
+  "events": "أحداث",
+  "edit_profile": "تعديل الملف الشخصي",
+  "profile_image": "صورة الملف الشخصي",
+  "personal_info": "معلومات شخصية",
+  "blood_type": "فصيلة الدم",
+  "help_support": "الدعم والمساعدة",
+  "full_name": "الاسم الكامل"
 }

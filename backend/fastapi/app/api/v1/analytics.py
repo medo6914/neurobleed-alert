@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.core.dependencies import get_current_user, require_permission
+from app.core.dependencies import get_current_user, require_permission, require_any_permission
 from app.core.rbac import Permission
 from app.models.user import User
 from app.schemas.analytics import (
@@ -32,7 +32,7 @@ async def get_analytics_service(db: AsyncSession = Depends(get_db)) -> Analytics
 async def get_analytics_overview(
     hospital_id: UUID | None = None,
     service: AnalyticsService = Depends(get_analytics_service),
-    current_user: User = Depends(require_permission(Permission.ADMIN_ACCESS)),
+    current_user: User = Depends(require_permission(Permission.ADMIN_ACCESS, Permission.PATIENT_VIEW)),
 ):
     return await service.get_overview(hospital_id=hospital_id)
 
@@ -67,7 +67,7 @@ async def get_alert_analytics(
 @router.get("/hospitals", response_model=HospitalOverview)
 async def get_hospital_overview(
     service: AnalyticsService = Depends(get_analytics_service),
-    current_user: User = Depends(require_permission(Permission.ADMIN_ACCESS)),
+    current_user: User = Depends(require_permission(Permission.ADMIN_ACCESS, Permission.PATIENT_VIEW)),
 ):
     return await service.get_hospital_overview()
 
@@ -84,6 +84,6 @@ async def get_system_health(
 async def get_activity_feed(
     limit: int = Query(50, le=200),
     service: AnalyticsService = Depends(get_analytics_service),
-    current_user: User = Depends(require_permission(Permission.ADMIN_ACCESS)),
+    current_user: User = Depends(require_permission(Permission.ADMIN_ACCESS, Permission.PATIENT_VIEW)),
 ):
     return await service.get_activity_feed(limit=limit)
