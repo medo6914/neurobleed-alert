@@ -789,7 +789,7 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                         Icons.meeting_room,
                         'إشغال',
                         '${_percent(stats['bed_occupancy_rate'])}%',
-                        const Color(0xFFFF3B30)Bright),
+                        const Color(0xFFFF3B30)),
                   ],
                 ),
               ],
@@ -1163,18 +1163,18 @@ class _AdminPanelScreenState extends ConsumerState<AdminPanelScreen> {
                       ],
                     ),
                     borderRadius: BorderRadius.circular(16),
-                    boxShadow: const BoxShadow(color: Color(0x22000000), blurRadius: 8, offset: Offset(0, 2)),
+                    boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 8, offset: Offset(0, 2))],
                   ),
                   child: Column(
                     children: [
                       const Icon(Icons.psychology,
-                          size: 56, color: const Color(0xFF2196F3)Light),
+                          size: 56, color: Color(0xFF42A5F5)),
                       const SizedBox(height: 12),
                       Text(
                         health['status'] == 'ok'
                             ? 'الخدمة تعمل'
                             : 'خدمة غير متاحة',
-                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)?.copyWith(
+                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold).copyWith(
                           color: health['status'] == 'ok'
                               ? const Color(0xFF34C759)
                               : const Color(0xFFFF3B30),
