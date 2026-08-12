@@ -469,12 +469,12 @@ class AppRouter {
             name: 'settings',
             builder: (context, state) => const SettingsScreen(),
           ),
-          GoRoute(
-            path: '/admin',
-            name: 'admin',
-            builder: (context, state) => const AdminPanelScreen(),
-          ),
         ],
+      ),
+      GoRoute(
+        path: '/admin',
+        name: 'admin',
+        builder: (context, state) => const AdminPanelScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

@@ -28,6 +28,10 @@ class AuthGuard extends ChangeNotifier {
     '/otp',
   ];
 
+  bool _isAdminRoute(String location) {
+    return location == '/admin' || location.startsWith('/admin/');
+  }
+
   String? guard(BuildContext context, GoRouterState state) {
     if (!_isInitialized) return '/splash';
 
@@ -42,8 +46,8 @@ class AuthGuard extends ChangeNotifier {
       return getHome(role: _role);
     }
 
-    if (_isAuthenticated && location == '/admin' && !_isSuperAdmin) {
-      return '/dashboard';
+    if (_isAdminRoute(location) && (!_isAuthenticated || !_isSuperAdmin)) {
+      return _isAuthenticated ? getHome(role: _role) : '/login';
     }
 
     if (!_isAuthenticated && !isPublicRoute) {
@@ -58,7 +62,7 @@ class AuthGuard extends ChangeNotifier {
   }
 
   String? getHome({String? role}) {
-    if (role == 'super_admin' || role == 'admin') return '/admin';
+    if (role == 'super_admin') return '/admin';
     return '/dashboard';
   }
 

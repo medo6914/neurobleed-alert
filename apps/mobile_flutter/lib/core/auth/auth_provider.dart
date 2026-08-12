@@ -156,7 +156,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String email,
     required String password,
     required String fullName,
-    String role = 'user',
   }) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
@@ -165,7 +164,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         'email': email,
         'password': password,
         'full_name': fullName,
-        'role': role,
       });
       final data = response.data;
       await _storage.saveToken(data['access_token']);

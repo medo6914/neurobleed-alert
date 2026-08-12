@@ -20,8 +20,7 @@ class _ShellScreenState extends ConsumerState<ShellScreen> {
       return 3;
     }
     if (location.startsWith('/profile') ||
-        location.startsWith('/settings') ||
-        location.startsWith('/admin')) {
+        location.startsWith('/settings')) {
       return 4;
     }
     return 0;

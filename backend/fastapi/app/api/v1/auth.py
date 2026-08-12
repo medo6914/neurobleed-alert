@@ -98,6 +98,9 @@ def _resolve_role(email: str, requested: str | None) -> UserRole:
 
     Super Admin is assigned automatically by the backend only when the
     email belongs to a configured Super Admin account.
+
+    Public registration is restricted to user-facing roles only
+    (user, doctor). All other roles are silently downgraded to user.
     """
     if email.strip().lower() in _super_admin_emails():
         return UserRole.SUPER_ADMIN
@@ -105,9 +108,9 @@ def _resolve_role(email: str, requested: str | None) -> UserRole:
         role = UserRole(requested) if requested else None
     except ValueError:
         role = None
-    if role in (UserRole.SUPER_ADMIN, UserRole.ADMIN):
-        return UserRole.USER
-    return role or UserRole.USER
+    if role in (UserRole.USER, UserRole.DOCTOR):
+        return role
+    return UserRole.USER
 
 
 def _hash_token(token: str) -> str:
