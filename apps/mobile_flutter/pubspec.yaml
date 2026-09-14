@@ -48,7 +48,7 @@ dependencies:
   web_socket_channel: ^3.0.0
   flutter_blue_plus: ^1.32.0
   web: ^1.0.0
-  local_auth: ^2.1.8
+  local_auth: ^3.0.2
   connectivity_plus: ^6.0.0
   cached_network_image: ^3.3.1
   shimmer: ^3.0.0
